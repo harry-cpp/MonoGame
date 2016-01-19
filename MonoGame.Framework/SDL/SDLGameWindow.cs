@@ -12,14 +12,14 @@ namespace Microsoft.Xna.Framework
         {
             get
             {
-                return !this.IsBorderless && _reziable;
+                return !this.IsBorderless && _resizable;
             }
             set
             {
                 if (!_handle.Equals(IntPtr.Zero))
                     throw new Exception("SDL does not support changing resizable parameter of the window after it's already been created.");
                 
-                _reziable = value;
+                _resizable = value;
             }
         }
 
@@ -104,7 +104,7 @@ namespace Microsoft.Xna.Framework
         internal bool _isFullScreen;
 
         private IntPtr _handle;
-        private bool _disposed, _reziable, _borderless, _willBeFullScreen, _mouseVisible;
+        private bool _disposed, _resizable, _borderless, _willBeFullScreen, _mouseVisible;
         private string _screenDeviceName;
 
         public SDLGameWindow()
