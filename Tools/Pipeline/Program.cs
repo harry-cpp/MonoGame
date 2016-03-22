@@ -4,12 +4,7 @@
 
 using System;
 using System.Diagnostics;
-#if WINDOWS
-using System.Windows.Forms;
-#endif
-#if MONOMAC
-using Gtk;
-#endif
+using Xwt;
 
 namespace MonoGame.Tools.Pipeline
 {
@@ -22,43 +17,24 @@ namespace MonoGame.Tools.Pipeline
         static void Main(string [] args)
         {
 #if WINDOWS
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
+            Application.Initialize(ToolkitType.Wpf);
+#else
+            Application.Initialize(ToolkitType.Gtk3);
+#endif
 
-            PipelineSettings.Default.Load();
+            PipelineSettings.Default.Load ();
 
-			var view = new MainView();
+            var window = new MainWindow();
+            new PipelineController(window);
+            window.Show();
+
             if (args != null && args.Length > 0)
             {
-                var projectFilePath = string.Join(" ", args);
-                view.OpenProjectPath = projectFilePath;
+                // var projectFilePath = string.Join(" ", args);
+                window.Open (args);
             }
 
-            var controller = new PipelineController(view);
-            Application.Run(view);
-#endif
-#if LINUX || MONOMAC
-
-			Gtk.Application.Init ();
-            Global.Initalize ();
-			MainWindow win = new MainWindow ();
-			win.Show (); 
-			new PipelineController(win);
-			#if LINUX
-			if (args != null && args.Length > 0)
-			{
-				var projectFilePath = string.Join(" ", args);
-				win.OpenProjectPath = projectFilePath;
-			}
-			#elif MONOMAC
-			var project = Environment.GetEnvironmentVariable("MONOGAME_PIPELINE_PROJECT");
-			if (!string.IsNullOrEmpty (project)) {
-				win.OpenProjectPath = project;
-			}
-			#endif
-			win.OnShowEvent ();
-			Gtk.Application.Run ();
-#endif
+            Application.Run();
         }
     }
 }
