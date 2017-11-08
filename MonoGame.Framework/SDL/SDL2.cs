@@ -9,7 +9,7 @@ using System.Diagnostics;
 
 internal static class Sdl
 {
-    public const string NativeLibName = "SDL2.dll";
+    public const string NativeLibName = "libSDL2-2";
 
     public static int Major;
     public static int Minor;

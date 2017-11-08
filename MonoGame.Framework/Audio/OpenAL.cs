@@ -194,7 +194,7 @@ namespace MonoGame.OpenAL
 #elif IOS
         const string NativeLibName = "/System/Library/Frameworks/OpenAL.framework/OpenAL";
 #else
-        internal const string NativeLibName = "soft_oal.dll";
+        internal const string NativeLibName = "libopenal";
 #endif
 
         [CLSCompliant(false)]
@@ -457,7 +457,7 @@ namespace MonoGame.OpenAL
 #elif IOS
         const string NativeLibName = "/System/Library/Frameworks/OpenAL.framework/OpenAL";
 #else
-        internal const string NativeLibName = "soft_oal.dll";
+        internal const string NativeLibName = "libopenal";
 #endif
 
         [CLSCompliant(false)]

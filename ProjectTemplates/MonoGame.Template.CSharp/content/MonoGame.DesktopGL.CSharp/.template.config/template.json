@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "cra0zy",
+  "classifications": [
+    "MonoGame",
+    "GUI App",
+    "Game"
+  ],
+  "name": "MonoGame DesktopGL Game",
+  "identity": "MonoGame.DesktopGL.CSharp",
+  "groupIdentity": "MonoGame.DesktopGL",
+  "shortName": "mgdesktopgl",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "sourceName": "MGNamespace",
+  "preferNameDirectory": true
+}
