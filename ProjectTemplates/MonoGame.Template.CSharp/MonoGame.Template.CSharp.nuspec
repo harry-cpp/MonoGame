@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package>
+  <metadata>
+    <id>MonoGame.Template.CSharp</id>
+    <version>3.7.0.0</version>
+    <title>Gtk templates for CSharp</title>
+    <summary>A set of C# templates for your .Net Core MonoGame game.</summary>
+    <description>A set of C# templates for your .Net Core MonoGame game.</description>
+    <authors>cra0zy</authors>
+    <owners>cra0zy</owners>
+    <projectUrl>https://github.com/cra0zy/MonoGame/tree/core</projectUrl>
+    <iconUrl>https://pbs.twimg.com/profile_images/487954549441691649/O3KsHAsb_400x400.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <releaseNotes></releaseNotes>
+    <tags>monogame game c# template</tags>
+    <packageTypes>
+      <packageType name="Template" />
+    </packageTypes>
+  </metadata>
+</package>
