@@ -10,8 +10,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="MonoGame.Content.Builder" Version="3.6.0.1" />
-    <PackageReference Include="MonoGame.Framework.DesktopGL.Core" Version="3.7.0.1" />
+    <PackageReference Include="MonoGame.Content.Builder" Version="3.7.0.1" />
+    <PackageReference Include="MonoGame.Framework.DesktopGL.Core" Version="3.7.0.2" />
   </ItemGroup>
 
 </Project>
