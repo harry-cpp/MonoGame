@@ -1448,7 +1448,7 @@ namespace MonoGame.OpenGL
                     return null;
                     
 #if NETSTANDARD
-                return Marshal.GetDelegateForFunctionPointer<T>(addr);
+                return Marshal.GetDelegateForFunctionPointer<T>(addr) as System.Delegate;
 #else
                 return (T)(object)Marshal.GetDelegateForFunctionPointer(addr, typeof(T));
 #endif
