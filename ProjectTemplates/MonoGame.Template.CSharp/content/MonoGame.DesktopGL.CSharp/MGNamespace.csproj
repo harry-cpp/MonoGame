@@ -11,7 +11,7 @@
 
   <ItemGroup>
     <PackageReference Include="MonoGame.Content.Builder" Version="3.7.0.1" />
-    <PackageReference Include="MonoGame.Framework.DesktopGL.Core" Version="3.7.0.2" />
+    <PackageReference Include="MonoGame.Framework.DesktopGL.Core" Version="3.7.0.3" />
   </ItemGroup>
 
 </Project>
