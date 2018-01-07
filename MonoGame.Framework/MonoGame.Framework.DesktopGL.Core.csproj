@@ -21,13 +21,13 @@
     <OutputPath>bin\Linux\AnyCPU\Debug</OutputPath>
     <IntermediateOutputPath>obj\Linux\AnyCPU\Debug</IntermediateOutputPath>
     <DocumentationFile>bin\Linux\AnyCPU\Debug\MonoGame.Framework.xml</DocumentationFile>
-    <DefineConstants>DEBUG;OPENGL;OPENAL;XNADESIGNPROVIDED;TRACE;LINUX;DESKTOPGL;SUPPORTS_EFX</DefineConstants>
+    <DefineConstants>DEBUG;OPENGL;OPENAL;XNADESIGNPROVIDED;TRACE;LINUX;DESKTOPGL;SUPPORTS_EFX;NETSTANDARD</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <OutputPath>bin\Linux\AnyCPU\Release</OutputPath>
     <IntermediateOutputPath>obj\Linux\AnyCPU\Release</IntermediateOutputPath>
     <DocumentationFile>bin\Linux\AnyCPU\Release\MonoGame.Framework.xml</DocumentationFile>
-    <DefineConstants>OPENGL;OPENAL;XNADESIGNPROVIDED;TRACE;LINUX;DESKTOPGL;SUPPORTS_EFX</DefineConstants>
+    <DefineConstants>OPENGL;OPENAL;XNADESIGNPROVIDED;TRACE;LINUX;DESKTOPGL;SUPPORTS_EFX;NETSTANDARD</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
