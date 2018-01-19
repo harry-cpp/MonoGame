@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>MonoGame.Template.CSharp</id>
-    <version>3.7.0.4</version>
+    <version>3.7.0.5</version>
     <title>Gtk templates for CSharp</title>
     <summary>A set of C# templates for your .Net Core MonoGame game.</summary>
     <description>A set of C# templates for your .Net Core MonoGame game.</description>
