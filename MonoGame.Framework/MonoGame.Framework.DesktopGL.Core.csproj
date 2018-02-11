@@ -13,7 +13,7 @@
     <RepositoryUrl>https://github.com/cra0zy/MonoGame/tree/core</RepositoryUrl>
     <Description>.NET Standard version of MonoGame DesktopGL platform.</Description>
     <PackageTags>monogame;.net core;core;.net standard;standard;desktopgl</PackageTags>
-    <Version>3.7.0.3</Version>
+    <Version>3.7.0.6</Version>
     <Authors>cra0zy</Authors>
     <PackageId>MonoGame.Framework.DesktopGL.Core</PackageId>
   </PropertyGroup>
