@@ -708,6 +708,7 @@
       <Link>Utilities\NVorbis\Ogg\OggPageFlags.cs</Link>
       <Services>NVorbis</Services>
     </Compile>
+    <Compile Include="Properties\AssemblyInfo.Core.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
