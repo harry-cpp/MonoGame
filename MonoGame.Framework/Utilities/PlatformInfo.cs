@@ -40,6 +40,8 @@ namespace MonoGame.Framework.Utilities
                 return MonoGamePlatform.PSVita;
 #elif STADIA
                 return MonoGamePlatform.Stadia;
+#elif GTK
+                return MonoGamePlatform.Gtk;
 #endif
             }
         }

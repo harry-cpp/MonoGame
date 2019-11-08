@@ -90,7 +90,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif ANDROID
                 View view = ((AndroidGameWindow)Game.Instance.Window).GameView;
                 return new DisplayMode(view.Width, view.Height, SurfaceFormat.Color);
-#elif DESKTOPGL
+#elif DESKTOPGL && !GTK
                 var displayIndex = Sdl.Display.GetWindowDisplayIndex(SdlGameWindow.Instance.Handle);
 
                 Sdl.Display.Mode mode;
@@ -304,7 +304,7 @@ namespace Microsoft.Xna.Framework.Graphics
             get
             {
                 bool displayChanged = false;
-#if DESKTOPGL
+#if DESKTOPGL && !GTK
                 var displayIndex = Sdl.Display.GetWindowDisplayIndex (SdlGameWindow.Instance.Handle);
                 displayChanged = displayIndex != _displayIndex;
 #endif
@@ -312,7 +312,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 {
                     var modes = new List<DisplayMode>(new[] { CurrentDisplayMode, });
 
-#if DESKTOPGL
+#if DESKTOPGL && !GTK
                     _displayIndex = displayIndex;
                     modes.Clear();
                     
