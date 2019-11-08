@@ -104,6 +104,14 @@ Task("TestDesktopGL")
     });
 });
 
+Task("BuildGtk")
+    .IsDependentOn("Prep")
+    .Does(() =>
+{
+    DotNetCoreRestore("MonoGame.Framework/MonoGame.Framework.Gtk.csproj");
+    PackProject("MonoGame.Framework/MonoGame.Framework.Gtk.csproj");
+});
+
 Task("BuildWindowsDX")
     .IsDependentOn("Prep")
     .WithCriteria(() => IsRunningOnWindows())
@@ -231,6 +239,7 @@ Task("PackVSMacTemplates")
 
 Task("BuildAll")
     .IsDependentOn("BuildDesktopGL")
+    .IsDependentOn("BuildGtk")
     .IsDependentOn("BuildWindowsDX")
     .IsDependentOn("BuildAndroid")
     .IsDependentOn("BuildiOS")
