@@ -49,9 +49,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _valid = 0;
         }
 
-#if WEB
-        internal void SetConstantBuffers(GraphicsDevice device, int shaderProgram)
-#elif OPENGL
+#if WEB || OPENGL
         internal void SetConstantBuffers(GraphicsDevice device, ShaderProgram shaderProgram)
 #else
         internal void SetConstantBuffers(GraphicsDevice device)

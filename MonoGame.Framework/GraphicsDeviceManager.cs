@@ -106,14 +106,14 @@ namespace Microsoft.Xna.Framework
             if (_graphicsDevice != null)
                 return;
 
-            try
-            {
+            /*try
+            {*/
                 if (!_initialized)
                     Initialize();
 
                 var gdi = DoPreparingDeviceSettings();
                 CreateDevice(gdi);
-            }
+            /*}
             catch (NoSuitableGraphicsDeviceException)
             {
                 throw;
@@ -121,7 +121,7 @@ namespace Microsoft.Xna.Framework
             catch (Exception ex)
             {
                 throw new NoSuitableGraphicsDeviceException("Failed to create graphics device!", ex);
-            }
+            }*/
         }
 
         private void CreateDevice(GraphicsDeviceInformation gdi)

@@ -17,7 +17,7 @@ using OpenTK.Graphics;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    static class GraphicsExtensions
+    static partial class GraphicsExtensions
     {
 #if OPENGL
         public static int OpenGLNumberOfElements(this VertexElementFormat elementFormat)

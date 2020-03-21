@@ -4,9 +4,6 @@
 
 namespace MonoGame.Web
 {
-    public static class WebGL
-    {
-        public static dynamic gl;
-    }
+
 }
 

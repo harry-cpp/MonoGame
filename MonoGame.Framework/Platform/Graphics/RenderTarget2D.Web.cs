@@ -3,11 +3,32 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using WebGLDotNET;
+using static WebHelper;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class RenderTarget2D
     {
+        WebGLTexture IRenderTarget.GLTexture
+        {
+            get { return glTexture; }
+        }
+
+        uint IRenderTarget.GLTarget
+        {
+            get { return glTarget; }
+        }
+
+        WebGLRenderbuffer IRenderTarget.GLColorBuffer { get; set; }
+        WebGLRenderbuffer IRenderTarget.GLDepthBuffer { get; set; }
+        WebGLRenderbuffer IRenderTarget.GLStencilBuffer { get; set; }
+
+        uint IRenderTarget.GetFramebufferTarget(RenderTargetBinding renderTargetBinding)
+        {
+            return glTarget;
+        }
+
         private void PlatformConstruct(
             GraphicsDevice graphicsDevice, 
             int width, 
@@ -18,17 +39,18 @@ namespace Microsoft.Xna.Framework.Graphics
             RenderTargetUsage usage, 
             bool shared)
         {
-            throw new NotImplementedException();
+            graphicsDevice.PlatformCreateRenderTarget(this, width, height, mipMap, this.Format, preferredDepthFormat, preferredMultiSampleCount, usage);
         }
 
         private void PlatformGraphicsDeviceResetting()
         {
-            throw new NotImplementedException();
+
         }
 
         protected override void Dispose(bool disposing)
         {
-            throw new NotImplementedException();
+            if (!IsDisposed)
+                this.GraphicsDevice.PlatformDeleteRenderTarget(this);
 
             base.Dispose(disposing);
         }

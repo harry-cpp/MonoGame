@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using WebGLDotNET;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -42,7 +43,16 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
 		public bool IsContentLost { get { return false; } }
-		public event EventHandler<EventArgs> ContentLost;
+
+        public WebGLTexture GLTexture => throw new NotImplementedException();
+
+        public uint GLTarget => throw new NotImplementedException();
+
+        public WebGLRenderbuffer GLColorBuffer { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public WebGLRenderbuffer GLDepthBuffer { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public WebGLRenderbuffer GLStencilBuffer { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+        public event EventHandler<EventArgs> ContentLost;
 		
         /// <summary>
         /// Initializes a new instance of the <see cref="RenderTargetCube"/> class.
@@ -90,6 +100,11 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             
             return selectedFormat;
+        }
+
+        public uint GetFramebufferTarget(RenderTargetBinding renderTargetBinding)
+        {
+            throw new NotImplementedException();
         }
     }
 }

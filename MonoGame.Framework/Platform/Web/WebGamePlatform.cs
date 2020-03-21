@@ -3,57 +3,48 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.Collections.Generic;
-using Microsoft.Xna.Framework.Input;
-using XnaKeys = Microsoft.Xna.Framework.Input.Keys;
-
-using JSIL;
-using JSIL.Meta;
-
-using MonoGame.Web;
+using Microsoft.Xna.Framework.Graphics;
+using WebAssembly;
 
 namespace Microsoft.Xna.Framework
 {
-    using MonoGame.Web;
-
-    public interface IHasCallback
-    {
-        void Callback();
-    }
-
-    class WebGamePlatform : GamePlatform, IHasCallback
+    class WebGamePlatform : GamePlatform
     {
         private WebGameWindow _view;
+        private JSObject _window;
+        private bool _exit;
+        private Action<double> _loop;
 
         public WebGamePlatform(Game game)
             : base(game)
         {
-            Window = new WebGameWindow(this);
+            Window = _view = new WebGameWindow(game);
 
-            _view = (WebGameWindow)Window;
-        }
-
-        public virtual void Callback()
-        {
-            this.Game.Tick();
+            _window = (JSObject)Runtime.GetGlobalObject("window");
+            _loop = new Action<double>(AnimationFrame);
         }
         
         public override void Exit()
         {
+            _exit = true;
         }
 
         public override void RunLoop()
         {
-            throw new InvalidOperationException("You can not run a synchronous loop on the web platform.");
+            throw new Exception("How did this happen?");
         }
 
         public override void StartRunLoop()
         {
-            ResetWindowBounds();
-            _view.window.setInterval((Action)(() => {
-                _view.ProcessEvents();
-                Game.Tick();
-            }), 25);
+            _window.Invoke("requestAnimationFrame", _loop);
+        }
+
+        public void AnimationFrame(double timestamp)
+        {
+            Game.Tick();
+
+            if (!_exit)
+                _window.Invoke("requestAnimationFrame", _loop);
         }
 
         public override bool BeforeUpdate(GameTime gameTime)
@@ -68,44 +59,31 @@ namespace Microsoft.Xna.Framework
 
         public override void EnterFullScreen()
         {
-            ResetWindowBounds();
+
         }
 
         public override void ExitFullScreen()
         {
-            ResetWindowBounds();
+
         }
 
-        internal void ResetWindowBounds()
+        internal override void OnPresentationChanged(PresentationParameters pp)
         {
-            var graphicsDeviceManager = (GraphicsDeviceManager)Game.Services.GetService(typeof(IGraphicsDeviceManager));
-
-            if (graphicsDeviceManager.IsFullScreen)
-            {
-                
-            }
-            else
-            {
-                _view.glcanvas.style.width = graphicsDeviceManager.PreferredBackBufferWidth + "px";
-                _view.glcanvas.style.height = graphicsDeviceManager.PreferredBackBufferHeight + "px";
-            }
+            BeginScreenDeviceChange(pp.IsFullScreen);
+            EndScreenDeviceChange(string.Empty, pp.BackBufferWidth, pp.BackBufferHeight);
         }
 
         public override void BeginScreenDeviceChange(bool willBeFullScreen)
         {
+            _view.BeginScreenDeviceChange(willBeFullScreen);
         }
 
         public override void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight)
         {
+            _view.EndScreenDeviceChange(screenDeviceName, clientWidth, clientHeight);
         }
 
-        public override GameRunBehavior DefaultRunBehavior
-        {
-            get
-            {
-                return GameRunBehavior.Asynchronous;
-            }
-        }
+        public override GameRunBehavior DefaultRunBehavior => GameRunBehavior.Asynchronous;
     }
 }
 

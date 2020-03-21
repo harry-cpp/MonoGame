@@ -4,17 +4,24 @@
 
 using System;
 using System.Diagnostics;
+using static WebHelper;
+using WebGLDotNET;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
     public abstract partial class Texture
     {
-        internal int glTexture = -1;
+        internal WebGLTexture glTexture;
+        internal uint glTarget;
+        internal uint glTextureUnit = WebGL2RenderingContextBase.TEXTURE0;
+        internal uint glInternalFormat;
+        internal uint glFormat;
+        internal uint glType;
         internal SamplerState glLastSamplerState;
 
         private void PlatformGraphicsDeviceResetting()
         {
-            glTexture = -1;
+            DeleteGLTexture();
             glLastSamplerState = null;
         }
 
@@ -22,11 +29,18 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (!IsDisposed)
             {
-                glTexture = -1;
+                DeleteGLTexture();
                 glLastSamplerState = null;
             }
 
             base.Dispose(disposing);
+        }
+
+        private void DeleteGLTexture()
+        {
+            if (glTexture != null)
+                GraphicsDevice.DisposeTexture(glTexture);
+            glTexture = null;
         }
     }
 }

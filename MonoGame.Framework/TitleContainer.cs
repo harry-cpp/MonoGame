@@ -4,6 +4,7 @@
 
 using System;
 using System.IO;
+using System.Threading.Tasks;
 using MonoGame.Utilities;
 
 namespace Microsoft.Xna.Framework
@@ -43,6 +44,39 @@ namespace Microsoft.Xna.Framework
             try
             {
                 stream = PlatformOpenStream(safeName);
+                if (stream == null)
+                    throw FileNotFoundException(name, null);
+            }
+            catch (FileNotFoundException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new FileNotFoundException(name, ex);
+            }
+
+            return stream;
+        }
+
+        public static async Task<Stream> OpenStreamAsync(string name)
+        {
+            if (string.IsNullOrEmpty(name))
+                throw new ArgumentNullException("name");
+
+            // We do not accept absolute paths here.
+            if (Path.IsPathRooted(name))
+                throw new ArgumentException("Invalid filename. TitleContainer.OpenStream requires a relative path.", name);
+
+            // Normalize the file path.
+            var safeName = NormalizeRelativePath(name);
+
+            // Call the platform code to open the stream.  Any errors
+            // at this point should result in a file not found.
+            Stream stream;
+            try
+            {
+                stream = await PlatformOpenStreamAsync(safeName);
                 if (stream == null)
                     throw FileNotFoundException(name, null);
             }

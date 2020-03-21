@@ -1,0 +1,26 @@
+﻿<Project Sdk="Mono.WebAssembly.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <MonoWasmLinkMode>Full</MonoWasmLinkMode>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <RestoreSources>../ThirdParty/WebGL</RestoreSources>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.Web.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="WebAssembly.Bindings" Version="0.2.2" />
+    <PackageReference Include="WebAssembly.Net.Http" Version="0.2.2" />
+    <PackageReference Include="WebAssembly.Net.WebSockets" Version="0.2.2" />
+    <PackageReference Include="WebGLDotNET" Version="2.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="index.html" />
+    <None Remove="Scripts\mono_support.js" />
+  </ItemGroup>
+  
+</Project>

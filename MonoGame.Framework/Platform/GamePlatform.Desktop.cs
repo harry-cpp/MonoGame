@@ -20,6 +20,8 @@ namespace Microsoft.Xna.Framework
             return new MonoGame.Framework.WinFormsGamePlatform(game);
 #elif WINDOWS_UAP
             return new UAPGamePlatform(game);
+#elif WEB
+            return new WebGamePlatform(game);
 #endif
         }
    }

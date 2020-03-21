@@ -1,0 +1,99 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    <DefineConstants>WEBGL;XNADESIGNPROVIDED;WEB;SUPPORTS_EFX;NETSTANDARD;STBSHARP_INTERNAL</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Description>MonoGame is an open source implementation of the Microsoft XNA 4.x Framework.</Description>
+    <PackageTags>monogame;.net core;core;.net standard;standard;web</PackageTags>
+    <PackageId>MonoGame.Framework.Web</PackageId>
+    <RestoreSources>../ThirdParty/WebGL</RestoreSources>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="bin\**\*" />
+    <Compile Remove="obj\**\*" />
+    <Compile Remove="Platform\**\*" />
+    <Compile Remove="Properties\**\*" />
+    <Compile Remove="Graphics\GraphicsAdapter.cs" />
+    <Compile Remove="Platform\Media\Song.Default.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Platform\**\*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Media\Video.cs" />
+    <Compile Remove="Media\VideoPlayer.cs" />
+    <Compile Remove="Content\ContentReaders\VideoReader.cs" />
+    <Compile Remove="Input\MessageBox.cs" />
+    <Compile Remove="Input\KeyboardInput.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="Platform\Input\Keyboard.Default.cs" />
+    <Compile Include="Platform\Graphics\GraphicsDevice.Web.cs" />
+    <Compile Include="Platform\Graphics\IRenderTarget.Web.cs" />
+    <Compile Include="Platform\Graphics\GraphicsDevice.Web.FramebufferHelper.cs" />
+    <Compile Include="Platform\Graphics\GraphicsAdapter.Legacy.cs" />
+    <Compile Include="Platform\Web\WebGamePlatform.cs" />
+    <Compile Include="Platform\Web\WebGameWindow.cs" />
+    <Compile Include="Platform\Web\WebHelper.cs" />
+    <Compile Include="Platform\TitleContainer.Web.cs" />
+    <Compile Include="Platform\Media\MediaPlayer.Default.cs" />
+    <Compile Include="Platform\Media\MediaLibrary.Default.cs" />
+    <Compile Include="Platform\Input\GamePad.Web.cs" />
+    <Compile Include="Platform\Input\Joystick.Web.cs" />
+    <Compile Include="Platform\Input\Mouse.Default.cs" />
+    <Compile Include="Platform\Input\MouseCursor.Default.cs" />
+    <Compile Include="Platform\Graphics\GraphicsCapabilities.Web.cs" />
+    <Compile Include="Platform\Graphics\GraphicsExtensions.Web.cs" />
+    <Compile Include="Platform\Graphics\RenderTarget2D.Web.cs" />
+    <Compile Include="Platform\Graphics\RenderTargetCube.Web.cs" />
+    <Compile Include="Platform\Graphics\SamplerStateCollection.Web.cs" />
+    <Compile Include="Platform\Graphics\Texture.Web.cs" />
+    <Compile Include="Platform\Graphics\Texture2D.Web.cs" />
+    <Compile Include="Platform\Graphics\Texture3D.Web.cs" />
+    <Compile Include="Platform\Graphics\TextureCollection.Web.cs" />
+    <Compile Include="Platform\Graphics\TextureCube.Web.cs" />
+    <Compile Include="Platform\Graphics\Shader\ConstantBuffer.Web.cs" />
+    <Compile Include="Platform\Graphics\Shader\Shader.Web.cs" />
+    <Compile Include="Platform\Graphics\Shader\ShaderProgramCache.Web.cs" />
+    <Compile Include="Platform\Graphics\States\BlendState.Web.cs" />
+    <Compile Include="Platform\Graphics\States\DepthStencilState.Web.cs" />
+    <Compile Include="Platform\Graphics\States\RasterizerState.Web.cs" />
+    <Compile Include="Platform\Graphics\States\SamplerState.Web.cs" />
+    <Compile Include="Platform\Graphics\Vertices\IndexBuffer.Web.cs" />
+    <Compile Include="Platform\Graphics\Vertices\VertexBuffer.Web.cs" />
+    <Compile Include="Platform\Graphics\Vertices\VertexDeclaration.Web.cs" />
+    <Compile Include="Platform\Audio\DynamicSoundEffectInstance.Web.cs" />
+    <Compile Include="Platform\Audio\SoundEffect.Web.cs" />
+    <Compile Include="Platform\Audio\SoundEffectInstance.Web.cs" />
+    <Compile Include="Platform\Media\Song.Web.cs" />
+    <Compile Include="Platform\Utilities\ReflectionHelpers.Default.cs" />
+    <Compile Include="Platform\Audio\Microphone.Default.cs" />
+    <Compile Include="Platform\GamePlatform.Desktop.cs" />
+    <Compile Include="Platform\Graphics\RenderTarget3D.Web.cs" />
+    <Compile Include="Platform\Graphics\OcclusionQuery.Null.cs" />
+    <Compile Include="Platform\Graphics\Effect\EffectResource.OpenGL.cs" />
+    <Compile Include="Platform\Graphics\GraphicsDebug.Default.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Platform\Graphics\Effect\Resources\AlphaTestEffect.ogl.mgfxo" />
+    <EmbeddedResource Include="Platform\Graphics\Effect\Resources\BasicEffect.ogl.mgfxo" />
+    <EmbeddedResource Include="Platform\Graphics\Effect\Resources\DualTextureEffect.ogl.mgfxo" />
+    <EmbeddedResource Include="Platform\Graphics\Effect\Resources\EnvironmentMapEffect.ogl.mgfxo" />
+    <EmbeddedResource Include="Platform\Graphics\Effect\Resources\SkinnedEffect.ogl.mgfxo" />
+    <EmbeddedResource Include="Platform\Graphics\Effect\Resources\SpriteEffect.ogl.mgfxo" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="WebAssembly.Bindings" Version="0.2.2" />
+    <PackageReference Include="WebAssembly.Net.Http" Version="0.2.2" />
+    <PackageReference Include="WebAssembly.Net.WebSockets" Version="0.2.2" />
+    <PackageReference Include="WebGLDotNET" Version="2.0.1" />
+  </ItemGroup>
+
+</Project>

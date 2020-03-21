@@ -10,6 +10,7 @@ using System.Reflection;
 using MonoGame.Utilities;
 using Microsoft.Xna.Framework.Graphics;
 using System.Globalization;
+using System.Threading.Tasks;
 
 #if !WINDOWS_UAP
 using Microsoft.Xna.Framework.Audio;
@@ -256,6 +257,44 @@ namespace Microsoft.Xna.Framework.Content
             loadedAssets[key] = result;
             return result;
 		}
+
+		public virtual async Task<T> LoadAsync<T>(string assetName)
+		{
+            if (string.IsNullOrEmpty(assetName))
+            {
+                throw new ArgumentNullException("assetName");
+            }
+            if (disposed)
+            {
+                throw new ObjectDisposedException("ContentManager");
+            }
+
+            T result = default(T);
+            
+            // On some platforms, name and slash direction matter.
+            // We store the asset by a /-seperating key rather than how the
+            // path to the file was passed to us to avoid
+            // loading "content/asset1.xnb" and "content\\ASSET1.xnb" as if they were two 
+            // different files. This matches stock XNA behavior.
+            // The dictionary will ignore case differences
+            var key = assetName.Replace('\\', '/');
+
+            // Check for a previously loaded asset first
+            object asset = null;
+            if (loadedAssets.TryGetValue(key, out asset))
+            {
+                if (asset is T)
+                {
+                    return (T)asset;
+                }
+            }
+
+            // Load the asset.
+            result = await ReadAssetAsync<T>(assetName, null);
+
+            loadedAssets[key] = result;
+            return result;
+		}
 		
 		protected virtual Stream OpenStream(string assetName)
 		{
@@ -299,6 +338,49 @@ namespace Microsoft.Xna.Framework.Content
 			}
 			return stream;
 		}
+		
+		protected virtual async Task<Stream> OpenStreamAsync(string assetName)
+		{
+			Stream stream;
+			try
+            {
+                var assetPath = Path.Combine(RootDirectory, assetName) + ".xnb";
+
+                // This is primarily for editor support. 
+                // Setting the RootDirectory to an absolute path is useful in editor
+                // situations, but TitleContainer can ONLY be passed relative paths.                
+#if DESKTOPGL || WINDOWS
+                if (Path.IsPathRooted(assetPath))                
+                    stream = File.OpenRead(assetPath);                
+                else
+#endif                
+                stream = await TitleContainer.OpenStreamAsync(assetPath);
+#if ANDROID
+                // Read the asset into memory in one go. This results in a ~50% reduction
+                // in load times on Android due to slow Android asset streams.
+                MemoryStream memStream = new MemoryStream();
+                stream.CopyTo(memStream);
+                memStream.Seek(0, SeekOrigin.Begin);
+                stream.Close();
+                stream = memStream;
+#endif
+			}
+			catch (FileNotFoundException fileNotFound)
+			{
+				throw new ContentLoadException("The content file was not found.", fileNotFound);
+			}
+#if !WINDOWS_UAP
+			catch (DirectoryNotFoundException directoryNotFound)
+			{
+				throw new ContentLoadException("The directory was not found.", directoryNotFound);
+			}
+#endif
+			catch (Exception exception)
+			{
+				throw new ContentLoadException("Opening stream error.", exception);
+			}
+			return stream;
+		}
 
 		protected T ReadAsset<T>(string assetName, Action<IDisposable> recordDisposableObject)
 		{
@@ -316,6 +398,38 @@ namespace Microsoft.Xna.Framework.Content
 
             // Try to load as XNB file
             var stream = OpenStream(assetName);
+            using (var xnbReader = new BinaryReader(stream))
+            {
+                using (var reader = GetContentReaderFromXnb(assetName, stream, xnbReader, recordDisposableObject))
+                {
+                    result = reader.ReadAsset<T>();
+                    if (result is GraphicsResource)
+                        ((GraphicsResource)result).Name = originalAssetName;
+                }
+            }
+            
+			if (result == null)
+				throw new ContentLoadException("Could not load " + originalAssetName + " asset!");
+
+			return (T)result;
+		}
+
+		protected async Task<T> ReadAssetAsync<T>(string assetName, Action<IDisposable> recordDisposableObject)
+		{
+			if (string.IsNullOrEmpty(assetName))
+			{
+				throw new ArgumentNullException("assetName");
+			}
+			if (disposed)
+			{
+				throw new ObjectDisposedException("ContentManager");
+			}
+						
+			string originalAssetName = assetName;
+			object result = null;
+
+            // Try to load as XNB file
+            var stream = await OpenStreamAsync(assetName);
             using (var xnbReader = new BinaryReader(stream))
             {
                 using (var reader = GetContentReaderFromXnb(assetName, stream, xnbReader, recordDisposableObject))
