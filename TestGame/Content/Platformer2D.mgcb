@@ -186,13 +186,22 @@
 /build:Pixel.png
 
 #begin Sounds/ExitReached.wav
-/copy:Sounds/ExitReached.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/ExitReached.wav
 
 #begin Sounds/GemCollected.wav
-/copy:Sounds/GemCollected.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/GemCollected.wav
 
 #begin Sounds/MonsterKilled.wav
-/copy:Sounds/MonsterKilled.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/MonsterKilled.wav
 
 #begin Sounds/Music.wma
 /importer:WmaImporter
@@ -201,16 +210,28 @@
 /build:Sounds/Music.wma
 
 #begin Sounds/PlayerFall.wav
-/copy:Sounds/PlayerFall.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/PlayerFall.wav
 
 #begin Sounds/PlayerJump.wav
-/copy:Sounds/PlayerJump.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/PlayerJump.wav
 
 #begin Sounds/PlayerKilled.wav
-/copy:Sounds/PlayerKilled.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/PlayerKilled.wav
 
 #begin Sounds/Powerup.wav
-/copy:Sounds/Powerup.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Powerup.wav
 
 #begin Sprites/Gem.png
 /importer:TextureImporter

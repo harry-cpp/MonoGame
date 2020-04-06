@@ -1,3 +1,5 @@
+using System;
+using System.IO;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
@@ -65,16 +67,25 @@ namespace Platformer2D
 
             Songs.Music = await content.LoadAsync<Song>("Sounds/Music"); Counter++;
 
-            SoundEffects.killedSound = await content.LoadAsync<SoundEffect>("Content/Sounds/PlayerKilled.wav"); Counter++;
-            SoundEffects.jumpSound = await content.LoadAsync<SoundEffect>("Content/Sounds/PlayerJump.wav"); Counter++;
-            SoundEffects.fallSound = await content.LoadAsync<SoundEffect>("Content/Sounds/PlayerFall.wav"); Counter++;
-            SoundEffects.exitReachedSound = await content.LoadAsync<SoundEffect>("Content/Sounds/ExitReached.wav"); Counter++;
-            SoundEffects.collectedSound = await content.LoadAsync<SoundEffect>("Content/Sounds/GemCollected.wav"); Counter++;
+            SoundEffects.killedSound = await content.LoadAsync<SoundEffect>("Sounds/PlayerKilled"); Counter++;
+            SoundEffects.jumpSound = await content.LoadAsync<SoundEffect>("Sounds/PlayerJump"); Counter++;
+            SoundEffects.fallSound = await content.LoadAsync<SoundEffect>("Sounds/PlayerFall"); Counter++;
+            SoundEffects.exitReachedSound = await content.LoadAsync<SoundEffect>("Sounds/ExitReached"); Counter++;
+            SoundEffects.collectedSound = await content.LoadAsync<SoundEffect>("Sounds/GemCollected"); Counter++;
 
             Levels = new List<string[]>();
             for (int i = 0; i < 3; i++)
             {
-                Levels.Add(System.IO.File.ReadAllLines("Content/Levels/" + i + ".txt"));
+                using (var s = await TitleContainer.OpenStreamAsync("Content/Levels/" + i + ".txt"))
+                {
+                    using (var textReader = new StreamReader(s))
+                    {
+                        var levelStr = textReader.ReadToEnd();
+                        Levels.Add(levelStr.Split(new[] { "\n" }, StringSplitOptions.RemoveEmptyEntries));
+                        Console.WriteLine(Levels[i]);
+                    }
+                }
+                
                 Counter++;
             }
 
