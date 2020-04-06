@@ -82,7 +82,6 @@ namespace Platformer2D
                     {
                         var levelStr = textReader.ReadToEnd();
                         Levels.Add(levelStr.Split(new[] { "\n" }, StringSplitOptions.RemoveEmptyEntries));
-                        Console.WriteLine(Levels[i]);
                     }
                 }
                 
