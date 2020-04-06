@@ -81,23 +81,23 @@ namespace TestGame
                 frameCounter++;
             }
             
-            GraphicsDevice.SetRenderTarget(target);
+            //GraphicsDevice.SetRenderTarget(target);
 
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             _spriteBatch.Begin();
 
             _spriteBatch.Draw(_tex, Vector2.Zero, Color.White);
-            _spriteBatch.DrawString(font, "Fps: " + frame + System.Environment.NewLine + "Well spritefonts are working as well...", Vector2.Zero, Color.White);
+            _spriteBatch.DrawString(font, "Fps: " + frame + System.Environment.NewLine + "Well spritefonts are working as well...\nA:" + Keyboard.GetState().IsKeyDown(Keys.A), Vector2.Zero, Color.White);
             _spriteBatch.End();
 
-            GraphicsDevice.SetRenderTarget(null);
+            /*GraphicsDevice.SetRenderTarget(null);
             
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             _spriteBatch.Begin();
             _spriteBatch.Draw(target, new Rectangle(0, 0, 400, 400), Color.White);
-            _spriteBatch.End();
+            _spriteBatch.End();*/
 
             base.Draw(gameTime);
         }

@@ -44,6 +44,7 @@
     <Compile Include="Platform\Media\MediaLibrary.Default.cs" />
     <Compile Include="Platform\Input\GamePad.Web.cs" />
     <Compile Include="Platform\Input\Joystick.Web.cs" />
+    <Compile Include="Platform\Input\KeyboardUtil.Web.cs" />
     <Compile Include="Platform\Input\Mouse.Default.cs" />
     <Compile Include="Platform\Input\MouseCursor.Default.cs" />
     <Compile Include="Platform\Graphics\GraphicsCapabilities.Web.cs" />

@@ -48,65 +48,43 @@ namespace Microsoft.Xna.Framework
             body.Invoke("appendChild", _canvas);
 
             // Disable selection
-            /*using (var canvasStyle = (JSObject)_canvas.GetObjectProperty("style"))
+            using (var canvasStyle = (JSObject)_canvas.GetObjectProperty("style"))
             {
                 canvasStyle.SetObjectProperty("userSelect", "none");
                 canvasStyle.SetObjectProperty("webkitUserSelect", "none");
                 canvasStyle.SetObjectProperty("msUserSelect", "none");
-            }*/
+            }
 
             WebHelper.gl = new WebGLRenderingContext(_canvas);
 
             // Block context menu on the canvas element
-            //_canvas.oncontextmenu += (e) => e.preventDefault();
+            _canvas.Invoke("addEventListener", "contextmenu", new Action<JSObject>((o) => {
+                o.Invoke("preventDefault");
+            }), false);
 
-            // Connect events
-            //_canvas.onmousemove += (e) => Canvas_MouseMove(e);
-            //_canvas.onmousedown += (e) => Canvas_MouseDown(e);
-            //_canvas.onmouseup += (e) => Canvas_MouseUp(e);
-            //_canvas.onmousewheel += (e) => Canvas_MouseWheel(e);
-            //_canvas.onkeydown += (e) => Canvas_KeyDown(e);
-            //_canvas.onkeyup += (e) => Canvas_KeyUp(e);
-
-            var _keyDown = new Func<JSObject, bool>(Canvas_KeyDown);
-            document.Invoke("addEventListener", "onkeydown", _keyDown, false);
-            //Console.WriteLine("called down");
-
-            //_keyUp = new Func<JSObject, bool>(Canvas_KeyUp);
-            //window.Invoke("onkeyup", _keyUp);
-
-            //document.addEventListener("webkitfullscreenchange", Document_FullscreenChange);
-            //document.addEventListener("mozfullscreenchange", Document_FullscreenChange);
-            //document.addEventListener("fullscreenchange", Document_FullscreenChange);
-            //document.addEventListener("MSFullscreenChange", Document_FullscreenChange);
+            _canvas.Invoke("addEventListener", "keydown", (Action<JSObject>)Canvas_KeyDown, false);
+            _canvas.Invoke("addEventListener", "keyup", (Action<JSObject>)Canvas_KeyUp, false);
         }
 
-        private bool Canvas_KeyDown(JSObject e)
+        private void Canvas_KeyDown(JSObject e)
         {
-            Console.WriteLine("called down");
-
-            /*e.preventDefault();
-
-            var xnaKey = KeyboardUtil.ToXna((int)e.keyCode, (int)e.location);
+            var keyCode = (int)e.GetObjectProperty("keyCode");
+            var location = (int)e.GetObjectProperty("location");
+            var xnaKey = KeyboardUtil.ToXna(keyCode, location);
 
             if (!_keys.Contains(xnaKey))
                 _keys.Add(xnaKey);
 
-            Keyboard.CapsLock = ((int)e.keyCode == 20) ? !Keyboard.CapsLock : e.getModifierState("CapsLock");
-            Keyboard.NumLock = ((int)e.keyCode == 144) ? !Keyboard.NumLock : e.getModifierState("NumLock");
-
-            EnsureFullscreen();*/
-            return true;
+            e.Invoke("preventDefault");
         }
 
-        private bool Canvas_KeyUp(JSObject e)
+        private void Canvas_KeyUp(JSObject e)
         {
-            Console.WriteLine("called up");
+            var keyCode = (int)e.GetObjectProperty("keyCode");
+            var location = (int)e.GetObjectProperty("location");
+            var xnaKey = KeyboardUtil.ToXna(keyCode, location);
 
-            /*_keys.Remove(KeyboardUtil.ToXna((int)e.keyCode, int.Parse(e.location.ToString())));
-
-            EnsureFullscreen();*/
-            return true;
+            _keys.Remove(xnaKey);
         }
 
         public override bool AllowUserResizing
