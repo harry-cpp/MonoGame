@@ -13,6 +13,7 @@ namespace TestGame
         private Song _song;
         bool loading = true;
         SpriteFont font;
+        private RenderTarget2D target;
 
         public Game1()
         {
@@ -31,6 +32,8 @@ namespace TestGame
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
+            target = new RenderTarget2D(GraphicsDevice, 1920, 1080);
+
             LoadContentAsync();
         }
 
@@ -77,6 +80,8 @@ namespace TestGame
             {
                 frameCounter++;
             }
+            
+            GraphicsDevice.SetRenderTarget(target);
 
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
@@ -84,7 +89,14 @@ namespace TestGame
 
             _spriteBatch.Draw(_tex, Vector2.Zero, Color.White);
             _spriteBatch.DrawString(font, "Fps: " + frame + System.Environment.NewLine + "Well spritefonts are working as well...", Vector2.Zero, Color.White);
+            _spriteBatch.End();
 
+            GraphicsDevice.SetRenderTarget(null);
+            
+            GraphicsDevice.Clear(Color.CornflowerBlue);
+
+            _spriteBatch.Begin();
+            _spriteBatch.Draw(target, new Rectangle(0, 0, 400, 400), Color.White);
             _spriteBatch.End();
 
             base.Draw(gameTime);

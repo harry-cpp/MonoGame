@@ -62,7 +62,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             internal virtual void BindRenderbuffer(WebGLRenderbuffer renderbuffer)
             {
-                gl.BindRenderbuffer(WebGL2RenderingContextBase.RENDERBUFFER, renderbuffer);
+                gl.BindRenderbuffer(WebGLRenderingContextBase.RENDERBUFFER, renderbuffer);
                 GraphicsExtensions.CheckGLError();
             }
 
@@ -74,7 +74,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             internal virtual void RenderbufferStorageMultisample(int samples, uint internalFormat, int width, int height)
             {
-                gl.RenderbufferStorage(WebGL2RenderingContextBase.RENDERBUFFER, internalFormat, width, height);
+                gl.RenderbufferStorage(WebGLRenderingContextBase.RENDERBUFFER, internalFormat, width, height);
                 GraphicsExtensions.CheckGLError();
             }
 
@@ -86,33 +86,15 @@ namespace Microsoft.Xna.Framework.Graphics
 
             internal virtual void BindFramebuffer(WebGLFramebuffer framebuffer)
             {
-                gl.BindFramebuffer(WebGL2RenderingContextBase.FRAMEBUFFER, framebuffer);
-                GraphicsExtensions.CheckGLError();
-            }
-
-            internal virtual void BindReadFramebuffer(WebGLFramebuffer readFramebuffer)
-            {
-                gl.BindFramebuffer(WebGL2RenderingContextBase.READ_FRAMEBUFFER, readFramebuffer);
+                gl.BindFramebuffer(WebGLRenderingContextBase.FRAMEBUFFER, framebuffer);
                 GraphicsExtensions.CheckGLError();
             }
 
             static readonly uint[] FramebufferAttachements = {
-                WebGL2RenderingContextBase.COLOR_ATTACHMENT0,
-                WebGL2RenderingContextBase.DEPTH_ATTACHMENT,
-                WebGL2RenderingContextBase.STENCIL_ATTACHMENT,
+                WebGLRenderingContextBase.COLOR_ATTACHMENT0,
+                WebGLRenderingContextBase.DEPTH_ATTACHMENT,
+                WebGLRenderingContextBase.STENCIL_ATTACHMENT,
             };
-
-            internal virtual void InvalidateDrawFramebuffer()
-            {
-                Debug.Assert(this.SupportsInvalidateFramebuffer);
-                gl.InvalidateFramebuffer(WebGL2RenderingContextBase.FRAMEBUFFER, FramebufferAttachements);
-            }
-
-            internal virtual void InvalidateReadFramebuffer()
-            {
-                Debug.Assert(this.SupportsInvalidateFramebuffer);
-                gl.InvalidateFramebuffer(WebGL2RenderingContextBase.FRAMEBUFFER, FramebufferAttachements);
-            }
 
             internal virtual void DeleteFramebuffer(WebGLFramebuffer framebuffer)
             {
@@ -122,30 +104,19 @@ namespace Microsoft.Xna.Framework.Graphics
 
             internal virtual void FramebufferTexture2D(uint attachement, uint target, WebGLTexture texture, int level = 0, double samples = 0)
             {
-                gl.FramebufferTexture2D(WebGL2RenderingContextBase.FRAMEBUFFER, attachement, target, texture, level);
+                gl.FramebufferTexture2D(WebGLRenderingContextBase.FRAMEBUFFER, attachement, target, texture, level);
                 GraphicsExtensions.CheckGLError();
             }
 
             internal virtual void FramebufferRenderbuffer(uint attachement, WebGLRenderbuffer renderbuffer, double level = 0)
             {
-                gl.FramebufferRenderbuffer(WebGL2RenderingContextBase.FRAMEBUFFER, attachement, WebGL2RenderingContextBase.RENDERBUFFER, renderbuffer);
+                gl.FramebufferRenderbuffer(WebGLRenderingContextBase.FRAMEBUFFER, attachement, WebGLRenderingContextBase.RENDERBUFFER, renderbuffer);
                 GraphicsExtensions.CheckGLError();
             }
 
             internal virtual void GenerateMipmap(uint target)
             {
                 gl.GenerateMipmap(target);
-                GraphicsExtensions.CheckGLError();
-
-            }
-
-            internal virtual void BlitFramebuffer(uint iColorAttachment, int width, int height)
-            {
-                gl.ReadBuffer(WebGL2RenderingContextBase.COLOR_ATTACHMENT0 + iColorAttachment);
-                GraphicsExtensions.CheckGLError();
-                gl.DrawBuffers(new[] { WebGL2RenderingContextBase.COLOR_ATTACHMENT0 + iColorAttachment });
-                GraphicsExtensions.CheckGLError();
-                gl.BlitFramebuffer(0, 0, width, height, 0, 0, width, height, WebGL2RenderingContextBase.COLOR_BUFFER_BIT, WebGL2RenderingContextBase.NEAREST);
                 GraphicsExtensions.CheckGLError();
 
             }

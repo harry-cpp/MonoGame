@@ -16,13 +16,13 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 if (!DepthBufferEnable)
                 {
-                    gl.Disable(WebGL2RenderingContextBase.DEPTH_TEST);
+                    gl.Disable(WebGLRenderingContextBase.DEPTH_TEST);
                     GraphicsExtensions.CheckGLError();
                 }
                 else
                 {
                     // enable Depth Buffer
-                    gl.Enable(WebGL2RenderingContextBase.DEPTH_TEST);
+                    gl.Enable(WebGLRenderingContextBase.DEPTH_TEST);
                     GraphicsExtensions.CheckGLError();
                 }
                 device._lastDepthStencilState.DepthBufferEnable = this.DepthBufferEnable;
@@ -46,13 +46,13 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 if (!StencilEnable)
                 {
-                    gl.Disable(WebGL2RenderingContextBase.STENCIL_TEST);
+                    gl.Disable(WebGLRenderingContextBase.STENCIL_TEST);
                     GraphicsExtensions.CheckGLError();
                 }
                 else
                 {
                     // enable Stencil
-                    gl.Enable(WebGL2RenderingContextBase.STENCIL_TEST);
+                    gl.Enable(WebGLRenderingContextBase.STENCIL_TEST);
                     GraphicsExtensions.CheckGLError();
                 }
                 device._lastDepthStencilState.StencilEnable = this.StencilEnable;
@@ -61,10 +61,10 @@ namespace Microsoft.Xna.Framework.Graphics
             // set function
             if (this.TwoSidedStencilMode)
             {
-                var cullFaceModeFront = WebGL2RenderingContextBase.FRONT;
-                var cullFaceModeBack = WebGL2RenderingContextBase.BACK;
-                var stencilFaceFront = WebGL2RenderingContextBase.FRONT;
-                var stencilFaceBack = WebGL2RenderingContextBase.BACK;
+                var cullFaceModeFront = WebGLRenderingContextBase.FRONT;
+                var cullFaceModeBack = WebGLRenderingContextBase.BACK;
+                var stencilFaceFront = WebGLRenderingContextBase.FRONT;
+                var stencilFaceBack = WebGLRenderingContextBase.BACK;
 
                 if (force ||
 					this.TwoSidedStencilMode != device._lastDepthStencilState.TwoSidedStencilMode ||
@@ -171,23 +171,23 @@ namespace Microsoft.Xna.Framework.Graphics
             switch (function)
             {
                 case CompareFunction.Always: 
-                    return WebGL2RenderingContextBase.ALWAYS;
+                    return WebGLRenderingContextBase.ALWAYS;
                 case CompareFunction.Equal:
-                    return WebGL2RenderingContextBase.EQUAL;
+                    return WebGLRenderingContextBase.EQUAL;
                 case CompareFunction.Greater:
-                    return WebGL2RenderingContextBase.GREATER;
+                    return WebGLRenderingContextBase.GREATER;
                 case CompareFunction.GreaterEqual:
-                    return WebGL2RenderingContextBase.GEQUAL;
+                    return WebGLRenderingContextBase.GEQUAL;
                 case CompareFunction.Less:
-                    return WebGL2RenderingContextBase.LESS;
+                    return WebGLRenderingContextBase.LESS;
                 case CompareFunction.LessEqual:
-                    return WebGL2RenderingContextBase.LEQUAL;
+                    return WebGLRenderingContextBase.LEQUAL;
                 case CompareFunction.Never:
-                    return WebGL2RenderingContextBase.NEVER;
+                    return WebGLRenderingContextBase.NEVER;
                 case CompareFunction.NotEqual:
-                    return WebGL2RenderingContextBase.NOTEQUAL;
+                    return WebGLRenderingContextBase.NOTEQUAL;
                 default:
-                    return WebGL2RenderingContextBase.ALWAYS;
+                    return WebGLRenderingContextBase.ALWAYS;
             }
         }
 
@@ -196,23 +196,23 @@ namespace Microsoft.Xna.Framework.Graphics
             switch (operation)
             {
                 case StencilOperation.Keep:
-                    return WebGL2RenderingContextBase.KEEP;
+                    return WebGLRenderingContextBase.KEEP;
                 case StencilOperation.Decrement:
-                    return WebGL2RenderingContextBase.DECR_WRAP;
+                    return WebGLRenderingContextBase.DECR_WRAP;
                 case StencilOperation.DecrementSaturation:
-                    return WebGL2RenderingContextBase.DECR;
+                    return WebGLRenderingContextBase.DECR;
                 case StencilOperation.IncrementSaturation:
-                    return WebGL2RenderingContextBase.INCR;
+                    return WebGLRenderingContextBase.INCR;
                 case StencilOperation.Increment:
-                    return WebGL2RenderingContextBase.INCR_WRAP;
+                    return WebGLRenderingContextBase.INCR_WRAP;
                 case StencilOperation.Invert:
-                    return WebGL2RenderingContextBase.INVERT;
+                    return WebGLRenderingContextBase.INVERT;
                 case StencilOperation.Replace:
-                    return WebGL2RenderingContextBase.REPLACE;
+                    return WebGLRenderingContextBase.REPLACE;
                 case StencilOperation.Zero:
-                    return WebGL2RenderingContextBase.ZERO;
+                    return WebGLRenderingContextBase.ZERO;
                 default:
-                    return WebGL2RenderingContextBase.KEEP;
+                    return WebGLRenderingContextBase.KEEP;
             }
         }
     }

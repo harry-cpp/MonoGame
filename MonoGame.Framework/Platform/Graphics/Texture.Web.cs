@@ -13,7 +13,7 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         internal WebGLTexture glTexture;
         internal uint glTarget;
-        internal uint glTextureUnit = WebGL2RenderingContextBase.TEXTURE0;
+        internal uint glTextureUnit = WebGLRenderingContextBase.TEXTURE0;
         internal uint glInternalFormat;
         internal uint glFormat;
         internal uint glType;

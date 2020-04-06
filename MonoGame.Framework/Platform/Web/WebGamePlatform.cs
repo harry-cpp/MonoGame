@@ -4,14 +4,13 @@
 
 using System;
 using Microsoft.Xna.Framework.Graphics;
-using WebAssembly;
+using static WebHelper;
 
 namespace Microsoft.Xna.Framework
 {
     class WebGamePlatform : GamePlatform
     {
         private WebGameWindow _view;
-        private JSObject _window;
         private bool _exit;
         private Action<double> _loop;
 
@@ -20,7 +19,6 @@ namespace Microsoft.Xna.Framework
         {
             Window = _view = new WebGameWindow(game);
 
-            _window = (JSObject)Runtime.GetGlobalObject("window");
             _loop = new Action<double>(AnimationFrame);
         }
         
@@ -36,7 +34,7 @@ namespace Microsoft.Xna.Framework
 
         public override void StartRunLoop()
         {
-            _window.Invoke("requestAnimationFrame", _loop);
+            window.Invoke("requestAnimationFrame", _loop);
         }
 
         public void AnimationFrame(double timestamp)
@@ -44,7 +42,7 @@ namespace Microsoft.Xna.Framework
             Game.Tick();
 
             if (!_exit)
-                _window.Invoke("requestAnimationFrame", _loop);
+                window.Invoke("requestAnimationFrame", _loop);
         }
 
         public override bool BeforeUpdate(GameTime gameTime)

@@ -17,7 +17,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             var error = gl.GetError();
 
-            if (error != WebGL2RenderingContextBase.NO_ERROR)
+            if (error != WebGLRenderingContextBase.NO_ERROR)
                 throw new MonoGameGLException("GL.GetError() returned " + error);
         }
 
@@ -86,17 +86,17 @@ namespace Microsoft.Xna.Framework.Graphics
                 case VertexElementFormat.Vector2:
                 case VertexElementFormat.Vector3:
                 case VertexElementFormat.Vector4:
-                    return (int)WebGL2RenderingContextBase.FLOAT;
+                    return (int)WebGLRenderingContextBase.FLOAT;
 
                 case VertexElementFormat.Color:
                 case VertexElementFormat.Byte4:
-                    return (int)WebGL2RenderingContextBase.UNSIGNED_BYTE;
+                    return (int)WebGLRenderingContextBase.UNSIGNED_BYTE;
 
                 case VertexElementFormat.Short2:
                 case VertexElementFormat.Short4:
                 case VertexElementFormat.NormalizedShort2:
                 case VertexElementFormat.NormalizedShort4:
-                    return (int)WebGL2RenderingContextBase.SHORT;
+                    return (int)WebGLRenderingContextBase.SHORT;
             }
 
             throw new ArgumentException();
@@ -131,11 +131,11 @@ namespace Microsoft.Xna.Framework.Graphics
             switch (function)
             {
                 case BlendFunction.Add:
-                    return WebGL2RenderingContextBase.FUNC_ADD;
+                    return WebGLRenderingContextBase.FUNC_ADD;
                 case BlendFunction.ReverseSubtract:
-                    return WebGL2RenderingContextBase.FUNC_REVERSE_SUBTRACT;
+                    return WebGLRenderingContextBase.FUNC_REVERSE_SUBTRACT;
                 case BlendFunction.Subtract:
-                    return WebGL2RenderingContextBase.FUNC_SUBTRACT;
+                    return WebGLRenderingContextBase.FUNC_SUBTRACT;
 
                 default:
                     throw new ArgumentException();
@@ -147,31 +147,31 @@ namespace Microsoft.Xna.Framework.Graphics
             switch (blend)
             {
                 case Blend.BlendFactor:
-                    return WebGL2RenderingContextBase.CONSTANT_COLOR;
+                    return WebGLRenderingContextBase.CONSTANT_COLOR;
                 case Blend.DestinationAlpha:
-                    return WebGL2RenderingContextBase.DST_ALPHA;
+                    return WebGLRenderingContextBase.DST_ALPHA;
                 case Blend.DestinationColor:
-                    return WebGL2RenderingContextBase.DST_COLOR;
+                    return WebGLRenderingContextBase.DST_COLOR;
                 case Blend.InverseBlendFactor:
-                    return WebGL2RenderingContextBase.ONE_MINUS_CONSTANT_COLOR;
+                    return WebGLRenderingContextBase.ONE_MINUS_CONSTANT_COLOR;
                 case Blend.InverseDestinationAlpha:
-                    return WebGL2RenderingContextBase.ONE_MINUS_DST_ALPHA;
+                    return WebGLRenderingContextBase.ONE_MINUS_DST_ALPHA;
                 case Blend.InverseDestinationColor:
-                    return WebGL2RenderingContextBase.ONE_MINUS_DST_COLOR;
+                    return WebGLRenderingContextBase.ONE_MINUS_DST_COLOR;
                 case Blend.InverseSourceAlpha:
-                    return WebGL2RenderingContextBase.ONE_MINUS_SRC_ALPHA;
+                    return WebGLRenderingContextBase.ONE_MINUS_SRC_ALPHA;
                 case Blend.InverseSourceColor:
-                    return WebGL2RenderingContextBase.ONE_MINUS_SRC_COLOR;
+                    return WebGLRenderingContextBase.ONE_MINUS_SRC_COLOR;
                 case Blend.One:
-                    return WebGL2RenderingContextBase.ONE;
+                    return WebGLRenderingContextBase.ONE;
                 case Blend.SourceAlpha:
-                    return WebGL2RenderingContextBase.SRC_ALPHA;
+                    return WebGLRenderingContextBase.SRC_ALPHA;
                 case Blend.SourceAlphaSaturation:
-                    return WebGL2RenderingContextBase.SRC_ALPHA_SATURATE;
+                    return WebGLRenderingContextBase.SRC_ALPHA_SATURATE;
                 case Blend.SourceColor:
-                    return WebGL2RenderingContextBase.SRC_COLOR;
+                    return WebGLRenderingContextBase.SRC_COLOR;
                 case Blend.Zero:
-                    return WebGL2RenderingContextBase.ZERO;
+                    return WebGLRenderingContextBase.ZERO;
                 default:
                     throw new ArgumentOutOfRangeException("blend", "The specified blend function is not implemented.");
             }
@@ -183,31 +183,31 @@ namespace Microsoft.Xna.Framework.Graphics
             switch (blend)
             {
                 case Blend.BlendFactor:
-                    return WebGL2RenderingContextBase.CONSTANT_COLOR;
+                    return WebGLRenderingContextBase.CONSTANT_COLOR;
                 case Blend.DestinationAlpha:
-                    return WebGL2RenderingContextBase.DST_ALPHA;
+                    return WebGLRenderingContextBase.DST_ALPHA;
                 case Blend.DestinationColor:
-                    return WebGL2RenderingContextBase.DST_COLOR;
+                    return WebGLRenderingContextBase.DST_COLOR;
                 case Blend.InverseBlendFactor:
-                    return WebGL2RenderingContextBase.ONE_MINUS_CONSTANT_COLOR;
+                    return WebGLRenderingContextBase.ONE_MINUS_CONSTANT_COLOR;
                 case Blend.InverseDestinationAlpha:
-                    return WebGL2RenderingContextBase.ONE_MINUS_DST_ALPHA;
+                    return WebGLRenderingContextBase.ONE_MINUS_DST_ALPHA;
                 case Blend.InverseDestinationColor:
-                    return WebGL2RenderingContextBase.ONE_MINUS_DST_COLOR;
+                    return WebGLRenderingContextBase.ONE_MINUS_DST_COLOR;
                 case Blend.InverseSourceAlpha:
-                    return WebGL2RenderingContextBase.ONE_MINUS_SRC_ALPHA;
+                    return WebGLRenderingContextBase.ONE_MINUS_SRC_ALPHA;
                 case Blend.InverseSourceColor:
-                    return WebGL2RenderingContextBase.ONE_MINUS_SRC_COLOR;
+                    return WebGLRenderingContextBase.ONE_MINUS_SRC_COLOR;
                 case Blend.One:
-                    return WebGL2RenderingContextBase.ONE;
+                    return WebGLRenderingContextBase.ONE;
                 case Blend.SourceAlpha:
-                    return WebGL2RenderingContextBase.SRC_ALPHA;
+                    return WebGLRenderingContextBase.SRC_ALPHA;
                 case Blend.SourceAlphaSaturation:
-                    return WebGL2RenderingContextBase.SRC_ALPHA_SATURATE;
+                    return WebGLRenderingContextBase.SRC_ALPHA_SATURATE;
                 case Blend.SourceColor:
-                    return WebGL2RenderingContextBase.SRC_COLOR;
+                    return WebGLRenderingContextBase.SRC_COLOR;
                 case Blend.Zero:
-                    return WebGL2RenderingContextBase.ZERO;
+                    return WebGLRenderingContextBase.ZERO;
                 default:
                     throw new ArgumentOutOfRangeException("blend", "The specified blend function is not implemented.");
             }
@@ -219,21 +219,21 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 default:
                 case CompareFunction.Always:
-                    return WebGL2RenderingContextBase.ALWAYS;
+                    return WebGLRenderingContextBase.ALWAYS;
                 case CompareFunction.Equal:
-                    return WebGL2RenderingContextBase.EQUAL;
+                    return WebGLRenderingContextBase.EQUAL;
                 case CompareFunction.Greater:
-                    return WebGL2RenderingContextBase.GREATER;
+                    return WebGLRenderingContextBase.GREATER;
                 case CompareFunction.GreaterEqual:
-                    return WebGL2RenderingContextBase.GEQUAL;
+                    return WebGLRenderingContextBase.GEQUAL;
                 case CompareFunction.Less:
-                    return WebGL2RenderingContextBase.LESS;
+                    return WebGLRenderingContextBase.LESS;
                 case CompareFunction.LessEqual:
-                    return WebGL2RenderingContextBase.LEQUAL;
+                    return WebGLRenderingContextBase.LEQUAL;
                 case CompareFunction.Never:
-                    return WebGL2RenderingContextBase.NEVER;
+                    return WebGLRenderingContextBase.NEVER;
                 case CompareFunction.NotEqual:
-                    return WebGL2RenderingContextBase.NOTEQUAL;
+                    return WebGLRenderingContextBase.NOTEQUAL;
             }
         }
 
@@ -243,43 +243,38 @@ namespace Microsoft.Xna.Framework.Graphics
             out uint glFormat,
             out uint glType)
         {
-            glInternalFormat = (int)WebGL2RenderingContextBase.RGBA;
-            glFormat = (int)WebGL2RenderingContextBase.RGBA;
-            glType = (int)WebGL2RenderingContextBase.UNSIGNED_BYTE;
+            glInternalFormat = (int)WebGLRenderingContextBase.RGBA;
+            glFormat = (int)WebGLRenderingContextBase.RGBA;
+            glType = (int)WebGLRenderingContextBase.UNSIGNED_BYTE;
 
             var supportsSRgb = graphicsDevice.GraphicsCapabilities.SupportsSRgb;
 
             switch (format)
             {
                 case SurfaceFormat.Color:
-                    glInternalFormat = WebGL2RenderingContextBase.RGBA;
-                    glFormat = WebGL2RenderingContextBase.RGBA;
-                    glType = WebGL2RenderingContextBase.UNSIGNED_BYTE;
-                    break;
-                case SurfaceFormat.ColorSRgb:
-                    glInternalFormat = WebGL2RenderingContextBase.SRGB;
-                    glFormat = WebGL2RenderingContextBase.RGBA;
-                    glType = WebGL2RenderingContextBase.UNSIGNED_BYTE;
+                    glInternalFormat = WebGLRenderingContextBase.RGBA;
+                    glFormat = WebGLRenderingContextBase.RGBA;
+                    glType = WebGLRenderingContextBase.UNSIGNED_BYTE;
                     break;
                 case SurfaceFormat.Bgr565:
-                    glInternalFormat = WebGL2RenderingContextBase.RGB;
-                    glFormat = WebGL2RenderingContextBase.RGB;
-                    glType = WebGL2RenderingContextBase.UNSIGNED_SHORT_5_6_5;
+                    glInternalFormat = WebGLRenderingContextBase.RGB;
+                    glFormat = WebGLRenderingContextBase.RGB;
+                    glType = WebGLRenderingContextBase.UNSIGNED_SHORT_5_6_5;
                     break;
                 case SurfaceFormat.Bgra4444:
-                    glInternalFormat = WebGL2RenderingContextBase.RGBA;
-                    glFormat = WebGL2RenderingContextBase.RGBA;
-                    glType = WebGL2RenderingContextBase.UNSIGNED_SHORT_4_4_4_4;
+                    glInternalFormat = WebGLRenderingContextBase.RGBA;
+                    glFormat = WebGLRenderingContextBase.RGBA;
+                    glType = WebGLRenderingContextBase.UNSIGNED_SHORT_4_4_4_4;
                     break;
                 case SurfaceFormat.Bgra5551:
-                    glInternalFormat = WebGL2RenderingContextBase.RGBA;
-                    glFormat = WebGL2RenderingContextBase.RGBA;
-                    glType = WebGL2RenderingContextBase.UNSIGNED_SHORT_5_5_5_1;
+                    glInternalFormat = WebGLRenderingContextBase.RGBA;
+                    glFormat = WebGLRenderingContextBase.RGBA;
+                    glType = WebGLRenderingContextBase.UNSIGNED_SHORT_5_5_5_1;
                     break;
                 case SurfaceFormat.Alpha8:
-                    glInternalFormat = WebGL2RenderingContextBase.LUMINANCE;
-                    glFormat = WebGL2RenderingContextBase.LUMINANCE;
-                    glType = WebGL2RenderingContextBase.UNSIGNED_BYTE;
+                    glInternalFormat = WebGLRenderingContextBase.LUMINANCE;
+                    glFormat = WebGLRenderingContextBase.LUMINANCE;
+                    glType = WebGLRenderingContextBase.UNSIGNED_BYTE;
                     break;
                 default:
                     throw new NotSupportedException();
@@ -291,13 +286,13 @@ namespace Microsoft.Xna.Framework.Graphics
             switch (primitiveType)
             {
                 case PrimitiveType.LineList:
-                    return (int)WebGL2RenderingContextBase.LINES;
+                    return (int)WebGLRenderingContextBase.LINES;
                 case PrimitiveType.LineStrip:
-                    return (int)WebGL2RenderingContextBase.LINE_STRIP;
+                    return (int)WebGLRenderingContextBase.LINE_STRIP;
                 case PrimitiveType.TriangleList:
-                    return (int)WebGL2RenderingContextBase.TRIANGLES;
+                    return (int)WebGLRenderingContextBase.TRIANGLES;
                 case PrimitiveType.TriangleStrip:
-                    return (int)WebGL2RenderingContextBase.TRIANGLE_STRIP;
+                    return (int)WebGLRenderingContextBase.TRIANGLE_STRIP;
             }
 
             throw new ArgumentException();
@@ -305,7 +300,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public static WebGLTexture GetBoundTexture2D()
         {
-            var ret = gl.GetParameter(WebGL2RenderingContextBase.TEXTURE_BINDING_2D);
+            var ret = gl.GetParameter(WebGLRenderingContextBase.TEXTURE_BINDING_2D);
             GraphicsExtensions.CheckGLError();
 
             return ret as WebGLTexture;

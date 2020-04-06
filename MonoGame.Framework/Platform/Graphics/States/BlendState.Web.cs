@@ -18,9 +18,9 @@ namespace Microsoft.Xna.Framework.Graphics
             if (force || blendEnabled != device._lastBlendEnable)
             {
                 if (blendEnabled)
-                    gl.Enable(WebGL2RenderingContextBase.BLEND);
+                    gl.Enable(WebGLRenderingContextBase.BLEND);
                 else
-                    gl.Disable(WebGL2RenderingContextBase.BLEND);
+                    gl.Disable(WebGLRenderingContextBase.BLEND);
                 GraphicsExtensions.CheckGLError();
                 device._lastBlendEnable = blendEnabled;
             }

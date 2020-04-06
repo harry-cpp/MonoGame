@@ -37,7 +37,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 var tex = _textures[i];
 
-                gl.ActiveTexture((uint)(WebGL2RenderingContextBase.TEXTURE0 + i));
+                gl.ActiveTexture((uint)(WebGLRenderingContextBase.TEXTURE0 + i));
                 GraphicsExtensions.CheckGLError();
 
                 // Clear the previous binding if the 

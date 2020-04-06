@@ -13,6 +13,7 @@ using WebAssembly.Core;
 using WebGLDotNET;
 using static WebHelper;
 using MonoGame.Utilities;
+using WebAssembly;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -121,8 +122,9 @@ namespace Microsoft.Xna.Framework.Graphics
         private float _lastClearDepth = 1.0f;
         private int _lastClearStencil = 0;
         private DepthStencilState clearDepthStencilState = new DepthStencilState { StencilEnable = true };
+        private JSObject _drawBuffersExtension;
 
-        private double[] _drawBuffers;
+        private int[] _drawBuffers;
 
         // Get a hashed value based on the currently bound shaders
         // throws an exception if no shaders are bound
@@ -163,24 +165,24 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             _programCache = new ShaderProgramCache(this);
 
-            MaxTextureSlots = (int)gl.GetParameter(WebGL2RenderingContextBase.MAX_TEXTURE_IMAGE_UNITS);
+            MaxTextureSlots = (int)gl.GetParameter(WebGLRenderingContextBase.MAX_TEXTURE_IMAGE_UNITS);
             GraphicsExtensions.CheckGLError();
 
-            _maxTextureSize = (int)gl.GetParameter(WebGL2RenderingContextBase.MAX_TEXTURE_SIZE);
+            _maxTextureSize = (int)gl.GetParameter(WebGLRenderingContextBase.MAX_TEXTURE_SIZE);
             GraphicsExtensions.CheckGLError();
 
-            MaxVertexAttributes = (int)gl.GetParameter(WebGL2RenderingContextBase.MAX_VERTEX_ATTRIBS);
+            MaxVertexAttributes = (int)gl.GetParameter(WebGLRenderingContextBase.MAX_VERTEX_ATTRIBS);
             GraphicsExtensions.CheckGLError();
 
             _maxVertexBufferSlots = MaxVertexAttributes;
             _newEnabledVertexAttributes = new bool[MaxVertexAttributes];
 
-            int maxDrawBuffers = (int)gl.GetParameter(WebGL2RenderingContextBase.MAX_DRAW_BUFFERS);
-            GraphicsExtensions.CheckGLError();
+            _drawBuffersExtension = (JSObject)gl.GetExtension("WEBGL_draw_buffers");
+            var maxDrawBuffers = (int)gl.GetParameter((uint)(int)_drawBuffersExtension.GetObjectProperty("MAX_DRAW_BUFFERS_WEBGL"));
 
-            _drawBuffers = new double[maxDrawBuffers];
+            _drawBuffers = new int[maxDrawBuffers];
             for (int i = 0; i < maxDrawBuffers; i++)
-                _drawBuffers[i] = WebGL2RenderingContextBase.COLOR_ATTACHMENT0 + i;
+                _drawBuffers[i] = (int)_drawBuffersExtension.GetObjectProperty("COLOR_ATTACHMENT" + i + "_WEBGL");
         }
 
         private void PlatformInitialize()
@@ -243,7 +245,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     _lastClearColor = color;
                 }
 
-                bufferMask = bufferMask | (int)WebGL2RenderingContextBase.COLOR_BUFFER_BIT;
+                bufferMask = bufferMask | (int)WebGLRenderingContextBase.COLOR_BUFFER_BIT;
             }
             if ((options & ClearOptions.Stencil) == ClearOptions.Stencil)
             {
@@ -253,7 +255,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     GraphicsExtensions.CheckGLError();
                     _lastClearStencil = stencil;
                 }
-                bufferMask = bufferMask | (int)WebGL2RenderingContextBase.STENCIL_BUFFER_BIT;
+                bufferMask = bufferMask | (int)WebGLRenderingContextBase.STENCIL_BUFFER_BIT;
             }
 
             if ((options & ClearOptions.DepthBuffer) == ClearOptions.DepthBuffer)
@@ -264,7 +266,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     GraphicsExtensions.CheckGLError();
                     _lastClearDepth = depth;
                 }
-                bufferMask = bufferMask | (int)WebGL2RenderingContextBase.DEPTH_BUFFER_BIT;
+                bufferMask = bufferMask | (int)WebGLRenderingContextBase.DEPTH_BUFFER_BIT;
             }
 
             gl.Clear(bufferMask);
@@ -278,7 +280,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void OnPresentationChanged()
         {
-
+            ApplyRenderTargets(null);
         }
 
         private void PlatformDispose()
@@ -451,7 +453,7 @@ namespace Microsoft.Xna.Framework.Graphics
         // FBO cache used to resolve MSAA rendertargets, we create 1 FBO per RenderTargetBinding combination
         private Dictionary<RenderTargetBinding[], WebGLFramebuffer> glResolveFramebuffers = new Dictionary<RenderTargetBinding[], WebGLFramebuffer>(new RenderTargetBindingArrayComparer());
 
-         internal void PlatformCreateRenderTarget(IRenderTarget renderTarget, int width, int height, bool mipMap, SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage)
+        internal void PlatformCreateRenderTarget(IRenderTarget renderTarget, int width, int height, bool mipMap, SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage)
         {
             WebGLRenderbuffer color = null;
             WebGLRenderbuffer depth = null;
@@ -459,24 +461,12 @@ namespace Microsoft.Xna.Framework.Graphics
             
             this.framebufferHelper.GenRenderbuffer(out color);
             this.framebufferHelper.BindRenderbuffer(color);
-            this.framebufferHelper.RenderbufferStorageMultisample(preferredMultiSampleCount, WebGL2RenderingContextBase.RGBA8, width, height);
+            this.framebufferHelper.RenderbufferStorageMultisample(preferredMultiSampleCount, WebGLRenderingContext.RGBA4, width, height);
 
             if (preferredDepthFormat != DepthFormat.None)
             {
-                var depthInternalFormat = WebGL2RenderingContextBase.DEPTH_COMPONENT16;
-                var stencilInternalFormat = WebGL2RenderingContextBase.NEVER;
-                switch (preferredDepthFormat)
-                {
-                    case DepthFormat.Depth16: 
-                        depthInternalFormat = WebGL2RenderingContextBase.DEPTH_COMPONENT16;
-                        break;
-                    case DepthFormat.Depth24:
-                        depthInternalFormat = WebGL2RenderingContextBase.DEPTH_COMPONENT24;
-                        break;
-                    case DepthFormat.Depth24Stencil8:
-                        depthInternalFormat = WebGL2RenderingContextBase.DEPTH24_STENCIL8;
-                        break;
-                }
+                var depthInternalFormat = WebGLRenderingContext.DEPTH_COMPONENT16;
+                var stencilInternalFormat = WebGLRenderingContext.NEVER;
 
                 if (depthInternalFormat != 0)
                 {
@@ -553,50 +543,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var renderTargetBinding = this._currentRenderTargetBindings[0];
             var renderTarget = renderTargetBinding.RenderTarget as IRenderTarget;
-            if (renderTarget.MultiSampleCount > 0 && this.framebufferHelper.SupportsBlitFramebuffer)
-            {
-                WebGLFramebuffer glResolveFramebuffer = null;
-                if (!this.glResolveFramebuffers.TryGetValue(this._currentRenderTargetBindings, out glResolveFramebuffer))
-                {
-                    this.framebufferHelper.GenFramebuffer(out glResolveFramebuffer);
-                    this.framebufferHelper.BindFramebuffer(glResolveFramebuffer);
-                    for (var i = 0; i < this._currentRenderTargetCount; ++i)
-                    {
-                        var rt = this._currentRenderTargetBindings[i].RenderTarget as IRenderTarget;
-                        this.framebufferHelper.FramebufferTexture2D((uint)(WebGL2RenderingContextBase.COLOR_ATTACHMENT0 + i), rt.GetFramebufferTarget(renderTargetBinding), rt.GLTexture);
-                    }
-                    this.glResolveFramebuffers.Add((RenderTargetBinding[])this._currentRenderTargetBindings.Clone(), glResolveFramebuffer);
-                }
-                else
-                {
-                    this.framebufferHelper.BindFramebuffer(glResolveFramebuffer);
-                }
-                // The only fragment operations which affect the resolve are the pixel ownership test, the scissor test, and dithering.
-                if (this._lastRasterizerState.ScissorTestEnable)
-                {
-                    gl.Disable(WebGL2RenderingContextBase.SCISSOR_TEST);
-                    GraphicsExtensions.CheckGLError();
-                }
-                var glFramebuffer = this.glFramebuffers[this._currentRenderTargetBindings];
-                this.framebufferHelper.BindReadFramebuffer(glFramebuffer);
-                for (var i = 0; i < this._currentRenderTargetCount; ++i)
-                {
-                    renderTargetBinding = this._currentRenderTargetBindings[i];
-                    renderTarget = renderTargetBinding.RenderTarget as IRenderTarget;
-                    this.framebufferHelper.BlitFramebuffer((uint)i, renderTarget.Width, renderTarget.Height);
-                }
-                if (renderTarget.RenderTargetUsage == RenderTargetUsage.DiscardContents && this.framebufferHelper.SupportsInvalidateFramebuffer)
-                    this.framebufferHelper.InvalidateReadFramebuffer();
-                if (this._lastRasterizerState.ScissorTestEnable)
-                {
-                    gl.Enable(WebGL2RenderingContextBase.SCISSOR_TEST);
-                    GraphicsExtensions.CheckGLError();
-                }
-            }
+            
             for (var i = 0; i < this._currentRenderTargetCount; ++i)
             {
                 renderTargetBinding = this._currentRenderTargetBindings[i];
                 renderTarget = renderTargetBinding.RenderTarget as IRenderTarget;
+                
                 if (renderTarget.LevelCount > 1)
                 {
                     gl.BindTexture(renderTarget.GLTarget, renderTarget.GLTexture);
@@ -608,7 +560,48 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private IRenderTarget PlatformApplyRenderTargets()
         {
-            throw new NotImplementedException();
+            WebGLFramebuffer glFramebuffer = null;
+
+            if (!this.glFramebuffers.TryGetValue(this._currentRenderTargetBindings, out glFramebuffer))
+            {
+                this.framebufferHelper.GenFramebuffer(out glFramebuffer);
+                this.framebufferHelper.BindFramebuffer(glFramebuffer);
+                var renderTargetBinding = this._currentRenderTargetBindings[0];
+                var renderTarget = renderTargetBinding.RenderTarget as IRenderTarget;
+                this.framebufferHelper.FramebufferRenderbuffer(WebGLRenderingContext.DEPTH_ATTACHMENT, renderTarget.GLDepthBuffer, 0);
+                this.framebufferHelper.FramebufferRenderbuffer(WebGLRenderingContext.STENCIL_ATTACHMENT, renderTarget.GLStencilBuffer, 0);
+
+                for (var i = 0; i < this._currentRenderTargetCount; ++i)
+                {
+                    renderTargetBinding = this._currentRenderTargetBindings[i];
+                    renderTarget = renderTargetBinding.RenderTarget as IRenderTarget;
+                    var attachement = (uint)(WebGLRenderingContext.COLOR_ATTACHMENT0 + i);
+
+                    this.framebufferHelper.FramebufferTexture2D(attachement, renderTarget.GetFramebufferTarget(renderTargetBinding), renderTarget.GLTexture, 0, renderTarget.MultiSampleCount);
+                }
+
+                this.glFramebuffers.Add((RenderTargetBinding[])_currentRenderTargetBindings.Clone(), glFramebuffer);
+            }
+            else
+            {
+                this.framebufferHelper.BindFramebuffer(glFramebuffer);
+            }
+
+            var tmp = new int[(int)_currentRenderTargetCount];
+            for (int i = 0; i < this._currentRenderTargetCount; i++)
+                tmp[i] = _drawBuffers[i];
+                
+            _drawBuffersExtension.Invoke("drawBuffersWEBGL", Int32Array.From(tmp));
+            GraphicsExtensions.CheckGLError();
+
+            // Reset the raster state because we flip vertices
+            // when rendering offscreen and hence the cull direction.
+            _rasterizerStateDirty = true;
+
+            // Textures will need to be rebound to render correctly in the new render target.
+            Textures.Dirty();
+
+            return _currentRenderTargetBindings[0].RenderTarget as IRenderTarget;
         }
 
         internal void PlatformBeginApplyState()
@@ -652,7 +645,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 if (_indexBuffer != null)
                 {
-                    gl.BindBuffer(WebGL2RenderingContextBase.ELEMENT_ARRAY_BUFFER, _indexBuffer.ibo);
+                    gl.BindBuffer(WebGLRenderingContextBase.ELEMENT_ARRAY_BUFFER, _indexBuffer.ibo);
                     GraphicsExtensions.CheckGLError();
                 }
                 _indexBufferDirty = false;
@@ -783,13 +776,14 @@ namespace Microsoft.Xna.Framework.Graphics
             var vertexBuffer = gl.CreateBuffer();
             var indexBuffer = gl.CreateBuffer();
 
-            gl.BindBuffer(WebGL2RenderingContextBase.ARRAY_BUFFER, vertexBuffer);
+            gl.BindBuffer(WebGLRenderingContextBase.ARRAY_BUFFER, vertexBuffer);
             GraphicsExtensions.CheckGLError();
-            gl.BufferData(WebGL2RenderingContextBase.ARRAY_BUFFER, Uint8Array.From(span), WebGL2RenderingContextBase.STATIC_DRAW);
+            gl.BufferData(WebGLRenderingContextBase.ARRAY_BUFFER, Uint8Array.From(span), WebGLRenderingContextBase.STATIC_DRAW);
+
             GraphicsExtensions.CheckGLError();
-            gl.BindBuffer(WebGL2RenderingContextBase.ELEMENT_ARRAY_BUFFER, indexBuffer);
+            gl.BindBuffer(WebGLRenderingContextBase.ELEMENT_ARRAY_BUFFER, indexBuffer);
             GraphicsExtensions.CheckGLError();
-            gl.BufferData(WebGL2RenderingContextBase.ELEMENT_ARRAY_BUFFER, Int16Array.From(indexData), WebGL2RenderingContextBase.STATIC_DRAW);
+            gl.BufferData(WebGLRenderingContextBase.ELEMENT_ARRAY_BUFFER, Int16Array.From(indexData), WebGLRenderingContextBase.STATIC_DRAW);
             GraphicsExtensions.CheckGLError();
 
             _vertexBuffersDirty = true;
@@ -799,11 +793,11 @@ namespace Microsoft.Xna.Framework.Graphics
             vertexDeclaration.GraphicsDevice = this;
             vertexDeclaration.Apply(_vertexShader, vertexOffset, ShaderProgramHash);
 
-            gl.DrawElements(mode, count, WebGL2RenderingContextBase.UNSIGNED_SHORT, (uint)(indexOffset * sizeof(short)));
+            gl.DrawElements(mode, count, WebGLRenderingContextBase.UNSIGNED_SHORT, (uint)(indexOffset * sizeof(short)));
             GraphicsExtensions.CheckGLError();
 
-            gl.BindBuffer(WebGL2RenderingContextBase.ARRAY_BUFFER, null);
-            gl.BindBuffer(WebGL2RenderingContextBase.ELEMENT_ARRAY_BUFFER, null);
+            gl.BindBuffer(WebGLRenderingContextBase.ARRAY_BUFFER, null);
+            gl.BindBuffer(WebGLRenderingContextBase.ELEMENT_ARRAY_BUFFER, null);
             gl.DeleteBuffer(vertexBuffer);
             gl.DeleteBuffer(indexBuffer);
 

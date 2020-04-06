@@ -39,7 +39,6 @@
     <Compile Include="Platform\Graphics\GraphicsAdapter.Legacy.cs" />
     <Compile Include="Platform\Web\WebGamePlatform.cs" />
     <Compile Include="Platform\Web\WebGameWindow.cs" />
-    <Compile Include="Platform\Web\WebHelper.cs" />
     <Compile Include="Platform\TitleContainer.Web.cs" />
     <Compile Include="Platform\Media\MediaPlayer.Default.cs" />
     <Compile Include="Platform\Media\MediaLibrary.Default.cs" />
@@ -93,7 +92,7 @@
     <PackageReference Include="WebAssembly.Bindings" Version="0.2.2" />
     <PackageReference Include="WebAssembly.Net.Http" Version="0.2.2" />
     <PackageReference Include="WebAssembly.Net.WebSockets" Version="0.2.2" />
-    <PackageReference Include="WebGLDotNET" Version="2.0.1" />
+    <PackageReference Include="WebGLDotNET" Version="2.1.0" />
   </ItemGroup>
 
 </Project>

@@ -35,13 +35,13 @@ namespace Microsoft.Xna.Framework.Graphics
             if (gl.IsShader(_shaderHandle))
                 return _shaderHandle;
 
-            _shaderHandle = gl.CreateShader(Stage == ShaderStage.Vertex ? WebGL2RenderingContextBase.VERTEX_SHADER : WebGL2RenderingContextBase.FRAGMENT_SHADER);
+            _shaderHandle = gl.CreateShader(Stage == ShaderStage.Vertex ? WebGLRenderingContextBase.VERTEX_SHADER : WebGLRenderingContextBase.FRAGMENT_SHADER);
             GraphicsExtensions.CheckGLError();
             gl.ShaderSource(_shaderHandle, _glslCode);
             GraphicsExtensions.CheckGLError();
             gl.CompileShader(_shaderHandle);
             GraphicsExtensions.CheckGLError();
-            var compiled = (bool)gl.GetShaderParameter(_shaderHandle, WebGL2RenderingContextBase.COMPILE_STATUS);
+            var compiled = (bool)gl.GetShaderParameter(_shaderHandle, WebGLRenderingContextBase.COMPILE_STATUS);
             GraphicsExtensions.CheckGLError();
             if (!compiled)
             {

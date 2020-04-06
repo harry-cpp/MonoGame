@@ -37,9 +37,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 ibo = gl.CreateBuffer();
                 GraphicsExtensions.CheckGLError();
-                gl.BindBuffer(WebGL2RenderingContextBase.ELEMENT_ARRAY_BUFFER, ibo);
+                gl.BindBuffer(WebGLRenderingContextBase.ELEMENT_ARRAY_BUFFER, ibo);
                 GraphicsExtensions.CheckGLError();
-                gl.BufferData(WebGL2RenderingContextBase.ELEMENT_ARRAY_BUFFER, 0, _isDynamic ? WebGL2RenderingContextBase.STREAM_DRAW : WebGL2RenderingContextBase.STATIC_DRAW);
+                gl.BufferData(WebGLRenderingContextBase.ELEMENT_ARRAY_BUFFER, 0, _isDynamic ? WebGLRenderingContextBase.STREAM_DRAW : WebGLRenderingContextBase.STATIC_DRAW);
                 GraphicsExtensions.CheckGLError();
             }
         }
@@ -63,24 +63,24 @@ namespace Microsoft.Xna.Framework.Graphics
             var elementSizeInByte = (IndexElementSize == IndexElementSize.SixteenBits ? 2 : 4);
             var bufferSize = IndexCount * elementSizeInByte;
             
-            gl.BindBuffer(WebGL2RenderingContextBase.ELEMENT_ARRAY_BUFFER, ibo);
+            gl.BindBuffer(WebGLRenderingContextBase.ELEMENT_ARRAY_BUFFER, ibo);
             GraphicsExtensions.CheckGLError();
             
             if (options == SetDataOptions.Discard)
             {
                 // By assigning NULL data to the buffer this gives a hint
                 // to the device to discard the previous content.
-                gl.BufferData(WebGL2RenderingContextBase.ELEMENT_ARRAY_BUFFER, 0, _isDynamic ? WebGL2RenderingContextBase.STREAM_DRAW : WebGL2RenderingContextBase.STATIC_DRAW);
+                gl.BufferData(WebGLRenderingContextBase.ELEMENT_ARRAY_BUFFER, 0, _isDynamic ? WebGLRenderingContextBase.STREAM_DRAW : WebGLRenderingContextBase.STATIC_DRAW);
                 GraphicsExtensions.CheckGLError();
             }
             
             if (elementSizeInByte == 2)
             {
-                gl.BufferSubData(WebGL2RenderingContextBase.ELEMENT_ARRAY_BUFFER, (uint)offsetInBytes, data);
+                gl.BufferSubData(WebGLRenderingContextBase.ELEMENT_ARRAY_BUFFER, (uint)offsetInBytes, data);
             }
             else
             {
-                gl.BufferSubData(WebGL2RenderingContextBase.ELEMENT_ARRAY_BUFFER, (uint)offsetInBytes, data);
+                gl.BufferSubData(WebGLRenderingContextBase.ELEMENT_ARRAY_BUFFER, (uint)offsetInBytes, data);
             }
 
             GraphicsExtensions.CheckGLError();

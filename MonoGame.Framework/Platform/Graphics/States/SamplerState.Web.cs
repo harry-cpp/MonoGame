@@ -32,9 +32,9 @@ namespace Microsoft.Xna.Framework.Graphics
                         gl.TexParameteri(target, TextureParameterNameTextureMaxAnisotropy, 1);
                         GraphicsExtensions.CheckGLError();
                     }
-                    gl.TexParameteri(target, WebGL2RenderingContextBase.TEXTURE_MIN_FILTER, (int)(useMipmaps ? WebGL2RenderingContextBase.NEAREST_MIPMAP_NEAREST : WebGL2RenderingContextBase.NEAREST));
+                    gl.TexParameteri(target, WebGLRenderingContextBase.TEXTURE_MIN_FILTER, (int)(useMipmaps ? WebGLRenderingContextBase.NEAREST_MIPMAP_NEAREST : WebGLRenderingContextBase.NEAREST));
                     GraphicsExtensions.CheckGLError();
-                    gl.TexParameteri(target, WebGL2RenderingContextBase.TEXTURE_MAG_FILTER, (int)WebGL2RenderingContextBase.NEAREST);
+                    gl.TexParameteri(target, WebGLRenderingContextBase.TEXTURE_MAG_FILTER, (int)WebGLRenderingContextBase.NEAREST);
                     GraphicsExtensions.CheckGLError();
                     break;
                 case TextureFilter.Linear:
@@ -43,9 +43,9 @@ namespace Microsoft.Xna.Framework.Graphics
                         gl.TexParameteri(target, TextureParameterNameTextureMaxAnisotropy, 1);
                         GraphicsExtensions.CheckGLError();
                     }
-                    gl.TexParameteri(target, WebGL2RenderingContextBase.TEXTURE_MIN_FILTER, (int)(useMipmaps ? WebGL2RenderingContextBase.LINEAR_MIPMAP_LINEAR : WebGL2RenderingContextBase.LINEAR));
+                    gl.TexParameteri(target, WebGLRenderingContextBase.TEXTURE_MIN_FILTER, (int)(useMipmaps ? WebGLRenderingContextBase.LINEAR_MIPMAP_LINEAR : WebGLRenderingContextBase.LINEAR));
                     GraphicsExtensions.CheckGLError();
-                    gl.TexParameteri(target, WebGL2RenderingContextBase.TEXTURE_MAG_FILTER, (int)WebGL2RenderingContextBase.LINEAR);
+                    gl.TexParameteri(target, WebGLRenderingContextBase.TEXTURE_MAG_FILTER, (int)WebGLRenderingContextBase.LINEAR);
                     GraphicsExtensions.CheckGLError();
                     break;
                 case TextureFilter.Anisotropic:
@@ -54,9 +54,9 @@ namespace Microsoft.Xna.Framework.Graphics
                         gl.TexParameteri(target, TextureParameterNameTextureMaxAnisotropy, MathHelper.Clamp(this.MaxAnisotropy, 1, GraphicsDevice.GraphicsCapabilities.MaxTextureAnisotropy));
                         GraphicsExtensions.CheckGLError();
                     }
-                    gl.TexParameteri(target, WebGL2RenderingContextBase.TEXTURE_MIN_FILTER, (int)(useMipmaps ? WebGL2RenderingContextBase.LINEAR_MIPMAP_LINEAR : WebGL2RenderingContextBase.LINEAR));
+                    gl.TexParameteri(target, WebGLRenderingContextBase.TEXTURE_MIN_FILTER, (int)(useMipmaps ? WebGLRenderingContextBase.LINEAR_MIPMAP_LINEAR : WebGLRenderingContextBase.LINEAR));
                     GraphicsExtensions.CheckGLError();
-                    gl.TexParameteri(target, WebGL2RenderingContextBase.TEXTURE_MAG_FILTER, (int)WebGL2RenderingContextBase.LINEAR);
+                    gl.TexParameteri(target, WebGLRenderingContextBase.TEXTURE_MAG_FILTER, (int)WebGLRenderingContextBase.LINEAR);
                     GraphicsExtensions.CheckGLError();
                     break;
                 case TextureFilter.PointMipLinear:
@@ -65,9 +65,9 @@ namespace Microsoft.Xna.Framework.Graphics
                         gl.TexParameteri(target, TextureParameterNameTextureMaxAnisotropy, 1);
                         GraphicsExtensions.CheckGLError();
                     }
-                    gl.TexParameteri(target, WebGL2RenderingContextBase.TEXTURE_MIN_FILTER, (int)(useMipmaps ? WebGL2RenderingContextBase.NEAREST_MIPMAP_LINEAR : WebGL2RenderingContextBase.NEAREST));
+                    gl.TexParameteri(target, WebGLRenderingContextBase.TEXTURE_MIN_FILTER, (int)(useMipmaps ? WebGLRenderingContextBase.NEAREST_MIPMAP_LINEAR : WebGLRenderingContextBase.NEAREST));
                     GraphicsExtensions.CheckGLError();
-                    gl.TexParameteri(target, WebGL2RenderingContextBase.TEXTURE_MAG_FILTER, (int)WebGL2RenderingContextBase.NEAREST);
+                    gl.TexParameteri(target, WebGLRenderingContextBase.TEXTURE_MAG_FILTER, (int)WebGLRenderingContextBase.NEAREST);
                     GraphicsExtensions.CheckGLError();
                     break;
                 case TextureFilter.LinearMipPoint:
@@ -76,9 +76,9 @@ namespace Microsoft.Xna.Framework.Graphics
                         gl.TexParameteri(target, TextureParameterNameTextureMaxAnisotropy, 1);
                         GraphicsExtensions.CheckGLError();
                     }
-                    gl.TexParameteri(target, WebGL2RenderingContextBase.TEXTURE_MIN_FILTER, (int)(useMipmaps ? WebGL2RenderingContextBase.LINEAR_MIPMAP_NEAREST : WebGL2RenderingContextBase.LINEAR));
+                    gl.TexParameteri(target, WebGLRenderingContextBase.TEXTURE_MIN_FILTER, (int)(useMipmaps ? WebGLRenderingContextBase.LINEAR_MIPMAP_NEAREST : WebGLRenderingContextBase.LINEAR));
                     GraphicsExtensions.CheckGLError();
-                    gl.TexParameteri(target, WebGL2RenderingContextBase.TEXTURE_MAG_FILTER, (int)WebGL2RenderingContextBase.LINEAR);
+                    gl.TexParameteri(target, WebGLRenderingContextBase.TEXTURE_MAG_FILTER, (int)WebGLRenderingContextBase.LINEAR);
                     GraphicsExtensions.CheckGLError();
                     break;
                 case TextureFilter.MinLinearMagPointMipLinear:
@@ -87,9 +87,9 @@ namespace Microsoft.Xna.Framework.Graphics
                         gl.TexParameteri(target, TextureParameterNameTextureMaxAnisotropy, 1);
                         GraphicsExtensions.CheckGLError();
                     }
-                    gl.TexParameteri(target, WebGL2RenderingContextBase.TEXTURE_MIN_FILTER, (int)(useMipmaps ? WebGL2RenderingContextBase.LINEAR_MIPMAP_LINEAR : WebGL2RenderingContextBase.LINEAR));
+                    gl.TexParameteri(target, WebGLRenderingContextBase.TEXTURE_MIN_FILTER, (int)(useMipmaps ? WebGLRenderingContextBase.LINEAR_MIPMAP_LINEAR : WebGLRenderingContextBase.LINEAR));
                     GraphicsExtensions.CheckGLError();
-                    gl.TexParameteri(target, WebGL2RenderingContextBase.TEXTURE_MAG_FILTER, (int)WebGL2RenderingContextBase.NEAREST);
+                    gl.TexParameteri(target, WebGLRenderingContextBase.TEXTURE_MAG_FILTER, (int)WebGLRenderingContextBase.NEAREST);
                     GraphicsExtensions.CheckGLError();
                     break;
                 case TextureFilter.MinLinearMagPointMipPoint:
@@ -98,9 +98,9 @@ namespace Microsoft.Xna.Framework.Graphics
                         gl.TexParameteri(target, TextureParameterNameTextureMaxAnisotropy, 1);
                         GraphicsExtensions.CheckGLError();
                     }
-                    gl.TexParameteri(target, WebGL2RenderingContextBase.TEXTURE_MIN_FILTER, (int)(useMipmaps ? WebGL2RenderingContextBase.LINEAR_MIPMAP_NEAREST : WebGL2RenderingContextBase.LINEAR));
+                    gl.TexParameteri(target, WebGLRenderingContextBase.TEXTURE_MIN_FILTER, (int)(useMipmaps ? WebGLRenderingContextBase.LINEAR_MIPMAP_NEAREST : WebGLRenderingContextBase.LINEAR));
                     GraphicsExtensions.CheckGLError();
-                    gl.TexParameteri(target, WebGL2RenderingContextBase.TEXTURE_MAG_FILTER, (int)WebGL2RenderingContextBase.NEAREST);
+                    gl.TexParameteri(target, WebGLRenderingContextBase.TEXTURE_MAG_FILTER, (int)WebGLRenderingContextBase.NEAREST);
                     GraphicsExtensions.CheckGLError();
                     break;
                 case TextureFilter.MinPointMagLinearMipLinear:
@@ -109,9 +109,9 @@ namespace Microsoft.Xna.Framework.Graphics
                         gl.TexParameteri(target, TextureParameterNameTextureMaxAnisotropy, 1);
                         GraphicsExtensions.CheckGLError();
                     }
-                    gl.TexParameteri(target, WebGL2RenderingContextBase.TEXTURE_MIN_FILTER, (int)(useMipmaps ? WebGL2RenderingContextBase.NEAREST_MIPMAP_LINEAR : WebGL2RenderingContextBase.NEAREST));
+                    gl.TexParameteri(target, WebGLRenderingContextBase.TEXTURE_MIN_FILTER, (int)(useMipmaps ? WebGLRenderingContextBase.NEAREST_MIPMAP_LINEAR : WebGLRenderingContextBase.NEAREST));
                     GraphicsExtensions.CheckGLError();
-                    gl.TexParameteri(target, WebGL2RenderingContextBase.TEXTURE_MAG_FILTER, (int)WebGL2RenderingContextBase.LINEAR);
+                    gl.TexParameteri(target, WebGLRenderingContextBase.TEXTURE_MAG_FILTER, (int)WebGLRenderingContextBase.LINEAR);
                     GraphicsExtensions.CheckGLError();
                     break;
                 case TextureFilter.MinPointMagLinearMipPoint:
@@ -120,9 +120,9 @@ namespace Microsoft.Xna.Framework.Graphics
                         gl.TexParameteri(target, TextureParameterNameTextureMaxAnisotropy, 1);
                         GraphicsExtensions.CheckGLError();
                     }
-                    gl.TexParameteri(target, WebGL2RenderingContextBase.TEXTURE_MIN_FILTER, (int)(useMipmaps ? WebGL2RenderingContextBase.NEAREST_MIPMAP_NEAREST : WebGL2RenderingContextBase.NEAREST));
+                    gl.TexParameteri(target, WebGLRenderingContextBase.TEXTURE_MIN_FILTER, (int)(useMipmaps ? WebGLRenderingContextBase.NEAREST_MIPMAP_NEAREST : WebGLRenderingContextBase.NEAREST));
                     GraphicsExtensions.CheckGLError();
-                    gl.TexParameteri(target, WebGL2RenderingContextBase.TEXTURE_MAG_FILTER, (int)WebGL2RenderingContextBase.LINEAR);
+                    gl.TexParameteri(target, WebGLRenderingContextBase.TEXTURE_MAG_FILTER, (int)WebGLRenderingContextBase.LINEAR);
                     GraphicsExtensions.CheckGLError();
                     break;
                 default:
@@ -130,44 +130,10 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
             // Set up texture addressing.
-            gl.TexParameteri(target, WebGL2RenderingContextBase.TEXTURE_WRAP_S, (int)GetWrapMode(AddressU));
+            gl.TexParameteri(target, WebGLRenderingContextBase.TEXTURE_WRAP_S, (int)GetWrapMode(AddressU));
             GraphicsExtensions.CheckGLError();
-            gl.TexParameteri(target, WebGL2RenderingContextBase.TEXTURE_WRAP_T, (int)GetWrapMode(AddressV));
+            gl.TexParameteri(target, WebGLRenderingContextBase.TEXTURE_WRAP_T, (int)GetWrapMode(AddressV));
             GraphicsExtensions.CheckGLError();
-
-            // LOD bias is not supported by glTexParameter in OpenGL ES 2.0
-            gl.TexParameterf(target, WebGL2RenderingContextBase.MAX_TEXTURE_LOD_BIAS, MipMapLevelOfDetailBias);
-            GraphicsExtensions.CheckGLError();
-
-            // Comparison samplers are not supported in OpenGL ES 2.0 (without an extension, anyway)
-            switch (FilterMode)
-            {
-                case TextureFilterMode.Comparison:
-                    gl.TexParameteri(target, WebGL2RenderingContextBase.TEXTURE_COMPARE_MODE, (int)WebGL2RenderingContextBase.COMPARE_REF_TO_TEXTURE);
-                    GraphicsExtensions.CheckGLError();
-                    gl.TexParameteri(target, WebGL2RenderingContextBase.TEXTURE_COMPARE_MODE, (int)ComparisonFunction.GetDepthFunction());
-                    GraphicsExtensions.CheckGLError();
-                    break;
-                case TextureFilterMode.Default:
-                    gl.TexParameteri(target, WebGL2RenderingContextBase.TEXTURE_COMPARE_MODE, (int)WebGL2RenderingContextBase.NONE);
-                    GraphicsExtensions.CheckGLError();
-                    break;
-                default:
-                    throw new InvalidOperationException("Invalid filter mode!");
-            }
-
-            if (GraphicsDevice.GraphicsCapabilities.SupportsTextureMaxLevel)
-            {
-                if (this.MaxMipLevel > 0)
-                {
-                    gl.TexParameteri(WebGL2RenderingContextBase.TEXTURE_2D, WebGL2RenderingContextBase.TEXTURE_MAX_LEVEL, this.MaxMipLevel);
-                }
-                else
-                {
-                    gl.TexParameteri(WebGL2RenderingContextBase.TEXTURE_2D, WebGL2RenderingContextBase.TEXTURE_MAX_LEVEL, 1000);
-                }
-                GraphicsExtensions.CheckGLError();
-            }
         }
 
         private double GetWrapMode(TextureAddressMode textureAddressMode)
@@ -175,11 +141,11 @@ namespace Microsoft.Xna.Framework.Graphics
             switch (textureAddressMode)
             {
                 case TextureAddressMode.Clamp:
-                    return WebGL2RenderingContextBase.CLAMP_TO_EDGE;
+                    return WebGLRenderingContextBase.CLAMP_TO_EDGE;
                 case TextureAddressMode.Wrap:
-                    return WebGL2RenderingContextBase.REPEAT;
+                    return WebGLRenderingContextBase.REPEAT;
                 case TextureAddressMode.Mirror:
-                    return WebGL2RenderingContextBase.MIRRORED_REPEAT;
+                    return WebGLRenderingContextBase.MIRRORED_REPEAT;
                 default:
                     throw new ArgumentException("No support for " + textureAddressMode);
             }

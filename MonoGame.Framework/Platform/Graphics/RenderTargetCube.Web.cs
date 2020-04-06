@@ -26,7 +26,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         uint IRenderTarget.GetFramebufferTarget(RenderTargetBinding renderTargetBinding)
         {
-            return (uint)(WebGL2RenderingContextBase.TEXTURE_CUBE_MAP_POSITIVE_X + renderTargetBinding.ArraySlice);
+            return (uint)(WebGLRenderingContextBase.TEXTURE_CUBE_MAP_POSITIVE_X + renderTargetBinding.ArraySlice);
         }
 
         private void PlatformConstruct(GraphicsDevice graphicsDevice, bool mipMap, DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage)

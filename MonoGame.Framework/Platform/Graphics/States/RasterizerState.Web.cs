@@ -18,35 +18,35 @@ namespace Microsoft.Xna.Framework.Graphics
             if (force)
             {
                 // Turn off dithering to make sure data returned by Texture.GetData is accurate
-                gl.Disable(WebGL2RenderingContextBase.DITHER);
+                gl.Disable(WebGLRenderingContextBase.DITHER);
             }
 
             if (CullMode == CullMode.None)
             {
-                gl.Disable(WebGL2RenderingContextBase.CULL_FACE);
+                gl.Disable(WebGLRenderingContextBase.CULL_FACE);
                 GraphicsExtensions.CheckGLError();
             }
             else
             {
-                gl.Enable(WebGL2RenderingContextBase.CULL_FACE);
+                gl.Enable(WebGLRenderingContextBase.CULL_FACE);
                 GraphicsExtensions.CheckGLError();
-                gl.CullFace(WebGL2RenderingContextBase.BACK);
+                gl.CullFace(WebGLRenderingContextBase.BACK);
                 GraphicsExtensions.CheckGLError();
 
                 if (CullMode == CullMode.CullClockwiseFace)
                 {
                     if (offscreen)
-                        gl.FrontFace(WebGL2RenderingContextBase.CW);
+                        gl.FrontFace(WebGLRenderingContextBase.CW);
                     else
-                        gl.FrontFace(WebGL2RenderingContextBase.CCW);
+                        gl.FrontFace(WebGLRenderingContextBase.CCW);
                     GraphicsExtensions.CheckGLError();
                 }
                 else
                 {
                     if (offscreen)
-                        gl.FrontFace(WebGL2RenderingContextBase.CCW);
+                        gl.FrontFace(WebGLRenderingContextBase.CCW);
                     else
-                        gl.FrontFace(WebGL2RenderingContextBase.CW);
+                        gl.FrontFace(WebGLRenderingContextBase.CW);
                     GraphicsExtensions.CheckGLError();
                 }
             }
@@ -57,9 +57,9 @@ namespace Microsoft.Xna.Framework.Graphics
             if (force || this.ScissorTestEnable != device._lastRasterizerState.ScissorTestEnable)
 			{
 			    if (ScissorTestEnable)
-				    gl.Enable(WebGL2RenderingContextBase.SCISSOR_TEST);
+				    gl.Enable(WebGLRenderingContextBase.SCISSOR_TEST);
 			    else
-				    gl.Disable(WebGL2RenderingContextBase.SCISSOR_TEST);
+				    gl.Disable(WebGLRenderingContextBase.SCISSOR_TEST);
                 GraphicsExtensions.CheckGLError();
                 device._lastRasterizerState.ScissorTestEnable = this.ScissorTestEnable;
             }
@@ -89,11 +89,11 @@ namespace Microsoft.Xna.Framework.Graphics
                         default:
                             throw new ArgumentOutOfRangeException();
                     }
-                    gl.Enable(WebGL2RenderingContextBase.POLYGON_OFFSET_FILL);
+                    gl.Enable(WebGLRenderingContextBase.POLYGON_OFFSET_FILL);
                     gl.PolygonOffset(this.SlopeScaleDepthBias, this.DepthBias * depthMul);
                 }
                 else
-                    gl.Disable(WebGL2RenderingContextBase.POLYGON_OFFSET_FILL);
+                    gl.Disable(WebGLRenderingContextBase.POLYGON_OFFSET_FILL);
                 GraphicsExtensions.CheckGLError();
                 device._lastRasterizerState.DepthBias = this.DepthBias;
                 device._lastRasterizerState.SlopeScaleDepthBias = this.SlopeScaleDepthBias;
