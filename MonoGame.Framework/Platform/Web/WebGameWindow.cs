@@ -62,8 +62,37 @@ namespace Microsoft.Xna.Framework
                 o.Invoke("preventDefault");
             }), false);
 
-            _canvas.Invoke("addEventListener", "keydown", (Action<JSObject>)Canvas_KeyDown, false);
-            _canvas.Invoke("addEventListener", "keyup", (Action<JSObject>)Canvas_KeyUp, false);
+            _canvas.Invoke("addEventListener", "keydown", new Action<JSObject>(Canvas_KeyDown), false);
+            _canvas.Invoke("addEventListener", "keyup", new Action<JSObject>(Canvas_KeyUp), false);
+
+            _canvas.Invoke("addEventListener", "mousemove", new Action<JSObject>(Canvas_MouseEv), false);
+            _canvas.Invoke("addEventListener", "mousedown", new Action<JSObject>(Canvas_MouseEv), false);
+            _canvas.Invoke("addEventListener", "mouseup", new Action<JSObject>(Canvas_MouseEv), false);
+
+            _canvas.Invoke("addEventListener", "wheel", new Action<JSObject>(Canvas_MouseWheel), false);
+        }
+
+        private void Canvas_MouseEv(JSObject e)
+        {
+            var buttons = (int)e.GetObjectProperty("buttons");
+            var clientX = (int)e.GetObjectProperty("clientX");
+            var clientY = (int)e.GetObjectProperty("clientY");
+
+            this.MouseState.LeftButton = ((buttons & 1) > 0) ? ButtonState.Pressed : ButtonState.Released;
+            this.MouseState.MiddleButton = ((buttons & 4) > 0) ? ButtonState.Pressed : ButtonState.Released;
+            this.MouseState.RightButton = ((buttons & 2) > 0) ? ButtonState.Pressed : ButtonState.Released;
+            this.MouseState.X = clientX - (int)_canvas.GetObjectProperty("offsetLeft");
+            this.MouseState.Y = clientY - (int)_canvas.GetObjectProperty("offsetTop");
+        }
+
+        private void Canvas_MouseWheel(JSObject e)
+        {
+            var deltaY = (int)e.GetObjectProperty("deltaY");
+
+            if (deltaY < 0)
+                this.MouseState.ScrollWheelValue += 120;
+            else if (deltaY > 0)
+                this.MouseState.ScrollWheelValue -= 120;
         }
 
         private void Canvas_KeyDown(JSObject e)
