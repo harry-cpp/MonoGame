@@ -2,13 +2,13 @@
 using WebAssembly;
 using WebGLDotNET;
 
-namespace TestGame
+namespace Platformer2D
 {
     class Program
     {
         static async void Main()
         {
-            var g = new Game1();
+            var g = new PlatformerGame();
             g.Run();
         }
     }

@@ -5,6 +5,7 @@
     <MonoWasmLinkMode>Full</MonoWasmLinkMode>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <RestoreSources>../ThirdParty/WebGL</RestoreSources>
+    <MonoGamePlatform>DesktopGL</MonoGamePlatform>
   </PropertyGroup>
   
   <ItemGroup>
@@ -12,6 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="MonoGame.Content.Builder" Version="3.7.0.9" />
     <PackageReference Include="WebAssembly.Bindings" Version="0.2.2" />
     <PackageReference Include="WebAssembly.Net.Http" Version="0.2.2" />
     <PackageReference Include="WebAssembly.Net.WebSockets" Version="0.2.2" />
@@ -21,6 +23,10 @@
   <ItemGroup>
     <None Remove="index.html" />
     <None Remove="Scripts\mono_support.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <MonoGameContentReference Include="**\*.mgcb" />
   </ItemGroup>
   
 </Project>
