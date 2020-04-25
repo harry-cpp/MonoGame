@@ -123,6 +123,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private DepthStencilState clearDepthStencilState = new DepthStencilState { StencilEnable = true };
         
         private double[] _drawBuffers;
+        private WEBGL_draw_buffers _drawBuffersExtension;
 
         // Get a hashed value based on the currently bound shaders
         // throws an exception if no shaders are bound
@@ -174,6 +175,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
             _maxVertexBufferSlots = MaxVertexAttributes;
             _newEnabledVertexAttributes = new bool[MaxVertexAttributes];
+
+            _drawBuffersExtension = gl.getExtension("WEBGL_draw_buffers").As<WEBGL_draw_buffers>();
+            var maxDrawBuffers = _drawBuffersExtension.MAX_DRAW_BUFFERS_WEBGL.As<int>();
+
+            _drawBuffers = new double[maxDrawBuffers];
+            for (int i = 0; i < maxDrawBuffers; i++)
+                _drawBuffers[i] = _drawBuffersExtension.COLOR_ATTACHMENT0_WEBGL + i;
         }
 
         private void PlatformInitialize()
@@ -425,30 +433,18 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void PlatformCreateRenderTarget(IRenderTarget renderTarget, int width, int height, bool mipMap, SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage)
         {
-            /*WebGLRenderbuffer color = null;
+            WebGLRenderbuffer color = null;
             WebGLRenderbuffer depth = null;
             WebGLRenderbuffer stencil = null;
             
             this.framebufferHelper.GenRenderbuffer(out color);
             this.framebufferHelper.BindRenderbuffer(color);
-            this.framebufferHelper.RenderbufferStorageMultisample(preferredMultiSampleCount, gl.RGBA8, width, height);
+            this.framebufferHelper.RenderbufferStorageMultisample(preferredMultiSampleCount, gl.RGBA4, width, height);
 
             if (preferredDepthFormat != DepthFormat.None)
             {
-                var depthInternalFormat = glc.DEPTH_COMPONENT16;
-                var stencilInternalFormat = glc.NEVER;
-                switch (preferredDepthFormat)
-                {
-                    case DepthFormat.Depth16: 
-                        depthInternalFormat = glc.DEPTH_COMPONENT16;
-                        break;
-                    case DepthFormat.Depth24:
-                        depthInternalFormat = gl.DEPTH_COMPONENT24;
-                        break;
-                    case DepthFormat.Depth24Stencil8:
-                        depthInternalFormat = gl.DEPTH24_STENCIL8;
-                        break;
-                }
+                var depthInternalFormat = gl.DEPTH_COMPONENT16;
+                var stencilInternalFormat = gl.NEVER;
 
                 if (depthInternalFormat != 0)
                 {
@@ -470,7 +466,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             renderTarget.GLColorBuffer = color;
             renderTarget.GLDepthBuffer = depth;
-            renderTarget.GLStencilBuffer = stencil;*/
+            renderTarget.GLStencilBuffer = stencil;
         }
 
         internal void PlatformDeleteRenderTarget(IRenderTarget renderTarget)
@@ -580,19 +576,19 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private IRenderTarget PlatformApplyRenderTargets()
         {
-            /*if (!this.glFramebuffers.TryGetValue(this._currentRenderTargetBindings, out WebGLFramebuffer glFramebuffer))
+            if (!this.glFramebuffers.TryGetValue(this._currentRenderTargetBindings, out WebGLFramebuffer glFramebuffer))
             {
                 this.framebufferHelper.GenFramebuffer(out glFramebuffer);
                 this.framebufferHelper.BindFramebuffer(glFramebuffer);
                 var renderTargetBinding = this._currentRenderTargetBindings[0];
                 var renderTarget = renderTargetBinding.RenderTarget as IRenderTarget;
-                this.framebufferHelper.FramebufferRenderbuffer(glc.DEPTH_ATTACHMENT, renderTarget.GLDepthBuffer, 0);
-                this.framebufferHelper.FramebufferRenderbuffer(glc.STENCIL_ATTACHMENT, renderTarget.GLStencilBuffer, 0);
+                this.framebufferHelper.FramebufferRenderbuffer(gl.DEPTH_ATTACHMENT, renderTarget.GLDepthBuffer, 0);
+                this.framebufferHelper.FramebufferRenderbuffer(gl.STENCIL_ATTACHMENT, renderTarget.GLStencilBuffer, 0);
                 for (var i = 0; i < this._currentRenderTargetCount; ++i)
                 {
                     renderTargetBinding = this._currentRenderTargetBindings[i];
                     renderTarget = renderTargetBinding.RenderTarget as IRenderTarget;
-                    var attachement = glc.COLOR_ATTACHMENT0 + i;
+                    var attachement = gl.COLOR_ATTACHMENT0 + i;
 
                     this.framebufferHelper.FramebufferTexture2D(attachement, (int)renderTarget.GetFramebufferTarget(renderTargetBinding), renderTarget.GLTexture, 0, renderTarget.MultiSampleCount);
                 }
@@ -607,16 +603,16 @@ namespace Microsoft.Xna.Framework.Graphics
             var tmp = new double[(int)_currentRenderTargetCount];
             for (int i = 0; i < this._currentRenderTargetCount; i++)
                 tmp[i] = _drawBuffers[i];
-            gl.drawBuffers(tmp);
+            _drawBuffersExtension.drawBuffersWEBGL(tmp);
 
             // Reset the raster state because we flip vertices
             // when rendering offscreen and hence the cull direction.
             _rasterizerStateDirty = true;
 
             // Textures will need to be rebound to render correctly in the new render target.
-            Textures.Dirty();*/
+            Textures.Dirty();
 
-            return null; // _currentRenderTargetBindings[0].RenderTarget as IRenderTarget;
+            return _currentRenderTargetBindings[0].RenderTarget as IRenderTarget;
         }
         
         internal void OnPresentationChanged()

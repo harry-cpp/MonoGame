@@ -33,8 +33,8 @@ namespace Microsoft.Xna.Framework.Graphics
                     // TODO: Avoid doing this redundantly (see TextureCollection.SetTextures())
                     // However, I suspect that rendering from the same texture with different sampling modes
                     // is a relatively rare occurrence...
-                    /*gl.activeTexture(gl.TEXTURE0 + i);
-                    GraphicsExtensions.CheckGLError();*/
+                    gl.activeTexture(gl.TEXTURE0 + i);
+                    GraphicsExtensions.CheckGLError();
 
                     // NOTE: We don't have to bind the texture here because it is already bound in
                     // TextureCollection.SetTextures(). This, of course, assumes that SetTextures() is called
@@ -42,8 +42,8 @@ namespace Microsoft.Xna.Framework.Graphics
                     // GL.BindTexture(texture.glTarget, texture.glTexture);
                     // GraphicsExtensions.CheckGLError();
 
-                    /*sampler.Activate(device, texture.glTarget, texture.LevelCount > 1);
-                    texture.glLastSamplerState = sampler;*/
+                    sampler.Activate(device, texture.glTarget, texture.LevelCount > 1);
+                    texture.glLastSamplerState = sampler;
                 }
             }
         }
