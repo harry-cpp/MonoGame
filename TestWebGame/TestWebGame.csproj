@@ -27,7 +27,7 @@
   <ItemGroup>
     <PackageReference Include="MonoGame.Content.Builder" Version="3.7.0.*" />
     <PackageReference Include="Retyped.dom" Version="2.8.6733" />
-    <PackageReference Include="Bridge" Version="17.2.0" />
+    <PackageReference Include="Bridge" Version="17.10.1" />
   </ItemGroup>
   
 </Project>
