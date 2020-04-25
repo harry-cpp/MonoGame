@@ -176,12 +176,15 @@ namespace Microsoft.Xna.Framework.Graphics
             _maxVertexBufferSlots = MaxVertexAttributes;
             _newEnabledVertexAttributes = new bool[MaxVertexAttributes];
 
-            _drawBuffersExtension = gl.getExtension("WEBGL_draw_buffers").As<WEBGL_draw_buffers>();
-            var maxDrawBuffers = _drawBuffersExtension.MAX_DRAW_BUFFERS_WEBGL.As<int>();
+            if (gl.getSupportedExtensions().Contains("WEBGL_draw_buffers"))
+            {
+                _drawBuffersExtension = gl.getExtension("WEBGL_draw_buffers").As<WEBGL_draw_buffers>();
+                var maxDrawBuffers = _drawBuffersExtension.MAX_DRAW_BUFFERS_WEBGL.As<int>();
 
-            _drawBuffers = new double[maxDrawBuffers];
-            for (int i = 0; i < maxDrawBuffers; i++)
-                _drawBuffers[i] = _drawBuffersExtension.COLOR_ATTACHMENT0_WEBGL + i;
+                _drawBuffers = new double[maxDrawBuffers];
+                for (int i = 0; i < maxDrawBuffers; i++)
+                    _drawBuffers[i] = _drawBuffersExtension.COLOR_ATTACHMENT0_WEBGL + i;
+            }
         }
 
         private void PlatformInitialize()
@@ -600,10 +603,13 @@ namespace Microsoft.Xna.Framework.Graphics
                 this.framebufferHelper.BindFramebuffer(glFramebuffer);
             }
 
-            var tmp = new double[(int)_currentRenderTargetCount];
-            for (int i = 0; i < this._currentRenderTargetCount; i++)
-                tmp[i] = _drawBuffers[i];
-            _drawBuffersExtension.drawBuffersWEBGL(tmp);
+            if (_drawBuffersExtension != null)
+            {
+                var tmp = new double[(int)_currentRenderTargetCount];
+                for (int i = 0; i < this._currentRenderTargetCount; i++)
+                    tmp[i] = _drawBuffers[i];
+                _drawBuffersExtension.drawBuffersWEBGL(tmp);
+            }
 
             // Reset the raster state because we flip vertices
             // when rendering offscreen and hence the cull direction.

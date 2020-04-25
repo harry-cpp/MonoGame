@@ -11,20 +11,22 @@ namespace Microsoft.Xna.Framework.Media
 {
     public sealed partial class Song : IEquatable<Song>, IDisposable
     {
-        private HTMLAudioElement _audio;
+        private SoundEffect _soundEffect;
+        private SoundEffectInstance _soundEffectInstance;
 
         private void PlatformInitialize(string fileName)
         {
             Content.ContentManager.BlockContentLoaading = true;
+            LoadSong(fileName.EndsWith(".mp3") ? fileName : fileName + ".mp3");
 
-            _audio = new HTMLAudioElement();
-            _audio.oncanplaythrough += (e) => Content.ContentManager.BlockContentLoaading = false;
-            _audio.src = fileName.EndsWith(".mp3") ? fileName : fileName + ".mp3";
-            _audio.load();
+            // TODO: Fix sound looping and hook up to game loop to track song position
+        }
 
-            _duration = TimeSpan.FromSeconds(_audio.duration);
-
-            _audio.onended += (e) => MediaPlayer.OnSongFinishedPlaying(null, null);
+        private async void LoadSong(string fileName)
+        {
+            _soundEffect = await SoundEffect.FromURL(fileName);
+            _soundEffectInstance = _soundEffect.CreateInstance();
+            Content.ContentManager.BlockContentLoaading = false;
         }
         
         internal void SetEventHandler(FinishedPlayingHandler handler) { }
@@ -36,39 +38,34 @@ namespace Microsoft.Xna.Framework.Media
 
         internal void Play(TimeSpan? startPosition)
         {
-            if (startPosition.HasValue)
-                _audio.currentTime = startPosition.Value.Seconds;
-
-            _audio.play();
-            _playCount++;
+            _soundEffectInstance.Play();
+            _soundEffectInstance._source.loop = true;
         }
 
         internal void Resume()
         {
-            _audio.play();
+            _soundEffectInstance.Resume();
         }
 
         internal void Pause()
         {
-            _audio.pause();
+            _soundEffectInstance.Pause();
         }
 
         internal void Stop()
         {
-            _audio.currentTime = 0;
-            _audio.pause();
-            _playCount = 0;
+            _soundEffectInstance.Stop(true);
         }
 
         internal float Volume
         {
-            get => (float)_audio.volume;
-            set => _audio.volume = value;
+            get => (float)_soundEffectInstance.Volume;
+            set => _soundEffectInstance.Volume = value;
         }
 
         public TimeSpan Position
         {
-            get => TimeSpan.FromSeconds(_audio.currentTime);
+            get => TimeSpan.Zero;
         }
 
         private Album PlatformGetAlbum()

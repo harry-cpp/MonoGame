@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using static Retyped.dom;
@@ -34,6 +35,12 @@ namespace Microsoft.Xna.Framework
 
         public override void StartRunLoop()
         {
+            // Safari workaround so sound effects would play
+            // this means Run needs to be called on something like a button click
+            var se = new SoundEffect();
+            se.SetEmptyBuffer();
+            se.Play();
+
             window.requestAnimationFrame(AnimationFrame);
         }
 

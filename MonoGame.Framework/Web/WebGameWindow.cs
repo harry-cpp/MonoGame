@@ -5,12 +5,9 @@
 using System;
 using System.Collections.Generic;
 using Bridge;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Input;
 using static Retyped.dom;
-
-#if WEB
-using IntPtr = Microsoft.Xna.Framework.IntPtr;
-#endif
 
 static class WebHelper
 {
@@ -34,8 +31,9 @@ namespace Microsoft.Xna.Framework
 
             Keyboard.SetKeys(_keys);
 
-            _canvas = document.getElementById("monogamecanvas") as HTMLCanvasElement;
+            _canvas = document.getElementById("monogamecanvas").As<HTMLCanvasElement>();
             _canvas.tabIndex = 1000;
+            _canvas.focus();
 
             // Disable selection
             _canvas.style.userSelect = "none";

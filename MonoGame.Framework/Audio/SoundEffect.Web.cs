@@ -25,6 +25,11 @@ namespace Microsoft.Xna.Framework.Audio
 
         }
 
+        internal void SetEmptyBuffer()
+        {
+            _buffer = SoundEffectInstance.Context.createBuffer(1, 1, 22050);
+        }
+
         private void PlatformLoadAudioStream(Stream s, out TimeSpan duration)
         {
             throw new NotImplementedException();

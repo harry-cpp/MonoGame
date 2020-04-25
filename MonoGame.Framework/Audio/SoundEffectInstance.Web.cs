@@ -15,10 +15,10 @@ namespace Microsoft.Xna.Framework.Audio
         internal static AudioContext Context = Script.Eval<AudioContext>("var AudioContext = window.AudioContext || window.webkitAudioContext || false; new AudioContext");
 
         private AudioBuffer _buffer;
-        private AudioBufferSourceNode _source;
+        internal AudioBufferSourceNode _source;
         private PannerNode _pannerNode;
         private BiquadFilterNode _biquadFilterNode;
-        private StereoPannerNode _stereoPannerNode;
+        private PannerNode _stereoPannerNode;
         private GainNode _gainNode;
         private SoundState _state;
         private double _endTime, _startTime;
@@ -33,7 +33,7 @@ namespace Microsoft.Xna.Framework.Audio
             _buffer = buffer;
             _state = SoundState.Stopped;
 
-            _stereoPannerNode = Context.createStereoPanner();
+            _stereoPannerNode = Context.createPanner();
             _pannerNode = Context.createPanner();
             _gainNode = Context.createGain();
 
@@ -108,7 +108,8 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformSetPan(float value)
         {
-            _stereoPannerNode.pan.value = value;
+            _stereoPannerNode.panningModel = PanningModelType.equalpower;
+            _stereoPannerNode.setPosition(value, 0 , 1 - System.Math.Abs(value));
         }
 
         private void PlatformSetPitch(float value)
@@ -149,10 +150,10 @@ namespace Microsoft.Xna.Framework.Audio
                     break;
             }
 
-            _stereoPannerNode.disconnect();
+            //_stereoPannerNode.disconnect();
             _biquadFilterNode.disconnect();
             
-            _stereoPannerNode.connect(_biquadFilterNode);
+            //_stereoPannerNode.connect(_biquadFilterNode);
             _biquadFilterNode.connect(_pannerNode);
         }
 
