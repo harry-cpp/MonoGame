@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using Bridge;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Input.Touch;
 using static Retyped.dom;
 
 static class WebHelper
@@ -76,6 +77,10 @@ namespace Microsoft.Xna.Framework
             _canvas.onmousewheel += (e) => Canvas_MouseWheel(e);
             _canvas.onkeydown += (e) => Canvas_KeyDown(e);
             _canvas.onkeyup += (e) => Canvas_KeyUp(e);
+            _canvas.ontouchstart += (e) => Canvas_TouchStart(e);
+            _canvas.ontouchmove += (e) => Canvas_TouchMove(e);
+            _canvas.ontouchend += (e) => Canvas_TouchEnd(e);
+            _canvas.ontouchcancel += (e) => Canvas_TouchEnd(e);
 
             document.addEventListener("webkitfullscreenchange", Document_FullscreenChange);
             document.addEventListener("mozfullscreenchange", Document_FullscreenChange);
@@ -87,7 +92,7 @@ namespace Microsoft.Xna.Framework
         // so make sure we connect this code to as many input events as possible
         private void EnsureFullscreen()
         {
-            var isfull = Script.Eval<bool>("(document.fullScreenElement && document.fullScreenElement !== null) || document.mozFullScreen || document.webkitIsFullScreen");
+            /*var isfull = Script.Eval<bool>("(document.fullScreenElement && document.fullScreenElement !== null) || document.mozFullScreen || document.webkitIsFullScreen");
 
             if (_isFullscreen != isfull)
             {
@@ -106,12 +111,12 @@ namespace Microsoft.Xna.Framework
                     f_method.call(document);
                     ");
                 }
-            }
+            }*/
         }
 
         private void Document_FullscreenChange(Event e)
         {
-            _isFullscreen = Script.Eval<bool>("(document.fullScreenElement && document.fullScreenElement !== null) || document.mozFullScreen || document.webkitIsFullScreen");
+            /*_isFullscreen = Script.Eval<bool>("(document.fullScreenElement && document.fullScreenElement !== null) || document.mozFullScreen || document.webkitIsFullScreen");
             
             if (_isFullscreen)
             {
@@ -128,7 +133,40 @@ namespace Microsoft.Xna.Framework
             _game.GraphicsDevice.PresentationParameters.BackBufferHeight = (int)_canvas.height;
             _game.GraphicsDevice.Viewport = new Graphics.Viewport(0, 0, (int)_canvas.width, (int)_canvas.height);
 
-            _game.graphicsDeviceManager.IsFullScreen = _isFullscreen;
+            _game.graphicsDeviceManager.IsFullScreen = _isFullscreen;*/
+        }
+
+        private void Canvas_TouchStart(TouchEvent e)
+        {
+            foreach (var touch in e.changedTouches)
+            {
+                var x = (int)(touch.clientX - _canvas.offsetLeft);
+                var y = (int)(touch.clientY - _canvas.offsetTop);
+
+                TouchPanelState.AddEvent(touch.identifier.As<int>(), TouchLocationState.Pressed, new Vector2(x, y));
+            }
+        }
+
+        private void Canvas_TouchMove(TouchEvent e)
+        {
+            foreach (var touch in e.changedTouches)
+            {
+                var x = (int)(touch.clientX - _canvas.offsetLeft);
+                var y = (int)(touch.clientY - _canvas.offsetTop);
+
+                TouchPanelState.AddEvent(touch.identifier.As<int>(), TouchLocationState.Moved, new Vector2(x, y));
+            }
+        }
+
+        private void Canvas_TouchEnd(TouchEvent e)
+        {
+            foreach (var touch in e.changedTouches)
+            {
+                var x = (int)(touch.clientX - _canvas.offsetLeft);
+                var y = (int)(touch.clientY - _canvas.offsetTop);
+
+                TouchPanelState.AddEvent(touch.identifier.As<int>(), TouchLocationState.Released, new Vector2(x, y));
+            }
         }
 
         private bool Canvas_MouseMove(MouseEvent e)
