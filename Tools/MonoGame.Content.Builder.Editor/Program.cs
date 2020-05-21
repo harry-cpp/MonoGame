@@ -71,52 +71,20 @@ namespace MonoGame.Tools.Pipeline
 
                 PipelineSettings.Default.Load();
 
-                if (!string.IsNullOrEmpty(PipelineSettings.Default.ErrorMessage))
-                {
-                    var logwin = new LogWindow();
-                    logwin.LogText = PipelineSettings.Default.ErrorMessage;
-                    app.Run(logwin);
-                    return;
-                }
-
-#if !DEBUG
-                try
-#endif
-                {
-                    var win = new MainWindow();
-                    var controller = PipelineController.Create(win);
+                var win = new MainWindow();
+                var controller = PipelineController.Create(win);
 
 #if GTK
-                    Global.Application.AddWindow(win.ToNative() as Gtk.Window);
+                Global.Application.AddWindow(win.ToNative() as Gtk.Window);
 #endif
 
-#if GTK && !DEBUG
-                    GLib.ExceptionManager.UnhandledException += (e) =>
-                    {
-                        var logwin = new LogWindow();
-                        logwin.LogText = e.ExceptionObject.ToString();
+                //if (string.IsNullOrEmpty(project) && Global.Unix && !Global.Linux)
+                //    project = Environment.GetEnvironmentVariable("MONOGAME_PIPELINE_PROJECT");
 
-                        logwin.Show();
-                        win.Close();
-                    };
-#endif
+                //if (!string.IsNullOrEmpty(project))
+                //    controller.OpenProject(project);
 
-                    if (string.IsNullOrEmpty(project) && Global.Unix && !Global.Linux)
-                        project = Environment.GetEnvironmentVariable("MONOGAME_PIPELINE_PROJECT");
-
-                    if (!string.IsNullOrEmpty(project))
-                        controller.OpenProject(project);
-
-                    app.Run(win);
-                }
-#if !DEBUG
-                catch (Exception ex)
-                {
-                    PipelineSettings.Default.ErrorMessage = ex.ToString();
-                    PipelineSettings.Default.Save();
-                    app.Restart();
-                }
-#endif
+                app.Run(win);
             }
         }
     }

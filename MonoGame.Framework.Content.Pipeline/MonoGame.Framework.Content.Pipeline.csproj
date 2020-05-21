@@ -273,9 +273,7 @@ This package provides you with the content pipeline for Windows, Mac and Linux w
     <NoWarn>NU5100</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <Content Include="..\Artifacts\MonoGame.Effect.Compiler\Release\*"
-             Exclude="..\Artifacts\MonoGame.Effect.Compiler\Release\*.nupkg"
-             Visible="false">
+    <Content Include="..\Artifacts\MonoGame.Effect.Compiler\Release\*" Exclude="..\Artifacts\MonoGame.Effect.Compiler\Release\*.nupkg" Visible="false">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

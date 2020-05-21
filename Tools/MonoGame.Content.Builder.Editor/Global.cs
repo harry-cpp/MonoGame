@@ -24,6 +24,8 @@ namespace MonoGame.Tools.Pipeline
         public static bool Unix { get; private set; }
         public static bool IsGtk { get; private set; }
 
+        public static bool IsMac => Unix && !Linux;
+
         private static Dictionary<string, Bitmap> _files;
         private static Image _folder;
         private static Bitmap _link;

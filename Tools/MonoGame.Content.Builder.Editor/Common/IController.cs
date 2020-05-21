@@ -89,44 +89,6 @@ namespace MonoGame.Tools.Pipeline
 
         bool Exit();
 
-        #region ContentItem
-
-        void DragDrop(string initialDirectory, string[] folders, string[] files);
-
-        void Include();
-
-        void IncludeFolder();
-
-        void Exclude(bool delete);
-
-        void NewItem();
-
-        void NewFolder();
-
-        void Rename();
-        
-        void AddAction(IProjectAction action);
-
-        void SelectionChanged(List<IProjectItem> items);
-
-        IProjectItem GetItem(string originalPath);
-
-        void CopyAssetPath();
-
-        #endregion
-
-        #region Undo, Redo
-
-        bool CanRedo { get; }
-
-        bool CanUndo { get; }
-
-        void Undo();
-
-        void Redo();
-
-        #endregion
-
         string GetFullPath(string filePath);
 
         string GetRelativePath(string filePath);

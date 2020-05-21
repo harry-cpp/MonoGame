@@ -9,7 +9,7 @@ namespace MonoGame.Tools.Pipeline
 {
     public class DirectoryItem : IProjectItem
     {
-        public DirectoryItem(string name, string location) : this(location + Path.DirectorySeparatorChar + name)
+        public DirectoryItem(string name, string location) : this(location + "/" + name)
         {
             
         }
@@ -17,6 +17,7 @@ namespace MonoGame.Tools.Pipeline
         public DirectoryItem(string path)
         {
             OriginalPath = path.Trim(Path.DirectorySeparatorChar).Replace(Path.DirectorySeparatorChar, '/');
+            DestinationPath = OriginalPath;
             Exists = true;
         }
 
