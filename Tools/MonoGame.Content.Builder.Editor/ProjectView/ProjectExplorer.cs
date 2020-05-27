@@ -65,7 +65,7 @@ namespace MonoGame.Content.Builder.Editor.ProjectView
         private void TreeView_CellEditing(object sender, GridViewCellEventArgs e)
         {
             var item = e.Item as TreeGridItem;
-            
+
             if (item.GetValue(2) is PipelineProject)
                 _treeView.CancelEdit();
         }
@@ -114,18 +114,22 @@ namespace MonoGame.Content.Builder.Editor.ProjectView
 
         private void TreeView_SelectionChanged(object sender, EventArgs e)
         {
+            if (_project == null)
+                return;
+
             var items = new List<IProjectItem>();
             var treeItems = new List<TreeGridItem>();
             var dic = new Dictionary<string, MenuItemCollection>();
 
-            foreach (TreeGridItem selected in _treeView.SelectedItems)
+            if (_treeView.SelectedItems != null)
             {
-                if (selected.GetValue(2) is IProjectItem item)
+                foreach (TreeGridItem selected in _treeView.SelectedItems)
                 {
-                    items.Add(item);
-                }
+                    if (selected.GetValue(2) is IProjectItem item)
+                        items.Add(item);
 
-                treeItems.Add(selected);
+                    treeItems.Add(selected);
+                }
             }
 
             Tools.Pipeline.PropertyGrid.Instance.SetObjects(items);
@@ -199,7 +203,7 @@ namespace MonoGame.Content.Builder.Editor.ProjectView
             var rootItem = root.GetValue(2) as IProjectItem;
             var rootItemPath = rootItem is PipelineProject ? string.Empty : rootItem.OriginalPath;
             var findItem = root.Children.FirstOrDefault(p =>
-                p is TreeGridItem pitem && 
+                p is TreeGridItem pitem &&
                 pitem.GetValue(1).ToString() == split[0]
             ) as TreeGridItem;
 
@@ -232,13 +236,15 @@ namespace MonoGame.Content.Builder.Editor.ProjectView
             return findItem;
         }
 
-        public void AddFiles(List<string> filePaths)
+        public void AddFiles(List<string> destPaths, List<string> sourcePaths = null)
         {
-            foreach (var filePath in filePaths)
-            {
-                var relativePath = PipelineController.Instance.GetRelativePath(filePath);
+            sourcePaths = sourcePaths ?? destPaths;
 
-                if (Directory.Exists(filePath))
+            for (int i = 0; i < sourcePaths.Count; i++)
+            {
+                var relativePath = PipelineController.Instance.GetRelativePath(destPaths[i]);
+
+                if (Directory.Exists(sourcePaths[i]))
                 {
                     var dirItem = new DirectoryItem(relativePath);
 
@@ -249,7 +255,7 @@ namespace MonoGame.Content.Builder.Editor.ProjectView
                     var contentItem = new ContentItem();
                     contentItem.Observer = PipelineController.Instance;
                     contentItem.ProcessorParams = new OpaqueDataDictionary();
-                    contentItem.OriginalPath = relativePath;
+                    contentItem.OriginalPath = PipelineController.Instance.GetRelativePath(sourcePaths[i]);
                     contentItem.DestinationPath = relativePath;
                     contentItem.ResolveTypes();
 

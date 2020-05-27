@@ -9,7 +9,6 @@ namespace MonoGame.Content.Builder.Editor.ProjectView
     public partial class NewFolderDialog : Dialog
     {
         private TextBox _textBoxName;
-        private Label _labelError;
         private Button _buttonCreate, _buttonCancel;
 
         private void InitializeComponent()
@@ -29,9 +28,6 @@ namespace MonoGame.Content.Builder.Editor.ProjectView
             _textBoxName.Text = "Folder";
             _textBoxName.SelectAll();
             dynamicLayout.Add(_textBoxName, true, false);
-
-            _labelError = new Label();
-            dynamicLayout.Add(_labelError, true, false);
 
             Content = dynamicLayout;
 

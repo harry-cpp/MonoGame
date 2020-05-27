@@ -14,11 +14,6 @@ namespace MonoGame.Tools.Pipeline
 
     public interface IController : IContentItemObserver
     {
-        /// <summary>
-        /// Types of content which can be created and added to a project. 
-        /// </summary>
-        IEnumerable<ContentItemTemplate> Templates { get; }
-
         List<IProjectItem> SelectedItems { get; }
 
         IProjectItem SelectedItem { get; }

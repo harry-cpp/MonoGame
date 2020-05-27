@@ -28,22 +28,7 @@ namespace MonoGame.Content.Builder.Editor.ProjectView
 
         private void TextBoxName_TextChanged(object sender, EventArgs args)
         {
-            if (string.IsNullOrEmpty(_textBoxName.Text))
-            {
-                _labelError.Text = "Please type in at least one chatacter!";
-                _buttonCreate.Enabled = false;
-                return;
-            }
-
-            if (!Global.CheckString(_textBoxName.Text))
-            {
-                _labelError.Text = "Invalid character detected!";
-                _buttonCreate.Enabled = false;
-                return;
-            }
-
-            _labelError.Text = string.Empty;
-            _buttonCreate.Enabled = true;
+            _buttonCreate.Enabled = !string.IsNullOrEmpty(_textBoxName.Text) && Global.CheckString(_textBoxName.Text);
         }
 
         private void TextBoxName_KeyUp(object sender, KeyEventArgs args)

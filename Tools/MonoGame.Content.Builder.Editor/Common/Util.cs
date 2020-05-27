@@ -2,10 +2,16 @@
 using System.IO;
 using System.Runtime.InteropServices;
 
-namespace MonoGame.Tools.Pipeline
+namespace MonoGame.Content.Builder.Editor
 {
     public static class Util
     {
+        public static bool IsMac => true;
+
+        public static bool IsLinux => false;
+
+        public static bool IsWindows => false;
+
         [DllImport("libc")]
         private static extern string realpath(string path, IntPtr resolved_path);
 

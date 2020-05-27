@@ -26,8 +26,6 @@ namespace MonoGame.Tools.Pipeline
         private Task _buildTask;
         private Process _buildProcess;
 
-        private readonly List<ContentItemTemplate> _templateItems;
-
         private static readonly string [] _mgcbSearchPaths = new []       
         {
 #if DEBUG
@@ -38,11 +36,6 @@ namespace MonoGame.Tools.Pipeline
             Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "../../../../../../MonoGame.Content.Builder/Release"),
 #endif
         };
-
-        public IEnumerable<ContentItemTemplate> Templates
-        {
-            get { return _templateItems; }
-        }
 
         public PipelineProject ProjectItem
         {
@@ -102,13 +95,11 @@ namespace MonoGame.Tools.Pipeline
             View.Attach(this);
             ProjectOpen = false;
 
-            _templateItems = new List<ContentItemTemplate>();
             var root = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             if (Directory.Exists(Path.Combine (root, "..", "Resources", "Templates")))
             {
                 root = Path.Combine(root, "..", "Resources");
             }
-            LoadTemplates(Path.Combine(root, "../../../Templates"));
 
             view.UpdateRecentList(PipelineSettings.Default.ProjectHistory);
         }
@@ -607,39 +598,6 @@ namespace MonoGame.Tools.Pipeline
             {
                 i.Observer = this;
                 i.ResolveTypes();
-            }
-
-            LoadTemplates(Path.Combine(_project.Location, "MGTemplates"));
-        }
-
-        private void LoadTemplates(string path)
-        {
-            if (!Directory.Exists(path))
-                return;
-
-            var files = Directory.GetFiles(path, "*.template", SearchOption.AllDirectories);
-            foreach (var f in files)
-            {
-                var lines = File.ReadAllLines(f);
-                if (lines.Length != 5)
-                    throw new Exception("Invalid template");
-
-                var item = new ContentItemTemplate()
-                    {
-                        Label = lines[0],
-                        Icon = lines[1],
-                        ImporterName = lines[2],
-                        ProcessorName = lines[3],
-                        TemplateFile = lines[4],
-                    };
-                
-                if (_templateItems.Any(i => i.Label == item.Label))
-                    continue;
-
-                var fpath = Path.GetDirectoryName(f);
-                item.TemplateFile = Path.GetFullPath(Path.Combine(fpath, item.TemplateFile));
-
-                _templateItems.Add(item);
             }
         }
 
