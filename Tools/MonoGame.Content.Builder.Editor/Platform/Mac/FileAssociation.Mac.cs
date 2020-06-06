@@ -8,27 +8,64 @@ namespace MonoGame.Tools.Pipeline
 {
     public static class FileAssociation
     {
+        private readonly static string appPath = Path.Combine(Environment.GetEnvironmentVariable("HOME"), "Applications/MGCB Editor.app");
         private const string lsregisterPath = "/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister";
 
         public static void Associate()
         {
-            RunLsregister("-v -f");
+            InstallApplication();
+            InstallMimetype();
         }
 
         public static void Unassociate()
         {
-            RunLsregister("-v -f -u");
+            UninstallMimetype();
+            UninstallApplication();
         }
 
-        private static void RunLsregister(string arguments)
+        private static void InstallApplication()
         {
-            // Assuming we're running in .app/Contents/MacOS, go back up to the .app
-            var appPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName), "../.."));
-            if (Path.GetExtension(appPath) != ".app")
+            Console.WriteLine("Installing application...");
+
+            var baseAppPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName), "../.."));
+            if (Path.GetExtension(baseAppPath) != ".app")
             {
                 throw new FileNotFoundException("Not running from within the app package");
             }
 
+            CopyDirectory(baseAppPath, appPath);
+
+            Console.WriteLine("Installation complete!");
+        }
+
+        private static void InstallMimetype()
+        {
+            Console.WriteLine("Installing mimetype...");
+            RunLsregister("-v -f");
+            Console.WriteLine("Installation complete!");
+        }
+
+        private static void UninstallApplication()
+        {
+            Console.WriteLine("Uninstalling aplication...");
+
+            if (Directory.Exists(appPath))
+            {
+                Directory.Delete(appPath, true);
+            }
+
+            Console.WriteLine("Uninstallation complete!");
+        }
+
+        private static void UninstallMimetype()
+        {
+            Console.WriteLine("Uninstalling mimetype...");
+            RunLsregister("-v -f -u");
+            Console.WriteLine("Uninstallation complete!");
+        }
+
+        private static void RunLsregister(string arguments)
+        {
             var process = new Process
             {
                 StartInfo = new ProcessStartInfo
@@ -47,6 +84,20 @@ namespace MonoGame.Tools.Pipeline
             process.BeginOutputReadLine();
             process.BeginErrorReadLine();
             process.WaitForExit();
+        }
+
+        private static void CopyDirectory(string sourceDirName, string destDirName)
+        {
+            var dir = new DirectoryInfo(sourceDirName);
+
+            if (!Directory.Exists(destDirName))
+                Directory.CreateDirectory(destDirName);
+
+            foreach (var file in dir.GetFiles())
+                file.CopyTo(Path.Combine(destDirName, file.Name), false);
+
+            foreach (var subdir in dir.GetDirectories())
+                CopyDirectory(subdir.FullName, Path.Combine(destDirName, subdir.Name));
         }
     }
 }
