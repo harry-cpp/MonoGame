@@ -6,31 +6,25 @@
 //////////////////////////////////////////////////////////////////////
 
 var target = Argument("build-target", "Default");
-string version = null;
-if (HasArgument("build-version"))
-    version = Argument<string>("build-version");
+var version = Argument("build-version", EnvironmentVariable("BUILD_NUMBER") ?? "3.8.0.1");
 var configuration = Argument("build-configuration", "Release");
 
 //////////////////////////////////////////////////////////////////////
 // PREPARATION
 //////////////////////////////////////////////////////////////////////
 
-var majorVersion = "3.0";
-if (version == null)
-    version = EnvironmentVariable("BUILD_NUMBER") ?? "1.0.0.0";
-
-MSBuildSettings msPackSettings;
+MSBuildSettings msPackSettings, mdPackSettings;
 DotNetCoreMSBuildSettings dnBuildSettings;
 DotNetCorePackSettings dnPackSettings;
 
-private void PackProject(string filePath)
+private void PackMSBuild(string filePath)
 {
-    // Windows and Linux dotnet tool does not allow building of .NET
-    // projects, as such we must call msbuild on these platforms.
-    if (IsRunningOnWindows())
-        DotNetCorePack(filePath, dnPackSettings);
-    else
-        MSBuild(filePath, msPackSettings);
+    MSBuild(filePath, msPackSettings);
+}
+
+private void PackDotnet(string filePath)
+{
+    DotNetCorePack(filePath, dnPackSettings);
 }
 
 private bool GetMSBuildWith(string requires)
@@ -60,11 +54,29 @@ private bool GetMSBuildWith(string requires)
 Task("Prep")
     .Does(() =>
 {
+    // Set MGFXC_WINE_PATH for building shaders on macOS and Linux
+    System.Environment.SetEnvironmentVariable("MGFXC_WINE_PATH", EnvironmentVariable("HOME") + "/.winemonogame");
+
+    // We tag the version with the build branch to make it
+    // easier to spot special builds in NuGet feeds.
+    var branch = EnvironmentVariable("GIT_BRANCH") ?? string.Empty;
+    if (branch == "develop")
+	version += "-develop";
+
+    Console.WriteLine("Build Version: {0}", version);
+
     msPackSettings = new MSBuildSettings();
     msPackSettings.Verbosity = Verbosity.Minimal;
     msPackSettings.Configuration = configuration;
+    msPackSettings.Restore = true;
     msPackSettings.WithProperty("Version", version);
     msPackSettings.WithTarget("Pack");
+
+    mdPackSettings = new MSBuildSettings();
+    mdPackSettings.Verbosity = Verbosity.Minimal;
+    mdPackSettings.Configuration = configuration;
+    mdPackSettings.WithProperty("Version", version);
+    mdPackSettings.WithTarget("PackageAddin");
 
     dnBuildSettings = new DotNetCoreMSBuildSettings();
     dnBuildSettings.WithProperty("Version", version);
@@ -79,8 +91,20 @@ Task("BuildDesktopGL")
     .IsDependentOn("Prep")
     .Does(() =>
 {
-    DotNetCoreRestore("MonoGame.Framework.DesktopGL.sln");
-    PackProject("MonoGame.Framework/MonoGame.Framework.DesktopGL.csproj");
+    DotNetCoreRestore("MonoGame.Framework/MonoGame.Framework.DesktopGL.csproj");
+    PackDotnet("MonoGame.Framework/MonoGame.Framework.DesktopGL.csproj");
+});
+
+Task("TestDesktopGL")
+    .IsDependentOn("BuildDesktopGL")
+    .Does(() =>
+{
+    CreateDirectory("Artifacts/Tests/DesktopGL/Debug");
+    DotNetCoreRun("../../../../Tests/MonoGame.Tests.DesktopGL.csproj", "", new DotNetCoreRunSettings
+    {
+        WorkingDirectory = "Artifacts/Tests/DesktopGL/Debug",
+	    ArgumentCustomization = args => args.Append("--teamcity")
+    });
 });
 
 Task("BuildWindowsDX")
@@ -88,8 +112,21 @@ Task("BuildWindowsDX")
     .WithCriteria(() => IsRunningOnWindows())
     .Does(() =>
 {
-    DotNetCoreRestore("MonoGame.Framework.WindowsDX.sln");
-    PackProject("MonoGame.Framework/MonoGame.Framework.WindowsDX.csproj");
+    DotNetCoreRestore("MonoGame.Framework/MonoGame.Framework.WindowsDX.csproj");
+    PackDotnet("MonoGame.Framework/MonoGame.Framework.WindowsDX.csproj");
+});
+
+Task("TestWindowsDX")
+    .IsDependentOn("BuildWindowsDX")
+    .WithCriteria(() => IsRunningOnWindows())
+    .Does(() =>
+{
+    CreateDirectory("Artifacts/Tests/WindowsDX/Debug");
+    DotNetCoreRun("../../../../Tests/MonoGame.Tests.WindowsDX.csproj", "", new DotNetCoreRunSettings
+    {
+        WorkingDirectory = "Artifacts/Tests/WindowsDX/Debug",
+	    ArgumentCustomization = args => args.Append("--teamcity")
+    });
 });
 
 Task("BuildAndroid")
@@ -99,35 +136,20 @@ Task("BuildAndroid")
     if (IsRunningOnWindows())
         return GetMSBuildWith("Component.Xamarin");
 
-    // Xamarin Android on Linux needs to be installed in this specific dir
-    if (DirectoryExists("/usr/lib/xamarin.android"))
-        return true;
-
-    return DirectoryExists("/Developer/MonoAndroid");
+    return DirectoryExists("/Library/Frameworks/Xamarin.Android.framework");
 }).Does(() =>
 {
-    DotNetCoreRestore("MonoGame.Framework/MonoGame.Framework.AndroidCore.csproj");
-
-    var buildSettings = msPackSettings;
-    if (DirectoryExists("/usr/lib/xamarin.android"))
-    {
-        // Some weird bug when packing xamarin andoid assembly from Linux
-        // Easy workaround at least :)
-        buildSettings = buildSettings.WithProperty("DesignTimeBuild", "true");
-    }
-
-    MSBuild("MonoGame.Framework/MonoGame.Framework.AndroidCore.csproj", buildSettings);
+    PackMSBuild("MonoGame.Framework/MonoGame.Framework.Android.csproj");
 });
 
 Task("BuildiOS")
     .IsDependentOn("Prep")
     .WithCriteria(() =>
 {
-    return DirectoryExists("/Developer/MonoTouch");
+    return DirectoryExists("/Library/Frameworks/Xamarin.iOS.framework");
 }).Does(() =>
 {
-    DotNetCoreRestore("MonoGame.Framework/MonoGame.Framework.iOSCore.csproj");
-    MSBuild("MonoGame.Framework/MonoGame.Framework.iOSCore.csproj", msPackSettings);
+    PackMSBuild("MonoGame.Framework/MonoGame.Framework.iOS.csproj");
 });
 
 Task("BuildUWP")
@@ -135,87 +157,79 @@ Task("BuildUWP")
     .WithCriteria(() => GetMSBuildWith("Microsoft.VisualStudio.Component.Windows10SDK.17763"))
     .Does(() =>
 {
-    DotNetCoreRestore("MonoGame.Framework/MonoGame.Framework.WindowsUniversal.csproj");
-    MSBuild("MonoGame.Framework/MonoGame.Framework.WindowsUniversal.csproj", msPackSettings);
+    PackMSBuild("MonoGame.Framework/MonoGame.Framework.WindowsUniversal.csproj");
 });
 
 Task("BuildContentPipeline")
     .IsDependentOn("Prep")
     .Does(() =>
 {
-    DotNetCoreRestore("MonoGame.Framework.Content.Pipeline/MonoGame.Framework.Content.Pipeline.csproj");
-    MSBuild("MonoGame.Framework.Content.Pipeline/MonoGame.Framework.Content.Pipeline.csproj", msPackSettings);
+    PackDotnet("Tools/MonoGame.Effect.Compiler/MonoGame.Effect.Compiler.csproj");
+
+    PackDotnet("MonoGame.Framework.Content.Pipeline/MonoGame.Framework.Content.Pipeline.csproj");
 });
 
 Task("BuildTools")
+    .IsDependentOn("BuildContentPipeline")
+    .Does(() =>
+{
+    PackDotnet("Tools/MonoGame.Content.Builder/MonoGame.Content.Builder.csproj");
+
+    PackDotnet("Tools/MonoGame.Effect.Compiler/MonoGame.Effect.Compiler.csproj");
+    
+    PackDotnet("Tools/MonoGame.Content.Builder.Editor/MonoGame.Content.Builder.Editor.csproj");
+
+    PackDotnet("Tools/MonoGame.Content.Builder.Task/MonoGame.Content.Builder.Task.csproj");
+
+    PackDotnet("Tools/MonoGame.Packaging.Flatpak/MonoGame.Packaging.Flatpak.csproj");
+});
+
+Task("TestTools")
+    .IsDependentOn("BuildTools")
+    .Does(() =>
+{
+    CreateDirectory("Artifacts/Tests/Tools/" + configuration);
+    DotNetCoreRun("../../../../Tools/MonoGame.Tools.Tests/MonoGame.Tools.Tests.csproj", "", new DotNetCoreRunSettings
+    {
+        WorkingDirectory = "Artifacts/Tests/Tools/" + configuration,
+	    ArgumentCustomization = args => args.Append("--teamcity"),
+        Configuration = configuration
+    });
+});
+
+Task("PackDotNetTemplates")
     .IsDependentOn("Prep")
     .Does(() =>
 {
-    DotNetCoreRestore("Tools/2MGFX/2MGFX.csproj");
-    PackProject("Tools/2MGFX/2MGFX.csproj");
-
-    DotNetCoreRestore("Tools/MGCB/MGCB.csproj");
-    PackProject("Tools/MGCB/MGCB.csproj");
-
-    DotNetCoreRestore("Tools/MonoGame.Content.Builder/MonoGame.Content.Builder.csproj");
-    PackProject("Tools/MonoGame.Content.Builder/MonoGame.Content.Builder.csproj");
+    PackDotnet("Templates/MonoGame.Templates.CSharp/MonoGame.Templates.CSharp.csproj");
 });
 
 Task("PackVSTemplates")
+    .IsDependentOn("PackDotNetTemplates")
+    .WithCriteria(() => IsRunningOnWindows())
     .Does(() =>
 {
-    var vsdirs = GetDirectories("./ProjectTemplates/VisualStudio20*");
+    var vsdirs = GetDirectories("./Templates/VisualStudio20*");
     foreach (var vsdir in vsdirs)
     {
         DeleteFiles(vsdir.CombineWithFilePath("*.zip").FullPath);
         var projdirs = GetDirectories(vsdir.CombineWithFilePath("*").FullPath);
-    foreach (var projdir in projdirs)
-    {
-        var outputPath = vsdir.CombineWithFilePath(projdir.GetDirectoryName() + ".zip");
-            Zip(projdir, outputPath);
+        foreach (var projdir in projdirs)
+        {
+            var outputPath = vsdir.CombineWithFilePath(projdir.GetDirectoryName() + ".zip");
+                Zip(projdir, outputPath);
+        }
     }
-    }
-    // pack core templates as a nuget
-    DotNetCoreRestore("ProjectTemplates/DotNetTemplate/MonoGame.Templates.CSharp/MonoGame.Templates.CSharp.csproj");
-    PackProject("ProjectTemplates/DotNetTemplate/MonoGame.Templates.CSharp/MonoGame.Templates.CSharp.csproj");
 });
 
-Task("PackWindows")
-    .WithCriteria(() => IsRunningOnWindows())
-    .IsDependentOn("BuildAll")
-    .IsDependentOn("PackVSTemplates")
+Task("PackVSMacTemplates")
+    .IsDependentOn("PackDotNetTemplates")
+    .WithCriteria(() => IsRunningOnUnix() && DirectoryExists("/Applications") && DirectoryExists("/Library"))
     .Does(() =>
 {
-    // The old build script passes defines through an nsh file, NSIS needs it to exist or it will crash
-    // TODO remove this
-    if (!FileExists("./Installers/Windows/header.nsh"))
-        System.IO.File.Create("./Installers/Windows/header.nsh").Dispose();
-
-    var settings = new MakeNSISSettings();
-    settings.ToolPath = "C:/Program Files (x86)/NSIS/makensis.exe";
-    settings.WorkingDirectory = "./Installers/Windows";
-    settings.Defines = new Dictionary<string, string>()
-    {
-        { "FrameworkPath", Context.Environment.WorkingDirectory.CombineWithFilePath("Installers/").FullPath },
-        { "VERSION", majorVersion},
-        { "INSTALLERVERSION", version },
-    };
-
-    MakeNSIS("./Installers/Windows/MonoGame.nsi", settings);
+    DotNetCoreRestore("Templates/VisualStudioForMac/MonoGame.IDE.VisualStudioForMac.csproj");
+    MSBuild("Templates/VisualStudioForMac/MonoGame.IDE.VisualStudioForMac.csproj", mdPackSettings);
 });
-
-Task("PackLinux")
-    .IsDependentOn("BuildAll")
-    .Does(() =>
-{
-});
-
-Task("PackMac")
-    .IsDependentOn("BuildAll")
-    .Does(() =>
-{
-});
-
 
 //////////////////////////////////////////////////////////////////////
 // TASK TARGETS
@@ -230,13 +244,19 @@ Task("BuildAll")
     .IsDependentOn("BuildContentPipeline")
     .IsDependentOn("BuildTools");
 
-Task("PackInstallers")
-    .IsDependentOn("PackWindows")
-    .IsDependentOn("PackLinux")
-    .IsDependentOn("PackMac");
+Task("Pack")
+    .IsDependentOn("BuildAll")
+    .IsDependentOn("PackDotNetTemplates")
+    .IsDependentOn("PackVSTemplates")
+    .IsDependentOn("PackVSMacTemplates");
+
+Task("Test")
+    .IsDependentOn("TestWindowsDX")
+    .IsDependentOn("TestDesktopGL")
+    .IsDependentOn("TestTools");
 
 Task("Default")
-    .IsDependentOn("PackInstallers");
+    .IsDependentOn("Pack");
 
 //////////////////////////////////////////////////////////////////////
 // EXECUTION

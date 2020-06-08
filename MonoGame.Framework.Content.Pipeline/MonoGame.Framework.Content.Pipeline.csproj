@@ -1,7 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+  <Import Project="..\MonoGame.props" />
+
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <BaseOutputPath>..\Artifacts\MonoGame.Framework.Content.Pipeline</BaseOutputPath>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Description>MonoGame is an open source implementation of the Microsoft XNA 4.x Framework. The goal is to make it easy for XNA developers to create cross-platform games with extremely high code reuse.
 
@@ -11,6 +14,9 @@ This package provides you with the content pipeline for Windows, Mac and Linux w
     
     <AssemblyName>MonoGame.Framework.Content.Pipeline</AssemblyName>
     <RootNamespace>Microsoft.Xna.Framework.Content.Pipeline</RootNamespace>
+    <CopyContentFiles>True</CopyContentFiles>
+    <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
+    <DefineConstants>STBSHARP_INTERNAL</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
@@ -42,8 +48,8 @@ This package provides you with the content pipeline for Windows, Mac and Linux w
       <Link>Utilities\ContentExtensions.cs</Link>
     </Compile>
     
-    <Compile Include="..\ThirdParty\StbImageSharp\src\StbImageSharp\**\*.cs" LinkBase="Utilities\StbImageSharp"/>
-    <Compile Include="..\ThirdParty\StbImageWriteSharp\src\StbImageWriteSharp\**\*.cs" LinkBase="Utilities\StbImageWriteSharp"/>
+    <Compile Include="..\ThirdParty\StbImageSharp\src\StbImageSharp\**\*.cs" LinkBase="Utilities\StbImageSharp" />
+    <Compile Include="..\ThirdParty\StbImageWriteSharp\src\StbImageWriteSharp\**\*.cs" LinkBase="Utilities\StbImageWriteSharp" />
   </ItemGroup>
 
   <ItemGroup>
@@ -55,9 +61,6 @@ This package provides you with the content pipeline for Windows, Mac and Linux w
     </Reference>
     <Reference Include="CppNet">
       <HintPath>..\ThirdParty\Dependencies\CppNet\CppNet.dll</HintPath>
-    </Reference>
-    <Reference Include="AssimpNet">
-      <HintPath>..\ThirdParty\Dependencies\assimp\AssimpNet.dll</HintPath>
     </Reference>
     <Reference Include="Nvidia.TextureTools">
       <HintPath>..\ThirdParty\Dependencies\NVTT\Nvidia.TextureTools.dll</HintPath>
@@ -88,23 +91,18 @@ This package provides you with the content pipeline for Windows, Mac and Linux w
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Win32.Registry" Version="4.5.0" />
+    <PackageReference Include="AssimpNet" Version="4.1.0" />
   </ItemGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="'$(CopyContentFiles)' == 'True'">
     <Content Include="..\ThirdParty\Dependencies\SharpDX\net40\SharpDX.dll" PackagePath="lib\netstandard2.0" Visible="false" />
     <Content Include="..\ThirdParty\Dependencies\SharpDX\SharpDX.D3DCompiler.dll" PackagePath="lib\netstandard2.0" Visible="false" />
     <Content Include="..\ThirdParty\Dependencies\CppNet\CppNet.dll" PackagePath="lib\netstandard2.0" Visible="false" />
-    <Content Include="..\ThirdParty\Dependencies\assimp\AssimpNet.dll" PackagePath="lib\netstandard2.0" Visible="false" />
     <Content Include="..\ThirdParty\Dependencies\NVTT\Nvidia.TextureTools.dll" PackagePath="lib\netstandard2.0" Visible="false" />
     <Content Include="..\ThirdParty\Dependencies\SharpFont\x64\SharpFont.dll" PackagePath="lib\netstandard2.0" Visible="false" />
     <Content Include="..\ThirdParty\Dependencies\ATI.TextureConverter\ATI.TextureConverter.dll" PackagePath="lib\netstandard2.0" Visible="false" />
     <Content Include="..\ThirdParty\Dependencies\PVRTexLibNET\PVRTexLibNET.dll" PackagePath="lib\netstandard2.0" Visible="false" />
 
-    <Content Include="..\ThirdParty\Dependencies\assimp\libassimp.so" Visible="false">
-      <Link>Assimp64.so</Link>
-      <PackagePath>runtimes\linux-x64\native</PackagePath>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="..\ThirdParty\Dependencies\FreeImage.NET\Linux\x64\libfreeimage-3.17.0.so" Visible="false">
       <Link>libFreeImage.so</Link>
       <PackagePath>runtimes\linux-x64\native</PackagePath>
@@ -150,11 +148,6 @@ This package provides you with the content pipeline for Windows, Mac and Linux w
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
 
-    <Content Include="..\ThirdParty\Dependencies\assimp\libassimp.dylib">
-      <Link>libassimp64.dylib</Link>
-      <PackagePath>runtimes\osx\native</PackagePath>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="..\ThirdParty\Dependencies\FreeImage.NET\MacOS\libfreeimage.dylib" Visible="false">
       <Link>libFreeImage.dylib</Link>
       <PackagePath>runtimes\osx\native</PackagePath>
@@ -185,7 +178,7 @@ This package provides you with the content pipeline for Windows, Mac and Linux w
       <PackagePath>runtimes\osx\native</PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\ThirdParty\Dependencies\SharpFont\x64\libpng15.15.dylib" Visible="false">
+    <Content Include="..\ThirdParty\Dependencies\SharpFont\x64\libpng16.16.dylib" Visible="false">
       <PackagePath>runtimes\osx\native</PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -200,10 +193,6 @@ This package provides you with the content pipeline for Windows, Mac and Linux w
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
 
-    <Content Include="..\ThirdParty\Dependencies\assimp\Assimp64.dll" Visible="false">
-      <PackagePath>runtimes\win-x64\native</PackagePath>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="..\ThirdParty\Dependencies\ffmpeg\Windows\x64\ffmpeg.exe" Visible="false">
       <PackagePath>runtimes\win-x64\native</PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -235,30 +224,45 @@ This package provides you with the content pipeline for Windows, Mac and Linux w
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\Switch\Tools\2MGFX\**\*.cs">
+    <Compile Include="..\Switch\Tools\MonoGame.Effect.Compiler\**\*.cs">
       <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
     </Compile>
     <Compile Include="..\Switch\Tools\MonoGame.Framework.Content.Pipeline\**\*.cs">
       <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
     </Compile>
-    <Compile Include="..\XBoxOne\Tools\2MGFX\**\*.cs">
+    <Compile Include="..\XBoxOne\Tools\MonoGame.Effect.Compiler\**\*.cs">
       <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
     </Compile>
     <Compile Include="..\XBoxOne\Tools\MonoGame.Framework.Content.Pipeline\**\*.cs">
       <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
     </Compile>
-    <Compile Include="..\PlayStation4\Tools\2MGFX\**\*.cs">
+    <Compile Include="..\PlayStation4\Tools\MonoGame.Effect.Compiler\**\*.cs">
       <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
     </Compile>
     <Compile Include="..\PlayStation4\Tools\MonoGame.Framework.Content.Pipeline\**\*.cs">
       <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
     </Compile>
-    <Compile Include="..\PSVita\Tools\2MGFX\**\*.cs">
+    <Compile Include="..\PSVita\Tools\MonoGame.Effect.Compiler\**\*.cs">
       <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
     </Compile>
     <Compile Include="..\PSVita\Tools\MonoGame.Framework.Content.Pipeline\**\*.cs">
       <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
     </Compile>
   </ItemGroup>
+
+  <PropertyGroup>
+    <!-- NuGet warns if we copy assemblies but don't reference them; we suppress those warnings. -->
+    <NoWarn>NU5100</NoWarn>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <Content Include="..\Artifacts\MonoGame.Effect.Compiler\$(Configuration)\*"
+             Exclude="..\Artifacts\MonoGame.Effect.Compiler\$(Configuration)\*.nupkg"
+             Visible="false">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  
+  <Import Project="..\Stadia\MonoGame.Framework.Content.Pipeline.targets" Condition="exists('..\Stadia\MonoGame.Framework.Content.Pipeline.targets')" />
 
 </Project>
