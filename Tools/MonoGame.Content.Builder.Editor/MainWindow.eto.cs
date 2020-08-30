@@ -31,7 +31,7 @@ namespace MonoGame.Tools.Pipeline
         public Command cmdNew, cmdOpen, cmdClose, cmdImport, cmdSave, cmdSaveAs, cmdExit;
         public static MenuBar MainMenu;
 
-        ButtonMenuItem menuFile, menuRecent, menuView;
+        ButtonMenuItem menuFile, menuRecent;
 
         ProjectPad projectExplorer;
         PropertyPad propertyGridControl;
