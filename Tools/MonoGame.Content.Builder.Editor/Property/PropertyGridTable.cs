@@ -134,7 +134,7 @@ namespace MonoGame.Content.Builder.Editor.Property
                     drawable.Cursor = _cursorResize;
                     break;
                 default:
-#if IDE
+#if GTK
                     drawable.Cursor = null;
 #else
                     drawable.Cursor = _cursorNormal;

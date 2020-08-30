@@ -124,8 +124,6 @@ namespace MonoGame.Tools.Pipeline
         {
             MainMenu = Menu = new PipelineMenuBar();
 
-            Menu.QuitItem = cmdExit.CreateMenuItem();
-
             menuFile = new ButtonMenuItem();
             menuFile.Text = "&File";
             menuFile.Items.Add(cmdNew);
@@ -142,6 +140,8 @@ namespace MonoGame.Tools.Pipeline
             menuFile.Items.Add(cmdSave);
             menuFile.Items.Add(cmdSaveAs);
             Menu.Items.Add(menuFile);
+
+            Menu.QuitItem = cmdExit.CreateMenuItem();
         }
     }
 }

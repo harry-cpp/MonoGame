@@ -144,7 +144,7 @@ namespace MonoGame.Content.Builder.Editor.Project
 
             // Populate context menu
 
-            _treeView.ContextMenu.Items.Clear();
+            _treeView.ContextMenu = new ContextMenu();
 
             var lastGroupNum = -1;
 

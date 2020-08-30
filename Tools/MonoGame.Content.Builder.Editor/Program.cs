@@ -18,74 +18,17 @@ namespace MonoGame.Tools.Pipeline
         [STAThread]
         public static void Main(string[] args)
         {
-            new CommandLineParser(new CommandLineInterface()).Invoke(args);
-        }
+            Styles.Load();
 
-        private class CommandLineInterface : ICommandLineInterface
-        {
-            public void Register(InvocationContext context)
-            {
-                try
-                {
-                    FileAssociation.Associate();
-                    Console.WriteLine("");
-                    Console.WriteLine("Registered MGCB Editor!");
-                }
-                catch
-                {
-                    Console.WriteLine("");
-                    Console.Error.WriteLine("Failed to register MGCB Editor");
-                    throw;
-                }
-            }
+            var app = new Application(Platform.Detect);
+            app.Style = "MGCBEditor";
 
-            public void Unregister(InvocationContext context)
-            {
-                try
-                {
-                    FileAssociation.Unassociate();
-                    Console.WriteLine("");
-                    Console.WriteLine("Unregistered MGCB Editor!");
-                }
-                catch
-                {
-                    Console.WriteLine("");
-                    Console.Error.WriteLine("Failed to unregister MGCB Editor");
-                    throw;
-                }
-            }
+            PipelineSettings.Default.Load();
 
-            public void Run(InvocationContext context, string project)
-            {
-                Styles.Load();
+            var win = new MainWindow();
+            var controller = PipelineController.Create(win);
 
-#if GTK
-                var app = new Application(Platforms.Gtk);
-#elif WPF
-                var app = new Application(Platforms.Wpf);
-#else
-                var app = new Application(Platforms.Mac64);
-#endif
-
-                app.Style = "PipelineTool";
-
-                PipelineSettings.Default.Load();
-
-                var win = new MainWindow();
-                var controller = PipelineController.Create(win);
-
-#if GTK
-                Global.Application.AddWindow(win.ToNative() as Gtk.Window);
-#endif
-
-                //if (string.IsNullOrEmpty(project) && Global.Unix && !Global.Linux)
-                //    project = Environment.GetEnvironmentVariable("MONOGAME_PIPELINE_PROJECT");
-
-                //if (!string.IsNullOrEmpty(project))
-                //    controller.OpenProject(project);
-
-                app.Run(win);
-            }
+            app.Run(win);
         }
     }
 }

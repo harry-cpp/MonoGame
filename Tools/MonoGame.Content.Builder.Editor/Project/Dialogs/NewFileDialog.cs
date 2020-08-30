@@ -25,7 +25,7 @@ namespace MonoGame.Content.Builder.Editor.Project
 
         private async void LoadTemplates()
         {
-            if (Util.IsMac)
+            if (Util.IsXamarinMac)
             {
                 await LoadTemplates(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../Resources"));
             }

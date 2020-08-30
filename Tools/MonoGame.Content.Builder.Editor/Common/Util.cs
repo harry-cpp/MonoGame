@@ -12,9 +12,9 @@ namespace MonoGame.Content.Builder.Editor
 
         public static bool IsWindows => false;
 
-        public static bool IsGtk => false;
+        public static bool IsGtk => true;
 
-        public static bool IsXamarinMac => true;
+        public static bool IsXamarinMac => false;
 
         [DllImport("libc")]
         private static extern string realpath(string path, IntPtr resolved_path);

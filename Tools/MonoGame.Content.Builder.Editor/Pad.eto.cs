@@ -25,7 +25,7 @@ namespace MonoGame.Tools.Pipeline
             stack.Orientation = Orientation.Horizontal;
 
             _labelTitle = new Label();
-            _labelTitle.Font = new Font(_labelTitle.Font.Family, _labelTitle.Font.Size - 1, FontStyle.Bold);
+            // _labelTitle.Font = new Font(_labelTitle.Font.Family, _labelTitle.Font.Size - 1, FontStyle.Bold);
             stack.Items.Add(new StackLayoutItem(_labelTitle, true));
 
             _imageSettings = new ImageView();
