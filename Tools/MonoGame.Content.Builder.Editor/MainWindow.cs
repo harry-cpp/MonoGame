@@ -169,6 +169,11 @@ namespace MonoGame.Tools.Pipeline
             }
         }
 
+        public void LoadProperties(List<IProjectItem> items)
+        {
+            propertyGridControl.SetObjects(items);
+        }
+
         #endregion
 
         #region Commands

@@ -631,5 +631,10 @@ namespace MonoGame.Tools.Pipeline
 
             return Uri.UnescapeDataString(relativeUri.ToString().Replace('/', Path.DirectorySeparatorChar));
         }
+
+        public void LoadProperties(List<IProjectItem> items)
+        {
+            View.LoadProperties(items);
+        }
     }
 }

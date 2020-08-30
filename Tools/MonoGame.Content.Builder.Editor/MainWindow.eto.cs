@@ -6,7 +6,8 @@ using System;
 using Eto;
 using Eto.Forms;
 using Eto.Drawing;
-using MonoGame.Content.Builder.Editor.ProjectView;
+using MonoGame.Content.Builder.Editor.Project;
+using MonoGame.Content.Builder.Editor.Property;
 
 namespace MonoGame.Tools.Pipeline
 {
@@ -28,11 +29,12 @@ namespace MonoGame.Tools.Pipeline
         }
 
         public Command cmdNew, cmdOpen, cmdClose, cmdImport, cmdSave, cmdSaveAs, cmdExit;
+        public static MenuBar MainMenu;
 
         ButtonMenuItem menuFile, menuRecent, menuView;
 
-        ProjectExplorer projectExplorer;
-        PropertyGrid propertyGridControl;
+        ProjectPad projectExplorer;
+        PropertyPad propertyGridControl;
 
         Splitter splitterHorizontal, splitterVertical;
 
@@ -59,10 +61,10 @@ namespace MonoGame.Tools.Pipeline
             splitterVertical.Panel1MinimumSize = 100;
             splitterVertical.Panel2MinimumSize = 100;
 
-            projectExplorer = new ProjectExplorer();
+            projectExplorer = new ProjectPad();
             splitterVertical.Panel1 = projectExplorer;
 
-            propertyGridControl = new PropertyGrid();
+            propertyGridControl = new PropertyPad();
             splitterVertical.Panel2 = propertyGridControl;
 
             splitterHorizontal.Panel1 = splitterVertical;
@@ -120,7 +122,7 @@ namespace MonoGame.Tools.Pipeline
 
         private void InitalizeMenu()
         {
-            Menu = new PipelineMenuBar();
+            MainMenu = Menu = new PipelineMenuBar();
 
             Menu.QuitItem = cmdExit.CreateMenuItem();
 

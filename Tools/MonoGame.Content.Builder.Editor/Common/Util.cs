@@ -12,6 +12,10 @@ namespace MonoGame.Content.Builder.Editor
 
         public static bool IsWindows => false;
 
+        public static bool IsGtk => false;
+
+        public static bool IsXamarinMac => true;
+
         [DllImport("libc")]
         private static extern string realpath(string path, IntPtr resolved_path);
 
@@ -51,6 +55,24 @@ namespace MonoGame.Content.Builder.Editor
             result = Uri.UnescapeDataString(result);
 
             return result;
+        }
+
+        public static T Show<T>(this Eto.Forms.Dialog<T> dialog, Eto.Forms.Control parent)
+        {
+#if IDE
+            return dialog.ShowModal(null);
+#else
+            return dialog.ShowModal(parent);
+#endif
+        }
+
+        public static Eto.Forms.DialogResult Show(this Eto.Forms.CommonDialog dialog, Eto.Forms.Control parent)
+        {
+#if IDE
+            return dialog.ShowDialog(null);
+#else
+            return dialog.ShowDialog(parent);
+#endif
         }
     }
 }

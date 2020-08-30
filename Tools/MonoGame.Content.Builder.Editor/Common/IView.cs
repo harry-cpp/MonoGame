@@ -36,5 +36,7 @@ namespace MonoGame.Tools.Pipeline
         void UpdateRecentList(List<string> recentList);
 
         void InitSolutionExplorer(PipelineProject project);
+
+        void LoadProperties(List<IProjectItem> items);
     }
 }

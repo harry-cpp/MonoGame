@@ -30,7 +30,7 @@ namespace MonoGame.Tools.Pipeline
 
             _imageSettings = new ImageView();
             _imageSettings.Image = Global.GetEtoIcon("Icons.Settings.png");
-            _imageSettings.Visible = true;
+            _imageSettings.Visible = false;
             stack.Items.Add(new StackLayoutItem(_imageSettings, false)); 
 
             panelLabel.Content = stack;

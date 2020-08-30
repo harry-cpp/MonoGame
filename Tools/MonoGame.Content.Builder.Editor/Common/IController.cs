@@ -87,5 +87,7 @@ namespace MonoGame.Tools.Pipeline
         string GetFullPath(string filePath);
 
         string GetRelativePath(string filePath);
+
+        void LoadProperties(List<IProjectItem> items);
     }
 }
