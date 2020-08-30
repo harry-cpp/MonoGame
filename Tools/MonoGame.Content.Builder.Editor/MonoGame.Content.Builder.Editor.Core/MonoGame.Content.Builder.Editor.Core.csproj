@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <BaseOutputPath>..\..\..\Artifacts\MonoGame.Content.Builder.Editor.Core</BaseOutputPath>
+    <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <Compile Include="..\..\MonoGame.Content.Builder\CommandLineParser.cs" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Content Include="Templates\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Eto.Forms" Version="2.5.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\MonoGame.Framework\MonoGame.Framework.DesktopGL.csproj" />
+    <ProjectReference Include="..\..\..\MonoGame.Framework.Content.Pipeline\MonoGame.Framework.Content.Pipeline.csproj">
+      <AdditionalProperties>CopyContentFiles=False</AdditionalProperties>
+    </ProjectReference>
+  </ItemGroup>
+
+</Project>

@@ -50,17 +50,6 @@ namespace MonoGame.Tools.Pipeline
             _files.Add("1.", linkfile);
         }
 
-        public static bool CheckString(string s)
-        {
-            var notAllowed = Path.GetInvalidFileNameChars();
-
-            for (int i = 0; i < notAllowed.Length; i++)
-                if (s.Contains(notAllowed[i].ToString()))
-                    return false;
-
-            return true;
-        }
-
         public static Image GetEtoDirectoryIcon()
         {
             return _folder;
