@@ -6,9 +6,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Reflection;
 using Eto.Drawing;
 using Eto.Forms;
+using MonoGame.Content.Builder.Editor.Project;
+using MonoGame.Content.Builder.Editor.Property;
 
 namespace MonoGame.Content.Builder.Editor
 {
@@ -16,6 +17,8 @@ namespace MonoGame.Content.Builder.Editor
     {
         private static PipelineProject? _project;
         private static readonly FileFilter _mgcbFileFilter, _allFileFilter, _xnaFileFilter;
+        private static ProjectPad _projectPad;
+        private static PropertyPad _propertyPad;
 
         static Controller()
         {
@@ -24,20 +27,19 @@ namespace MonoGame.Content.Builder.Editor
             _xnaFileFilter = new FileFilter("XNA Content Projects (*.contentproj)", new[] { ".contentproj" });
 
             View = null!;
+            _projectPad = null!;
+            _propertyPad = null!;
         }
 
         public static void Init(IView view)
         {
             View = view;
 
-            var root = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            if (Directory.Exists(Path.Combine(root, "..", "Resources", "Templates")))
-            {
-                root = Path.Combine(root, "..", "Resources");
-            }
+            _projectPad = new ProjectPad();
+            _propertyPad = new PropertyPad();
 
             view.UpdateRecentList(PipelineSettings.Default.ProjectHistory);
-            view.Attach();
+            view.Attach(_projectPad, _propertyPad);
         }
 
         public static PipelineProject? ProjectItem => _project;
@@ -53,6 +55,8 @@ namespace MonoGame.Content.Builder.Editor
                 return ret;
             }
         }
+
+        public static ProjectPad ProjectPad => _projectPad;
 
         public static bool IsProjectOpen => _project != null;
 
@@ -170,8 +174,10 @@ namespace MonoGame.Content.Builder.Editor
 
             var errortext = "Failed to open the project due to an unknown error.";
 
+#if !DEBUG
             try
             {
+#endif
                 _project = new PipelineProject();
 
                 var parser = new PipelineProjectParser(_project);
@@ -190,13 +196,15 @@ namespace MonoGame.Content.Builder.Editor
                 PipelineSettings.Default.Save();
                 View.UpdateRecentList(PipelineSettings.Default.ProjectHistory);
 
-                View.ProjectPad.Open(_project);
+                _projectPad.Open(_project);
+#if !DEBUG
             }
             catch (Exception)
             {
                 MessageBox.Show(null, Path.GetFileName(projectFilePath) + ": " + errortext, "Error Opening Project", MessageBoxButtons.OK, MessageBoxType.Error);
                 return;
             }
+#endif
         }
 
         public static void ClearRecentList()
@@ -219,7 +227,7 @@ namespace MonoGame.Content.Builder.Editor
             IsProjectDirty = false;
             _project = null;
 
-            View.ProjectPad.Open(_project);
+            _projectPad.Open(_project);
         }
 
         public static bool MoveProject(string newname)
@@ -366,7 +374,7 @@ namespace MonoGame.Content.Builder.Editor
 
         public static void LoadProperties(List<IProjectItem> items)
         {
-            View.PropertyPad.SetObjects(items);
+            _propertyPad.SetObjects(items);
         }
 
         public static Image GetFileIcon(string path, bool link)
@@ -381,7 +389,7 @@ namespace MonoGame.Content.Builder.Editor
 
         public static Image GetImageForResource(string resourceId)
         {
-            return View.GetImageForResource(resourceId);
+            return /*View.GetImageForResource(resourceId) ?? */ Bitmap.FromResource(resourceId);
         }
     }
 }

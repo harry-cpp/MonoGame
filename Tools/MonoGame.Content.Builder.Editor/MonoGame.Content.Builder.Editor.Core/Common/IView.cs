@@ -11,11 +11,7 @@ namespace MonoGame.Content.Builder.Editor
 {
     public interface IView
     {
-        ProjectPad ProjectPad { get; }
-
-        PropertyPad PropertyPad { get; }
-
-        void Attach();
+        void Attach(ProjectPad projectPad, PropertyPad propertyPad);
 
         void UpdateRecentList(List<string> recentList);
 
@@ -23,6 +19,6 @@ namespace MonoGame.Content.Builder.Editor
 
         Image GetFolderIcon();
 
-        Image GetImageForResource(string filePath);
+        Image? GetImageForResource(string filePath);
     }
 }

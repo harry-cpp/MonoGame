@@ -19,7 +19,7 @@ namespace MonoGame.Content.Builder
     /// </summary>
     public class MGBuildParser
     {
-        public static MGBuildParser Instance;
+        public static MGBuildParser Instance = null!;
 
         private readonly object _optionsObject;
         private readonly Queue<MemberInfo> _requiredOptions;

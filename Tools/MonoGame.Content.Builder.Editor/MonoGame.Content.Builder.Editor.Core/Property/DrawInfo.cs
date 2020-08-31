@@ -1,5 +1,4 @@
-﻿using System;
-using Eto.Drawing;
+﻿using Eto.Drawing;
 
 namespace MonoGame.Content.Builder.Editor.Property
 {

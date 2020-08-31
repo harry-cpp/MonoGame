@@ -11,7 +11,6 @@ namespace MonoGame.Content.Builder.Editor.Property
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = true)]
     public class CellAttribute : Attribute
     {
-        public string Name;
         public Type Type;
 
         public CellAttribute(Type type)
@@ -26,7 +25,7 @@ namespace MonoGame.Content.Builder.Editor.Property
         protected Rectangle _lastRec;
         protected Type _type;
 
-        public void Create(string category, string name, object value, Type type, EventHandler eventHandler = null)
+        public void Create(string category, string name, object? value, Type type, EventHandler? eventHandler = null)
         {
             Category = category;
             Value = value;
@@ -47,7 +46,7 @@ namespace MonoGame.Content.Builder.Editor.Property
         public string Text { get; set; }
         public bool Editable { get; set; }
         public int Height { get; set; }
-        public Action OnKill { get; set; }
+        public Action? OnKill { get; set; }
         public bool HasDialog { get; protected set; }
         public bool SkipCellDraw { get; set; }
 

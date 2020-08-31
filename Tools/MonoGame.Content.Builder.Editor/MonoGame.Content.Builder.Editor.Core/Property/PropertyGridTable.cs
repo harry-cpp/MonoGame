@@ -11,7 +11,7 @@ using Eto.Forms;
 
 namespace MonoGame.Content.Builder.Editor.Property
 {
-    public partial class PropertyGridTable
+    public partial class PropertyGridTable : Scrollable
     {
         private const int _spacing = 12;
         private const int _separatorWidth = 8;
@@ -19,9 +19,11 @@ namespace MonoGame.Content.Builder.Editor.Property
 
         public bool Group { get; set; }
 
+        PixelLayout pixel1;
+        Drawable drawable;
         private IEnumerable<Type> _cellTypes;
         private CursorType _currentCursor;
-        private CellBase _selectedCell;
+        private CellBase? _selectedCell;
         private List<CellBase> _cells;
         private Point _mouseLocation;
         private int _separatorPos, _moveSeparatorAmount;
@@ -32,7 +34,24 @@ namespace MonoGame.Content.Builder.Editor.Property
 
         public PropertyGridTable()
         {
-            InitializeComponent();
+            BackgroundColor = DrawInfo.BackColor;
+            ExpandContentWidth = true;
+
+            pixel1 = new PixelLayout();
+            pixel1.BackgroundColor = DrawInfo.BackColor;
+
+            drawable = new Drawable();
+            drawable.Height = 100;
+            pixel1.Add(drawable, 0, 0);
+
+            Content = pixel1;
+
+            drawable.Paint += Drawable_Paint;
+            drawable.MouseDown += Drawable_MouseDown;
+            drawable.MouseUp += Drawable_MouseUp;
+            drawable.MouseMove += Drawable_MouseMove;
+            drawable.MouseLeave += Drawable_MouseLeave;
+            SizeChanged += PropertyGridTable_SizeChanged;
 
             _cellTypes = Assembly.GetExecutingAssembly().GetTypes().Where(t => t.IsClass && t.IsSubclassOf(typeof(CellBase)));
             _separatorPos = 100;
@@ -59,10 +78,10 @@ namespace MonoGame.Content.Builder.Editor.Property
 
             foreach (var control in children)
             {
-                if (control != drawable)
+                if (control != drawable && control.Tag is CellBase cell)
                 {
-                    if (control.Tag is CellBase && (control.Tag as CellBase).OnKill != null)
-                        (control.Tag as CellBase).OnKill();
+                    if (cell.OnKill != null)
+                        cell.OnKill();
 
                     pixel1.Remove(control);
                 }
@@ -74,10 +93,8 @@ namespace MonoGame.Content.Builder.Editor.Property
             return ret;
         }
 
-        private Type GetCellType(IEnumerable<Type> types, string name, Type type)
+        private Type? GetCellType(IEnumerable<Type> types, string name, Type type)
         {
-            Type ret = null;
-
             foreach (var ct in types)
             {
                 var attrs = ct.GetCustomAttributes(typeof(CellAttribute), true);
@@ -86,22 +103,15 @@ namespace MonoGame.Content.Builder.Editor.Property
                 {
                     if (a.Type == type || type.IsSubclassOf(a.Type))
                     {
-                        if (a.Name == name)
-                        {
-                            ret = ct;
-                            break;
-                        }
-
-                        if (string.IsNullOrEmpty(a.Name) && ret == null)
-                            ret = ct;
+                        return ct;
                     }
                 }
             }
 
-            return ret;
+            return null;
         }
 
-        public void AddEntry(string category, string name, object? value, Type type, EventHandler eventHandler = null, bool editable = true)
+        public void AddEntry(string category, string name, object? value, Type type, EventHandler? eventHandler = null, bool editable = true)
         {
             var cellType = GetCellType(_cellTypes, name, type);
 
@@ -151,7 +161,7 @@ namespace MonoGame.Content.Builder.Editor.Property
             DrawInfo.SetPixelsPerPoint(g);
             var rec = new Rectangle(0, 0, drawable.Width - 1, DrawInfo.TextHeight + _spacing);
             var overGroup = false;
-            string prevCategory = null;
+            var prevCategory = string.Empty;
 
             _separatorPos = Math.Min(Width - _separatorSafeDistance, Math.Max(_separatorSafeDistance, _separatorPos));
             _selectedCell = null;

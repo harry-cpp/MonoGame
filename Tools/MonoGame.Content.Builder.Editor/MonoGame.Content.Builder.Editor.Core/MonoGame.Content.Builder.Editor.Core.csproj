@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <BaseOutputPath>..\..\..\Artifacts\MonoGame.Content.Builder.Editor.Core</BaseOutputPath>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
     <Nullable>enable</Nullable>
   </PropertyGroup>
@@ -15,6 +14,27 @@
     <Content Include="Templates\**\*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Icons\*">
+      <LogicalName>Icons.%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
+
+    <!-- The resources for treeview -->
+    <EmbeddedResource Include="Icons\TreeView\*">
+      <LogicalName>TreeView.%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
+    
+    <!-- The resources for output filtering -->
+    <EmbeddedResource Include="Icons\Build\*">
+      <LogicalName>Build.%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
+
+    <!-- The resources for menubar and toolbar -->
+    <EmbeddedResource Include="Icons\Commands\*">
+      <LogicalName>Commands.%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>

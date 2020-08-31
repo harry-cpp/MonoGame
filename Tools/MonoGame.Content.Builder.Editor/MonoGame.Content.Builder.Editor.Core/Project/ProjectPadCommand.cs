@@ -21,7 +21,7 @@ namespace MonoGame.Content.Builder.Editor.Project
             {
                 if (GetIsActive(_items))
                 {
-                    Clicked(Controller.View.ProjectPad, _treeItems, _items);
+                    Clicked(Controller.ProjectPad, _treeItems, _items);
                 }
             };
         }
