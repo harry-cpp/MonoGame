@@ -27,7 +27,7 @@ namespace MonoGame.Content.Builder.Editor
             _property = property;
         }
 
-        public override object? GetValue(object component)
+        public override object GetValue(object component)
         {
             var val = _property.GetValue(_targets[0]);
             for (var i = 1; i < _targets.Length; i++)
@@ -40,7 +40,7 @@ namespace MonoGame.Content.Builder.Editor
             return val;                
         }
 
-        public override void SetValue(object component, object? value)
+        public override void SetValue(object component, object value)
         {
             for (var i = 0; i < _targets.Length; i++)
                 _property.SetValue(_targets[i], value);         
@@ -62,9 +62,9 @@ namespace MonoGame.Content.Builder.Editor
         private readonly Type _propertyType;
         private readonly Type _componentType;
         private readonly string _propertyName;
-        private readonly OpaqueDataDictionary? _target;
+        private readonly OpaqueDataDictionary _target;
 
-        public OpaqueDataDictionaryElementPropertyDescriptor(string propertyName, Type propertyType, OpaqueDataDictionary? target = null)
+        public OpaqueDataDictionaryElementPropertyDescriptor(string propertyName, Type propertyType, OpaqueDataDictionary target = null)
             : base(propertyName, new Attribute[] { })
         {
             _propertyType = propertyType;
@@ -82,7 +82,7 @@ namespace MonoGame.Content.Builder.Editor
             return data[_propertyName];            
         }
 
-        public override void SetValue(object component, object? value)
+        public override void SetValue(object component, object value)
         {
             var data = _target ?? (component as OpaqueDataDictionary);
 

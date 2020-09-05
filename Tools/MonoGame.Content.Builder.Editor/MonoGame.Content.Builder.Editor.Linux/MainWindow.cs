@@ -17,7 +17,13 @@ namespace MonoGame.Content.Builder.Editor.Linux
         private HeaderBar _headerBar = null!;
 
         [Gtk.Builder.Object("build_buttonbox")]
-        private Box _buildBox = null!;
+        private Widget _buildBox = null!;
+
+        [Gtk.Builder.Object("cancel_button")]
+        private Widget _cancelBox = null!;
+
+        [Gtk.Builder.Object("separator1")]
+        private Widget _boxSeparator = null!;
 
         [Gtk.Builder.Object("popovermenu1")]
         private PopoverMenu _popovermenu1 = null!;
@@ -46,14 +52,12 @@ namespace MonoGame.Content.Builder.Editor.Linux
             var hpanned = new HPaned();
             var vpanned = new VPaned();
 
-            hpanned.Pack1(vpanned, true, true);
-            hpanned.Pack2(new TextView(), true, true);
+            hpanned.Pack1(vpanned, false, false);
+            hpanned.Pack2(new TextView(), true, false);
             hpanned.Position = 200;
 
-            vpanned.Pack1(projectPad.Control.ToNative(), true, true);
-            vpanned.Pack2(propertyPad.Control.ToNative(), true, true);
-
-            Child = hpanned;
+            vpanned.Pack1(projectPad.Control.ToNative(), true, false);
+            vpanned.Pack2(propertyPad.Control.ToNative(), true, false);
 
             ConnectAction("new", controller.Commands.NewProject);
             ConnectAction("open", controller.Commands.OpenProject);
@@ -61,20 +65,16 @@ namespace MonoGame.Content.Builder.Editor.Linux
             ConnectAction("save", controller.Commands.SaveProject);
             ConnectAction("saveas", controller.Commands.SaveAsProject);
             ConnectAction("close", controller.Commands.CloseProject);
+
+            Child = hpanned;
+            Child.ShowAll();
         }
 
-        private void ConnectAction(string action, Command command)
+        public void UpdateEnabledCommands()
         {
-            var simpleAction = new GLib.SimpleAction(action, null);
-            simpleAction.Activated += (o, args) => 
-            {
-                _popovermenu1.Hide();
-                _popovermenu2.Hide();
-                command.Execute();
-            };
-
-            command.EnabledChanged += (sender, e) => simpleAction.Enabled = command.Enabled;
-            Program.App.AddAction(simpleAction);
+            _buildBox.Visible = false;
+            _cancelBox.Visible = false;
+            _boxSeparator.Visible = _buildBox.Visible || _cancelBox.Visible;
         }
 
         public Eto.Drawing.Image GetFileIcon(string? filePath)
@@ -115,14 +115,18 @@ namespace MonoGame.Content.Builder.Editor.Linux
             return new Bitmap(new BitmapHandler(linkIcon));
         }
 
-        public void UpdateRecentList(List<string> recentList)
+        private void ConnectAction(string action, Command command)
         {
-            _buildBox.Visible = false;
-        }
+            var simpleAction = new GLib.SimpleAction(action, null);
+            simpleAction.Activated += (o, args) => 
+            {
+                _popovermenu1.Hide();
+                _popovermenu2.Hide();
+                command.Execute();
+            };
 
-        public void UpdateEnabledCommands()
-        {
-
+            command.EnabledChanged += (sender, e) => simpleAction.Enabled = command.Enabled;
+            Program.App.AddAction(simpleAction);
         }
     }
 }

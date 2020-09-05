@@ -23,7 +23,7 @@ namespace MonoGame.Content.Builder.Editor.Property
         Drawable drawable;
         private IEnumerable<Type> _cellTypes;
         private CursorType _currentCursor;
-        private CellBase? _selectedCell;
+        private CellBase _selectedCell;
         private List<CellBase> _cells;
         private Point _mouseLocation;
         private int _separatorPos, _moveSeparatorAmount;
@@ -93,7 +93,7 @@ namespace MonoGame.Content.Builder.Editor.Property
             return ret;
         }
 
-        private Type? GetCellType(IEnumerable<Type> types, string name, Type type)
+        private Type GetCellType(IEnumerable<Type> types, string name, Type type)
         {
             foreach (var ct in types)
             {
@@ -111,7 +111,7 @@ namespace MonoGame.Content.Builder.Editor.Property
             return null;
         }
 
-        public void AddEntry(string category, string name, object? value, Type type, EventHandler? eventHandler = null, bool editable = true)
+        public void AddEntry(string category, string name, object value, Type type, EventHandler eventHandler = null, bool editable = true)
         {
             var cellType = GetCellType(_cellTypes, name, type);
 

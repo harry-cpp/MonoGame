@@ -297,7 +297,7 @@ namespace MonoGame.Content.Builder.Editor
                 SaveProject(io, null);
         }
         
-        public void SaveProject(TextWriter io, Func<ContentItem, bool>? filterItem)
+        public void SaveProject(TextWriter io, Func<ContentItem, bool> filterItem)
         {
             const string lineFormat = "/{0}:{1}";
             const string processorParamFormat = "{0}={1}";
@@ -395,7 +395,7 @@ namespace MonoGame.Content.Builder.Editor
                             // Otherwise, write only values which are defined by the real processor.
                             foreach (var j in i.Processor.Properties)
                             {
-                                object? value = null;
+                                object value = null;
                                 if (i.ProcessorParams.ContainsKey(j.Name))
                                     value = i.ProcessorParams[j.Name];
 

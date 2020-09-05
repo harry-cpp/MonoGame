@@ -36,23 +36,6 @@ namespace MonoGame.Content.Builder.Editor
 
             CloseProject = new Command();
             CloseProject.MenuText = "Close";
-            /*
-            NewProject.Executed += (o, e) => controller.NewProject();
-            OpenProject.Executed += (o, e) => controller.OpenProject();
-            ImportProject.Executed += (o, e) => controller.ImportProject();
-            SaveProject.Executed += (o, e) => controller.SaveProject(false);
-            SaveAsProject.Executed += (o, e) => controller.SaveProject(true);
-            CloseProject.Executed += (o, e) => controller.CloseProject();*/
         }
-
-        /*public static void Update()
-        {
-            NewProject.Enabled = true;
-            OpenProject.Enabled = true;
-            ImportProject.Enabled = true;
-            SaveProject.Enabled = Controller.IsProjectOpen && Controller.IsProjectDirty;
-            SaveAsProject.Enabled = Controller.IsProjectOpen;
-            CloseProject.Enabled = Controller.IsProjectOpen;
-        }*/
     }
 }

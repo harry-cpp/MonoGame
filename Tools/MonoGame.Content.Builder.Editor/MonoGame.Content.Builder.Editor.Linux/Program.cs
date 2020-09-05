@@ -32,7 +32,7 @@ namespace MonoGame.Content.Builder.Editor.Linux
 
             var controller = new Controller(window);
 
-            window.ShowAll();
+            window.Show();
             Application.Run();
         }
     }

@@ -374,7 +374,7 @@ namespace MonoGame.Content.Builder.Editor
             return TypeDescriptor.GetConverter(type);
         }
 
-        public static ImporterTypeDescription? FindImporter(string name, string fileExtension)
+        public static ImporterTypeDescription FindImporter(string name, string fileExtension)
         {
             if (!string.IsNullOrEmpty(name))
             {
@@ -407,7 +407,7 @@ namespace MonoGame.Content.Builder.Editor
             return null;
         }
 
-        public static ProcessorTypeDescription? FindProcessor(string name, ImporterTypeDescription importer)
+        public static ProcessorTypeDescription FindProcessor(string name, ImporterTypeDescription importer)
         {
             if (!string.IsNullOrEmpty(name))
             {

@@ -82,7 +82,7 @@ namespace MonoGame.Content.Builder.Editor.Property
             _propertyTable.Update();
         }
 
-        private bool CompareVariables(ref object? a, object b, PropertyInfo p)
+        private bool CompareVariables(ref object a, object b, PropertyInfo p)
         {
             var prop = b.GetType().GetProperty(p.Name);
             if (prop == null)
@@ -115,7 +115,7 @@ namespace MonoGame.Content.Builder.Editor.Property
                         name = displayNameAttribute.DisplayName;
                 }
 
-                object? value = p.GetValue(objects[0], null);
+                object value = p.GetValue(objects[0], null);
                 foreach (object o in objects)
                 {
                     if (!CompareVariables(ref value, o, p))
@@ -147,7 +147,7 @@ namespace MonoGame.Content.Builder.Editor.Property
                 if (!p.Browsable)
                     continue;
 
-                object? value = objects[0].ProcessorParams[p.Name];
+                object value = objects[0].ProcessorParams[p.Name];
                 foreach (ContentItem o in objects)
                 {
                     if (value == null || !value.Equals(o.ProcessorParams[p.Name]))

@@ -16,7 +16,7 @@ namespace MonoGame.Content.Builder.Editor
     public class Controller : IController
     {
         private Commands _commands;
-        private PipelineProject? _project;
+        private PipelineProject _project;
         private readonly FileFilter _mgcbFileFilter, _allFileFilter, _xnaFileFilter;
         private ProjectPad _projectPad;
         private PropertyPad _propertyPad;
@@ -61,7 +61,7 @@ namespace MonoGame.Content.Builder.Editor
 
         public bool IsProjectOpen => Project != null;
 
-        private PipelineProject? Project
+        private PipelineProject Project
         {
             get => _project;
             set

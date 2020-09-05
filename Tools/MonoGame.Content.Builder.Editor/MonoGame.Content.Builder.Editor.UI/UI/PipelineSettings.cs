@@ -12,7 +12,7 @@ namespace MonoGame.Content.Builder.Editor
     public class PipelineSettings
     {
         private const string SettingsPath = "Settings.xml";
-        private IsolatedStorageFile? _isoStore;
+        private IsolatedStorageFile _isoStore;
 
         public static PipelineSettings Default { get; private set; }
 

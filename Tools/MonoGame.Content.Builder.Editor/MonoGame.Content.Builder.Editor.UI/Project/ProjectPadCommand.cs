@@ -17,7 +17,6 @@ namespace MonoGame.Content.Builder.Editor.Project
         {
             _items = new List<IProjectItem>();
             _treeItems = new List<TreeGridItem>();
-            _projectPad = null!;
 
             Executed += (o, e) =>
             {

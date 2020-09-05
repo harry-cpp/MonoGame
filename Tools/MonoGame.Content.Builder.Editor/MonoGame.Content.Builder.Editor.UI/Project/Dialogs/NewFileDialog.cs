@@ -83,7 +83,7 @@ namespace MonoGame.Content.Builder.Editor.Project
 
         private async Task LoadTemplates(string directoryPath)
         {
-            try
+            /*try
             {
                 if (!Directory.Exists(directoryPath))
                     return;
@@ -133,7 +133,7 @@ namespace MonoGame.Content.Builder.Editor.Project
                     _treeView.ReloadData();
                 }
             }
-            catch { }
+            catch { }*/
         }
     }
 }

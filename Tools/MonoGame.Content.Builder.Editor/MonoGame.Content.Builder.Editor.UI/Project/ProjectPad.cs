@@ -15,7 +15,7 @@ namespace MonoGame.Content.Builder.Editor.Project
     public partial class ProjectPad : Pad
     {
         private IController _controller;
-        private PipelineProject? _project;
+        private PipelineProject _project;
         private TreeGridItem _itemBase, _itemRoot;
         private Image _iconRoot;
         private List<ProjectPadCommand> _commands;
@@ -237,7 +237,7 @@ namespace MonoGame.Content.Builder.Editor.Project
             }
         }
 
-        public void Open(PipelineProject? project)
+        public void Open(PipelineProject project)
         {
             _project = project;
             _itemBase = new TreeGridItem();
@@ -296,7 +296,7 @@ namespace MonoGame.Content.Builder.Editor.Project
             }
 
             if (split.Length > 1)
-                AddItem(findItem, projectItem, string.Join('/', split, 1, split.Length - 1));
+                AddItem(findItem, projectItem, string.Join("/", split, 1, split.Length - 1));
 
             return findItem;
         }

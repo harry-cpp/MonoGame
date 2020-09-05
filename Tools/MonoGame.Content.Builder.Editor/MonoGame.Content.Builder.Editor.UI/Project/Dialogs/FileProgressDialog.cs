@@ -12,7 +12,7 @@ namespace MonoGame.Content.Builder.Editor.Project
     public partial class FileProgressDialog : Dialog
     {
         private bool _allowExit;
-        private Thread? _thread;
+        private Thread _thread;
         private Action _action;
         private Label _labelText;
 
