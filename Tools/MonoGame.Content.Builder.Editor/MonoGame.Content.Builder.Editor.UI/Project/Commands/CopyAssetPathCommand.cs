@@ -24,7 +24,7 @@ namespace MonoGame.Content.Builder.Editor.Project
             return "Copy Asset Path";
         }
 
-        public override void Clicked(ProjectPad projectExplorer, List<TreeGridItem> treeItems, List<IProjectItem> items)
+        public override void Clicked(ProjectPad projectPad, List<TreeGridItem> treeItems, List<IProjectItem> items)
         {
             var filePath = items[0].DestinationPath;
             filePath = filePath.Remove(filePath.Length - Path.GetExtension(filePath).Length);

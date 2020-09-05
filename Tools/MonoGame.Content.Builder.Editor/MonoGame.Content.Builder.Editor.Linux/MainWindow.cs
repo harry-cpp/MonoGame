@@ -3,13 +3,13 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System.Collections.Generic;
+using System.IO;
 using Gtk;
-using MonoGame.Content.Builder.Editor.Project;
-using MonoGame.Content.Builder.Editor.Property;
 using Eto.Drawing;
 using Eto.GtkSharp.Drawing;
+using Command = Eto.Forms.Command;
 
-namespace MonoGame.Content.Builder.Editor
+namespace MonoGame.Content.Builder.Editor.Linux
 {
     partial class MainWindow : Window, IView
     {
@@ -18,6 +18,12 @@ namespace MonoGame.Content.Builder.Editor
 
         [Gtk.Builder.Object("build_buttonbox")]
         private Box _buildBox = null!;
+
+        [Gtk.Builder.Object("popovermenu1")]
+        private PopoverMenu _popovermenu1 = null!;
+
+        [Gtk.Builder.Object("popovermenu2")]
+        private PopoverMenu _popovermenu2 = null!;
 
         private IconTheme _theme;
 
@@ -35,7 +41,7 @@ namespace MonoGame.Content.Builder.Editor
             Destroyed += (o, e) => Gtk.Application.Quit();
         }
 
-        public void Attach(ProjectPad projectPad, PropertyPad propertyPad)
+        public void Attach(IController controller, Pad projectPad, Pad propertyPad)
         {
             var hpanned = new HPaned();
             var vpanned = new VPaned();
@@ -44,38 +50,53 @@ namespace MonoGame.Content.Builder.Editor
             hpanned.Pack2(new TextView(), true, true);
             hpanned.Position = 200;
 
-            vpanned.Pack1(projectPad.ToNative(), true, true);
-            vpanned.Pack2(propertyPad.ToNative(), true, true);
+            vpanned.Pack1(projectPad.Control.ToNative(), true, true);
+            vpanned.Pack2(propertyPad.Control.ToNative(), true, true);
 
             Child = hpanned;
 
-            ConnectAction("open", () => Controller.OpenProject());
+            ConnectAction("new", controller.Commands.NewProject);
+            ConnectAction("open", controller.Commands.OpenProject);
+            ConnectAction("import", controller.Commands.ImportProject);
+            ConnectAction("save", controller.Commands.SaveProject);
+            ConnectAction("saveas", controller.Commands.SaveAsProject);
+            ConnectAction("close", controller.Commands.CloseProject);
         }
 
-        private static void ConnectAction(string actionName, System.Action action)
+        private void ConnectAction(string action, Command command)
         {
-            var simpleAction = new GLib.SimpleAction(actionName, null);
-            simpleAction.Activated += (o, args) => action();
+            var simpleAction = new GLib.SimpleAction(action, null);
+            simpleAction.Activated += (o, args) => 
+            {
+                _popovermenu1.Hide();
+                _popovermenu2.Hide();
+                command.Execute();
+            };
+
+            command.EnabledChanged += (sender, e) => simpleAction.Enabled = command.Enabled;
             Program.App.AddAction(simpleAction);
         }
 
-        public Eto.Drawing.Image GetFileIcon(string path, bool link)
+        public Eto.Drawing.Image GetFileIcon(string? filePath)
         {
-            Gdk.Pixbuf icon = null;
+            Gdk.Pixbuf? icon = null;
 
-            var file = GLib.FileFactory.NewForPath(path);
-            var info = file.QueryInfo("standard::*", GLib.FileQueryInfoFlags.None, null);
-            var sicon = info.Icon.ToString().Split(' ');
-
-            for (int i = sicon.Length - 1; i >= 1; i--)
+            if (File.Exists(filePath))
             {
-                try
+                var file = GLib.FileFactory.NewForPath(filePath);
+                var info = file.QueryInfo("standard::*", GLib.FileQueryInfoFlags.None, null);
+                var sicon = info.Icon.ToString().Split(' ');
+
+                for (int i = sicon.Length - 1; i >= 1; i--)
                 {
-                    icon = _theme.LoadIcon(sicon[i], 16, 0);
-                    if (icon != null)
-                        break;
+                    try
+                    {
+                        icon = _theme.LoadIcon(sicon[i], 16, 0);
+                        if (icon != null)
+                            break;
+                    }
+                    catch { }
                 }
-                catch { }
             }
 
             return new Bitmap(new BitmapHandler(icon ?? _theme.LoadIcon("text-x-generic", 16, 0)));
@@ -94,14 +115,14 @@ namespace MonoGame.Content.Builder.Editor
             return new Bitmap(new BitmapHandler(linkIcon));
         }
 
-        public Eto.Drawing.Image GetImageForResource(string filePath)
-        {
-            throw new System.NotImplementedException();
-        }
-
         public void UpdateRecentList(List<string> recentList)
         {
             _buildBox.Visible = false;
+        }
+
+        public void UpdateEnabledCommands()
+        {
+
         }
     }
 }

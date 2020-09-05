@@ -28,27 +28,27 @@ namespace MonoGame.Content.Builder.Editor.Project
             return "Link Existing Files...";
         }
 
-        public override void Clicked(ProjectPad projectExplorer, List<TreeGridItem> treeItems, List<IProjectItem> items)
+        public override void Clicked(ProjectPad projectPad, List<TreeGridItem> treeItems, List<IProjectItem> items)
         {
             var basePath = items[0] is PipelineProject ? string.Empty : items[0].OriginalPath;
             var allFileFilter = new FileFilter("All Files (*.*)", new[] { ".*" });
 
             var dialog = new OpenFileDialog();
-            dialog.Directory = new Uri(Controller.GetFullPath(basePath));
+            dialog.Directory = new Uri(projectPad.GetFullPath(basePath));
             dialog.MultiSelect = true;
             dialog.Filters.Add(allFileFilter);
             dialog.CurrentFilter = allFileFilter;
 
-            if (dialog.ShowDialog(projectExplorer) != DialogResult.Ok)
+            if (dialog.Show() != DialogResult.Ok)
                 return;
 
-            var dir1 = Controller.GetFullPath(basePath);
+            var dir1 = projectPad.GetFullPath(basePath);
             var dir2 = Path.GetDirectoryName(dialog.Filenames.ElementAt(0));
             var isFileInFolder = dir1 == dir2;
 
             if (isFileInFolder)
             {
-                projectExplorer.AddFiles(dialog.Filenames.ToList());
+                projectPad.AddFiles(dialog.Filenames.ToList());
             }
             else
             {
@@ -57,13 +57,13 @@ namespace MonoGame.Content.Builder.Editor.Project
                 foreach (var filePath in dialog.Filenames)
                 {
                     var relativeDestPath = Path.Combine(basePath, Path.GetFileName(filePath));
-                    destPaths.Add(Controller.GetFullPath(relativeDestPath));
+                    destPaths.Add(projectPad.GetFullPath(relativeDestPath));
                 }
 
-                projectExplorer.AddFiles(destPaths, dialog.Filenames.ToList());
+                projectPad.AddFiles(dialog.Filenames.ToList(), destPaths);
             }
 
-            projectExplorer.TreeView.ReloadData();
+            projectPad.TreeView.ReloadData();
         }
     }
 }

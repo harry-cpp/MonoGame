@@ -7,23 +7,25 @@ using Eto.Forms;
 
 namespace MonoGame.Content.Builder.Editor.Project
 {
-    public class RebuildCommand : ProjectPadCommand
+    public class RenameCommand : ProjectPadCommand
     {
-        public override (int groupIndex, int index) Index => (40, 10);
+        public override (int groupIndex, int index) Index => (30, 0);
+
+        public override bool IsInMenu => true;
 
         public override bool GetIsActive(List<IProjectItem> items)
         {
-            return true;
+            return items.Count == 1 && !(items[0] is PipelineProject);
         }
 
         public override string GetName(List<IProjectItem> items)
         {
-            return "Rebuild";
+            return "Rename";
         }
 
-        public override void Clicked(ProjectPad projectExplorer, List<TreeGridItem> treeItems, List<IProjectItem> items)
+        public override void Clicked(ProjectPad projectPad, List<TreeGridItem> treeItems, List<IProjectItem> items)
         {
-
+            projectPad.TreeView.BeginEdit(projectPad.TreeView.SelectedRow, 0);
         }
     }
 }

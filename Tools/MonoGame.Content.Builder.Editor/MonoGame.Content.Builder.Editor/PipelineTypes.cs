@@ -162,7 +162,7 @@ namespace MonoGame.Content.Builder.Editor
         }
     };
 
-    internal class PipelineTypes
+    public class PipelineTypes
     {
         [DebuggerDisplay("ImporterInfo: {Type.Name}")]
         private struct ImporterInfo

@@ -13,42 +13,43 @@ using MonoGame.Content.Builder.Editor.Property;
 
 namespace MonoGame.Content.Builder.Editor
 {
-    public static partial class Controller
+    public class Controller : IController
     {
-        private static PipelineProject? _project;
-        private static readonly FileFilter _mgcbFileFilter, _allFileFilter, _xnaFileFilter;
-        private static ProjectPad _projectPad;
-        private static PropertyPad _propertyPad;
+        private Commands _commands;
+        private PipelineProject? _project;
+        private readonly FileFilter _mgcbFileFilter, _allFileFilter, _xnaFileFilter;
+        private ProjectPad _projectPad;
+        private PropertyPad _propertyPad;
+        private bool _isProjectDirty;
 
-        static Controller()
+        public Controller(IView view)
         {
+            _commands = new Commands();
             _mgcbFileFilter = new FileFilter("MonoGame Content Build Project (*.mgcb)", new[] { ".mgcb" });
             _allFileFilter = new FileFilter("All Files (*.*)", new[] { ".*" });
             _xnaFileFilter = new FileFilter("XNA Content Projects (*.contentproj)", new[] { ".contentproj" });
-
-            View = null!;
-            _projectPad = null!;
-            _propertyPad = null!;
-        }
-
-        public static void Init(IView view)
-        {
             View = view;
 
-            _projectPad = new ProjectPad();
+            _commands.NewProject.Executed += (o, e) => NewProject();
+            _commands.OpenProject.Executed += (o, e) => OpenProject();
+            _commands.ImportProject.Executed += (o, e) => ImportProject();
+            _commands.SaveProject.Executed += (o, e) => SaveProject(false);
+            _commands.SaveAsProject.Executed += (o, e) => SaveProject(true);
+            _commands.CloseProject.Executed += (o, e) => CloseProject();
+
+            _projectPad = new ProjectPad(this);
             _propertyPad = new PropertyPad();
 
-            view.UpdateRecentList(PipelineSettings.Default.ProjectHistory);
-            view.Attach(_projectPad, _propertyPad);
+            view.Attach(this, _projectPad, _propertyPad);
+
+            UpdateEnabledCommands();
         }
 
-        public static PipelineProject? ProjectItem => _project;
-
-        public static string ProjectLocation
+        public string ProjectLocation
         {
             get
             {
-                var ret = (_project == null) ? string.Empty : _project.Location;
+                var ret = (Project == null) ? string.Empty : Project.Location;
                 if (!ret.EndsWith(Path.DirectorySeparatorChar.ToString()))
                     ret += Path.DirectorySeparatorChar;
 
@@ -56,28 +57,48 @@ namespace MonoGame.Content.Builder.Editor
             }
         }
 
-        public static ProjectPad ProjectPad => _projectPad;
+        public ProjectPad ProjectPad => _projectPad;
 
-        public static bool IsProjectOpen => _project != null;
+        public bool IsProjectOpen => Project != null;
 
-        public static bool IsProjectDirty { get; set; }
+        private PipelineProject? Project
+        {
+            get => _project;
+            set
+            {
+                _project = value;
+                UpdateEnabledCommands();
+            }
+        }
 
-        public static IView View { get; private set; }
+        public bool IsProjectDirty
+        {
+            get => _isProjectDirty;
+            set
+            {
+                _isProjectDirty = value;
+                UpdateEnabledCommands();
+            }
+        }
 
-        public static void OnProjectModified()
+        public IView View { get; private set; }
+
+        public Commands Commands => _commands;
+
+        public void OnProjectModified()
         {
             Debug.Assert(IsProjectOpen, "OnProjectModified called with no project open?");
             IsProjectDirty = true;
         }
 
-        public static void OnReferencesModified()
+        public void OnReferencesModified()
         {
             Debug.Assert(IsProjectOpen, "OnReferencesModified called with no project open?");
             IsProjectDirty = true;
             ResolveTypes();
         }
 
-        public static void NewProject()
+        public void NewProject()
         {
             // Make sure we give the user a chance to
             // save the project if they need too.
@@ -104,15 +125,15 @@ namespace MonoGame.Content.Builder.Editor
             CloseProject();
 
             // Clear existing project data, initialize to a new blank project.
-            _project = new PipelineProject();
-            PipelineTypes.Load(_project);
+            Project = new PipelineProject();
+            PipelineTypes.Load(Project);
 
             // Save the new project.
-            _project.OriginalPath = projectFilePath;
+            Project.OriginalPath = projectFilePath;
             IsProjectDirty = true;
         }
 
-        public static void ImportProject()
+        public void ImportProject()
         {
             // Make sure we give the user a chance to
             // save the project if they need too.
@@ -133,8 +154,8 @@ namespace MonoGame.Content.Builder.Editor
             try
 #endif
             {
-                _project = new PipelineProject();
-                var parser = new PipelineProjectParser(_project);
+                Project = new PipelineProject();
+                var parser = new PipelineProjectParser(Project);
                 parser.ImportProject(dialog.FileName);
 
                 ResolveTypes();
@@ -150,7 +171,7 @@ namespace MonoGame.Content.Builder.Editor
 #endif
         }
 
-        public static void OpenProject()
+        public void OpenProject()
         {
             // Make sure we give the user a chance to
             // save the project if they need too.
@@ -167,7 +188,7 @@ namespace MonoGame.Content.Builder.Editor
                 OpenProject(dialog.FileName);
         }
 
-        public static void OpenProject(string projectFilePath)
+        public void OpenProject(string projectFilePath)
         {
             projectFilePath = Path.GetFullPath(projectFilePath);
             CloseProject();
@@ -178,9 +199,9 @@ namespace MonoGame.Content.Builder.Editor
             try
             {
 #endif
-                _project = new PipelineProject();
+                Project = new PipelineProject();
 
-                var parser = new PipelineProjectParser(_project);
+                var parser = new PipelineProjectParser(Project);
                 var errorCallback = new MGBuildParser.ErrorCallback((msg, args) =>
                 {
                     errortext = string.Format(msg, args);
@@ -194,9 +215,9 @@ namespace MonoGame.Content.Builder.Editor
 
                 PipelineSettings.Default.AddProjectHistory(projectFilePath);
                 PipelineSettings.Default.Save();
-                View.UpdateRecentList(PipelineSettings.Default.ProjectHistory);
+                View.UpdateEnabledCommands();
 
-                _projectPad.Open(_project);
+                _projectPad.Open(Project);
 #if !DEBUG
             }
             catch (Exception)
@@ -207,14 +228,14 @@ namespace MonoGame.Content.Builder.Editor
 #endif
         }
 
-        public static void ClearRecentList()
+        public void ClearRecentList()
         {
             PipelineSettings.Default.ProjectHistory.Clear();
             PipelineSettings.Default.Save();
-            View.UpdateRecentList(PipelineSettings.Default.ProjectHistory);
+            View.UpdateEnabledCommands();
         }
 
-        public static void CloseProject()
+        public void CloseProject()
         {
             if (!IsProjectOpen)
                 return;
@@ -225,24 +246,24 @@ namespace MonoGame.Content.Builder.Editor
                 return;
 
             IsProjectDirty = false;
-            _project = null;
+            Project = null;
 
-            _projectPad.Open(_project);
+            _projectPad.Open(Project);
         }
 
-        public static bool MoveProject(string newname)
+        public bool MoveProject(string newname)
         {
-            if (_project == null)
+            if (Project == null)
                 return false;
 
-            string opath = _project.OriginalPath;
+            string opath = Project.OriginalPath;
             string ext = Path.GetExtension(opath);
 
             PipelineSettings.Default.ProjectHistory.Remove(opath);
 
             try
             {
-                File.Delete(_project.OriginalPath);
+                File.Delete(Project.OriginalPath);
             }
             catch
             {
@@ -250,10 +271,10 @@ namespace MonoGame.Content.Builder.Editor
                 return false;
             }
 
-            _project.OriginalPath = Path.GetDirectoryName(opath) + Path.DirectorySeparatorChar + newname + ext;
+            Project.OriginalPath = Path.GetDirectoryName(opath) + Path.DirectorySeparatorChar + newname + ext;
             if (!SaveProject(false))
             {
-                _project.OriginalPath = opath;
+                Project.OriginalPath = opath;
                 SaveProject(false);
                 MessageBox.Show(null, "Could not save the new project file.", "Error", MessageBoxButtons.OK, MessageBoxType.Error);
                 return false;
@@ -263,13 +284,13 @@ namespace MonoGame.Content.Builder.Editor
             return true;
         }
 
-        public static bool SaveProject(bool saveAs)
+        public bool SaveProject(bool saveAs)
         {
-            if (_project == null)
+            if (Project == null)
                 return false;
 
             // Do we need file name?
-            if (saveAs || string.IsNullOrEmpty(_project.OriginalPath))
+            if (saveAs || string.IsNullOrEmpty(Project.OriginalPath))
             {
                 var dialog = new SaveFileDialog();
                 dialog.Title = "Save Project";
@@ -277,8 +298,8 @@ namespace MonoGame.Content.Builder.Editor
                 dialog.Filters.Add(_allFileFilter);
                 dialog.CurrentFilter = _mgcbFileFilter;
 
-                if (!string.IsNullOrEmpty(_project.OriginalPath))
-                    dialog.FileName = _project.OriginalPath;
+                if (!string.IsNullOrEmpty(Project.OriginalPath))
+                    dialog.FileName = Project.OriginalPath;
 
                 if (dialog.Show() != DialogResult.Ok)
                     return false;
@@ -287,21 +308,21 @@ namespace MonoGame.Content.Builder.Editor
                 if (dialog.CurrentFilter == _mgcbFileFilter && !newFilePath.EndsWith(".mgcb"))
                     newFilePath += ".mgcb";
 
-                _project.OriginalPath = newFilePath;
+                Project.OriginalPath = newFilePath;
                 // View.SetTreeRoot(_project);
             }
 
             // Do the save.
             IsProjectDirty = false;
-            var parser = new PipelineProjectParser(_project);
+            var parser = new PipelineProjectParser(Project);
             parser.SaveProject();
 
             // Note: This is where a project loaded via 'new project' or 'import project' 
             //       get recorded into PipelineSettings because up until this point they did not
             //       exist as files on disk.
-            PipelineSettings.Default.AddProjectHistory(_project.OriginalPath);
+            PipelineSettings.Default.AddProjectHistory(Project.OriginalPath);
             PipelineSettings.Default.Save();
-            View.UpdateRecentList(PipelineSettings.Default.ProjectHistory);
+            View.UpdateEnabledCommands();
 
             return true;
         }
@@ -312,7 +333,7 @@ namespace MonoGame.Content.Builder.Editor
         /// Return true if yes or no is chosen.
         /// Return false if cancel is chosen.
         /// </summary>
-        private static bool AskSaveProject()
+        private bool AskSaveProject()
         {
             // If the project is not dirty or open
             // then we can simply skip it.
@@ -331,65 +352,44 @@ namespace MonoGame.Content.Builder.Editor
             return SaveProject(false);
         }
 
-        private static void ResolveTypes()
+        private void ResolveTypes()
         {
-            if (_project == null)
+            if (Project == null)
                 return;
 
-            PipelineTypes.Load(_project);
-            foreach (var i in _project.ContentItems)
+            PipelineTypes.Load(Project);
+            foreach (var i in Project.ContentItems)
                 i.ResolveTypes();
         }
 
-        public static string GetFullPath(string filePath)
-        {
-            if (_project == null || Path.IsPathRooted(filePath))
-            {
-                if (filePath.Length == 2 && filePath[0] != '/')
-                    filePath += "\\";
-                return filePath;
-            }
-
-            filePath = filePath.Replace("/", Path.DirectorySeparatorChar.ToString());
-            if (filePath.StartsWith("\\"))
-                filePath = filePath.Substring(1);
-
-            return _project.Location + Path.DirectorySeparatorChar + filePath;
-        }
-
-        public static string GetRelativePath(string path)
-        {
-            if (!IsProjectOpen)
-                return path;
-
-            var dirUri = new Uri(ProjectLocation);
-            var fileUri = new Uri(path);
-            var relativeUri = dirUri.MakeRelativeUri(fileUri);
-
-            if (relativeUri == null)
-                return path;
-
-            return Uri.UnescapeDataString(relativeUri.ToString().Replace('/', Path.DirectorySeparatorChar));
-        }
-
-        public static void LoadProperties(List<IProjectItem> items)
+        public void LoadProperties(List<IProjectItem> items)
         {
             _propertyPad.SetObjects(items);
         }
 
-        public static Image GetFileIcon(string path, bool link)
+        public Image GetFileIcon(string path, bool link)
         {
-            return View.GetFileIcon(path, link);
+            return View.GetFileIcon(path);
         }
 
-        public static Image GetFolderIcon()
+        public Image GetFolderIcon()
         {
             return View.GetFolderIcon();
         }
 
-        public static Image GetImageForResource(string resourceId)
+        public void UpdateEnabledCommands()
         {
-            return /*View.GetImageForResource(resourceId) ?? */ Bitmap.FromResource(resourceId);
+            _commands.NewProject.Enabled = true;
+            _commands.OpenProject.Enabled = true;
+            _commands.ImportProject.Enabled = true;
+            _commands.SaveProject.Enabled = IsProjectOpen && IsProjectDirty;
+            _commands.SaveAsProject.Enabled = IsProjectOpen;
+            _commands.CloseProject.Enabled = IsProjectOpen;
+
+            _projectPad.UpdateEnabledCommands(_commands);
+            _propertyPad.UpdateEnabledCommands(_commands);
+            
+            View.UpdateEnabledCommands();
         }
     }
 }

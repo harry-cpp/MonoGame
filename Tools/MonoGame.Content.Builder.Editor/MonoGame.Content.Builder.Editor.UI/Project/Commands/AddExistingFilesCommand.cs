@@ -28,22 +28,22 @@ namespace MonoGame.Content.Builder.Editor.Project
             return "Add Existing Files...";
         }
 
-        public override async void Clicked(ProjectPad projectExplorer, List<TreeGridItem> treeItems, List<IProjectItem> items)
+        public override async void Clicked(ProjectPad projectPad, List<TreeGridItem> treeItems, List<IProjectItem> items)
         {
             var basePath = items[0] is PipelineProject ? string.Empty : items[0].OriginalPath;
             var allFileFilter = new FileFilter("All Files (*.*)", new[] { ".*" });
 
             var dialog = new OpenFileDialog();
-            dialog.Directory = new Uri(Controller.GetFullPath(basePath));
+            dialog.Directory = new Uri(projectPad.GetFullPath(basePath));
             dialog.MultiSelect = true;
             dialog.Filters.Add(allFileFilter);
             dialog.CurrentFilter = allFileFilter;
 
-            if (dialog.ShowDialog(projectExplorer) != DialogResult.Ok)
+            if (dialog.Show() != DialogResult.Ok)
                 return;
 
             var filePaths = new List<string>();
-            var isInProjectFolder = !Controller.GetRelativePath(dialog.Filenames.ElementAt(0)).Contains("..");
+            var isInProjectFolder = !projectPad.GetRelativePath(dialog.Filenames.ElementAt(0)).Contains("..");
 
             if (isInProjectFolder)
             {
@@ -56,20 +56,20 @@ namespace MonoGame.Content.Builder.Editor.Project
                     foreach (var filePath in dialog.Filenames)
                     {
                         var relativeDestPath = Path.Combine(basePath, Path.GetFileName(filePath));
-                        var destPath = Controller.GetFullPath(relativeDestPath);
+                        var destPath = projectPad.GetFullPath(relativeDestPath);
 
                         filePaths.Add(destPath);
                         File.Copy(filePath, destPath);
                     }
                 });
-                await progressDialog.ShowModalAsync(projectExplorer);
+                await progressDialog.ShowModalAsync();
 
                 if (!progressDialog.IsSuccess)
                     return;
             }
 
-            projectExplorer.AddFiles(filePaths);
-            projectExplorer.TreeView.ReloadData();
+            projectPad.AddFiles(filePaths);
+            projectPad.TreeView.ReloadData();
         }
     }
 }

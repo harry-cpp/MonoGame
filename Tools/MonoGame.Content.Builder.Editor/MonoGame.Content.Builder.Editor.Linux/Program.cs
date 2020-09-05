@@ -7,7 +7,7 @@ using GLib;
 using Gtk;
 using Application = Gtk.Application;
 
-namespace MonoGame.Content.Builder.Editor
+namespace MonoGame.Content.Builder.Editor.Linux
 {
     public static class Program
     {
@@ -30,7 +30,7 @@ namespace MonoGame.Content.Builder.Editor
             var window = new MainWindow();
             app.AddWindow(window);
 
-            Controller.Init(window);
+            var controller = new Controller(window);
 
             window.ShowAll();
             Application.Run();

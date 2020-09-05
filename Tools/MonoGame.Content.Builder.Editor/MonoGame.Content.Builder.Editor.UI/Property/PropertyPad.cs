@@ -20,8 +20,6 @@ namespace MonoGame.Content.Builder.Editor.Property
 
         public PropertyPad()
         {
-            Title = "Properties";
-
             _layout = new DynamicLayout();
             _layout.BeginVertical();
 
@@ -32,8 +30,6 @@ namespace MonoGame.Content.Builder.Editor.Property
 
             _propertyTable = new PropertyGridTable();
             _layout.Add(_propertyTable);
-
-            SetMainContent(_layout);
 
             _cmdSortAbc = new RadioCommand();
             _cmdSortAbc.MenuText = "Sort Alphabetically";
@@ -47,6 +43,15 @@ namespace MonoGame.Content.Builder.Editor.Property
             AddViewItem(_cmdSortGroup);
 
             _objects = new List<object>();
+        }
+
+        public override Control Control => _layout;
+
+        public override string Title => "Properties";
+
+        public override void UpdateEnabledCommands(Commands commands)
+        {
+            
         }
 
         private void CmdSort_CheckedChanged(object sender, EventArgs e)

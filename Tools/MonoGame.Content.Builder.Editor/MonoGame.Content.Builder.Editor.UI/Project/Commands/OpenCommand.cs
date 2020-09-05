@@ -22,9 +22,9 @@ namespace MonoGame.Content.Builder.Editor.Project
             return "Open \"" + items[0].Name + "\"";
         }
 
-        public override void Clicked(ProjectPad projectExplorer, List<TreeGridItem> treeItems, List<IProjectItem> items)
+        public override void Clicked(ProjectPad projectPad, List<TreeGridItem> treeItems, List<IProjectItem> items)
         {
-            var filePath = Controller.GetFullPath(items[0].OriginalPath);
+            var filePath = projectPad.GetFullPath(items[0].OriginalPath);
 
             if (Util.IsMac)
             {

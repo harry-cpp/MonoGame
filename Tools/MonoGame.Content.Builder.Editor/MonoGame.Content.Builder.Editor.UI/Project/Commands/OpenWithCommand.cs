@@ -21,11 +21,11 @@ namespace MonoGame.Content.Builder.Editor.Project
             return "Open With...";
         }
 
-        public override void Clicked(ProjectPad projectExplorer, List<TreeGridItem> treeItems, List<IProjectItem> items)
+        public override void Clicked(ProjectPad projectPad, List<TreeGridItem> treeItems, List<IProjectItem> items)
         {
-            var filepath = Controller.GetFullPath(items[0].OriginalPath);
+            var filepath = projectPad.GetFullPath(items[0].OriginalPath);
             var dialog = new OpenWithDialog(filepath);
-            dialog.ShowDialog(projectExplorer);
+            dialog.Show();
         }
     }
 }

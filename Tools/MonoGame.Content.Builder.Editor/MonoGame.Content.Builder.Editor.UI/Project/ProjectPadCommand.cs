@@ -11,19 +11,26 @@ namespace MonoGame.Content.Builder.Editor.Project
     {
         private List<IProjectItem> _items;
         private List<TreeGridItem> _treeItems;
+        private ProjectPad _projectPad;
 
         public ProjectPadCommand()
         {
             _items = new List<IProjectItem>();
             _treeItems = new List<TreeGridItem>();
+            _projectPad = null!;
 
             Executed += (o, e) =>
             {
                 if (GetIsActive(_items))
                 {
-                    Clicked(Controller.ProjectPad, _treeItems, _items);
+                    Clicked(_projectPad, _treeItems, _items);
                 }
             };
+        }
+
+        public void Init(ProjectPad projectPad)
+        {
+            _projectPad = projectPad;
         }
 
         public bool OnIsActive(List<IProjectItem> items, List<TreeGridItem> treeItems)

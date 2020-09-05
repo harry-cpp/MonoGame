@@ -14,15 +14,16 @@ namespace MonoGame.Content.Builder.Editor.Project
 {
     public partial class ProjectPad : Pad
     {
+        private IController _controller;
         private PipelineProject? _project;
         private TreeGridItem _itemBase, _itemRoot;
-        private Image _iconRoot, _iconFolder, _iconFile;
+        private Image _iconRoot;
         private List<ProjectPadCommand> _commands;
         private TreeGridView _treeView;
 
-        public ProjectPad()
+        public ProjectPad(IController controller)
         {
-            Title = "Project Explorer";
+            _controller = controller;
 
             _treeView = new TreeGridView();
             _treeView.ContextMenu = new ContextMenu();
@@ -34,13 +35,9 @@ namespace MonoGame.Content.Builder.Editor.Project
                 Editable = true
             });
 
-            SetMainContent(_treeView);
-
             _itemBase = new TreeGridItem();
             _itemRoot = new TreeGridItem();
             _iconRoot = Bitmap.FromResource("TreeView.Root.png").WithSize(16, 16);
-            _iconFolder = Bitmap.FromResource("TreeView.Folder.png").WithSize(16, 16);
-            _iconFile = Bitmap.FromResource("TreeView.File.png").WithSize(16, 16);
 
             _commands = new List<ProjectPadCommand>();
 
@@ -49,6 +46,7 @@ namespace MonoGame.Content.Builder.Editor.Project
                 if (!t.IsAbstract && typeof(ProjectPadCommand).IsAssignableFrom(t))
                 {
                     var cmd = (ProjectPadCommand)Activator.CreateInstance(t);
+                    cmd.Init(this);
                     cmd.OnIsActive(new List<IProjectItem>(), new List<TreeGridItem>());
 
                     _commands.Add(cmd);
@@ -66,13 +64,13 @@ namespace MonoGame.Content.Builder.Editor.Project
                 return xindex.index - yindex.index;
             });
 
-            foreach (var cmd in _commands)
+            /*foreach (var cmd in _commands)
             {
                 if (cmd.IsInMenu)
                 {
                     AddMenuItem("Edit/" + cmd.Category + "/" + cmd.GetName(new List<IProjectItem>()), cmd);
                 }
-            }
+            }*/
 
             _treeView.CellEditing += TreeView_CellEditing;
             _treeView.CellEdited += TreeView_CellEdited;
@@ -83,6 +81,46 @@ namespace MonoGame.Content.Builder.Editor.Project
         public TreeGridView TreeView => _treeView;
 
         public TreeGridItem TreeRoot => _itemRoot;
+
+        public override Control Control => _treeView;
+
+        public override string Title => "Project Explorer";
+
+        public override void UpdateEnabledCommands(Commands commands)
+        {
+            
+        }
+
+        public string GetFullPath(string filePath)
+        {
+            if (_project == null || Path.IsPathRooted(filePath))
+            {
+                if (filePath.Length == 2 && filePath[0] != '/')
+                    filePath += "\\";
+                return filePath;
+            }
+
+            filePath = filePath.Replace("/", Path.DirectorySeparatorChar.ToString());
+            if (filePath.StartsWith("\\"))
+                filePath = filePath.Substring(1);
+
+            return _project.Location + Path.DirectorySeparatorChar + filePath;
+        }
+
+        public string GetRelativePath(string path)
+        {
+            if (_project == null)
+                return path;
+
+            var dirUri = new Uri(_project.Location);
+            var fileUri = new Uri(path);
+            var relativeUri = dirUri.MakeRelativeUri(fileUri);
+
+            if (relativeUri == null)
+                return path;
+
+            return Uri.UnescapeDataString(relativeUri.ToString().Replace('/', Path.DirectorySeparatorChar));
+        }
 
         private void TreeView_CellEditing(object sender, GridViewCellEventArgs e)
         {
@@ -109,7 +147,7 @@ namespace MonoGame.Content.Builder.Editor.Project
             {
                 var progressDialog = new FileProgressDialog(() =>
                 {
-                    var location = Controller.GetFullPath(projectItem.Location);
+                    var location = GetFullPath(projectItem.Location);
                     var originalPath = Path.Combine(location, projectItem.Name);
                     var newPath = Path.Combine(location, newFileName);
 
@@ -121,7 +159,7 @@ namespace MonoGame.Content.Builder.Editor.Project
                         throw new Exception("How did this happen?");
                 });
 
-                await progressDialog.ShowModalAsync(this);
+                await progressDialog.ShowModalAsync();
 
                 if (!progressDialog.IsSuccess)
                 {
@@ -155,8 +193,6 @@ namespace MonoGame.Content.Builder.Editor.Project
                     treeItems.Add(selected);
                 }
             }
-
-            Controller.LoadProperties(items);
 
             // Populate context menu
 
@@ -243,15 +279,15 @@ namespace MonoGame.Content.Builder.Editor.Project
 
                 if (split.Length == 1 && projectItem is ContentItem)
                 {
-                    var originalFilePath = Controller.GetFullPath(projectItem.OriginalPath);
+                    var originalFilePath = GetFullPath(projectItem.OriginalPath);
                     var link = projectItem.OriginalPath != projectItem.DestinationPath;
 
-                    findItem.SetValue(0, Controller.GetFileIcon(originalFilePath, link));
+                    findItem.SetValue(0, _controller.GetFileIcon(originalFilePath, link));
                     findItem.SetValue(2, projectItem);
                 }
                 else
                 {
-                    findItem.SetValue(0, Controller.GetFolderIcon());
+                    findItem.SetValue(0, _controller.GetFolderIcon());
                     findItem.SetValue(2, split.Length == 1 ? projectItem : new DirectoryItem(split[0], rootItemPath));
                 }
 
@@ -265,15 +301,18 @@ namespace MonoGame.Content.Builder.Editor.Project
             return findItem;
         }
 
-        public void AddFiles(List<string> destPaths, List<string>? sourcePaths = null)
+        public void AddFiles(List<string> filePaths)
         {
-            sourcePaths = sourcePaths ?? destPaths;
+            AddFiles(filePaths, filePaths);
+        }
 
-            for (int i = 0; i < sourcePaths.Count; i++)
+        public void AddFiles(List<string> sourceFilePaths, List<string> destFilePaths)
+        {
+            for (int i = 0; i < sourceFilePaths.Count; i++)
             {
-                var relativePath = Controller.GetRelativePath(destPaths[i]);
+                var relativePath = GetRelativePath(destFilePaths[i]);
 
-                if (Directory.Exists(sourcePaths[i]))
+                if (Directory.Exists(sourceFilePaths[i]))
                 {
                     var dirItem = new DirectoryItem(relativePath);
 
@@ -283,7 +322,7 @@ namespace MonoGame.Content.Builder.Editor.Project
                 {
                     var contentItem = new ContentItem();
                     contentItem.ProcessorParams = new OpaqueDataDictionary();
-                    contentItem.OriginalPath = Controller.GetRelativePath(sourcePaths[i]);
+                    contentItem.OriginalPath = GetRelativePath(sourceFilePaths[i]);
                     contentItem.DestinationPath = relativePath;
                     contentItem.ResolveTypes();
 

@@ -31,7 +31,7 @@ namespace MonoGame.Content.Builder.Editor.Project
             return "Exclude From Project";
         }
 
-        public override void Clicked(ProjectPad projectExplorer, List<TreeGridItem> treeItems, List<IProjectItem> items)
+        public override void Clicked(ProjectPad projectPad, List<TreeGridItem> treeItems, List<IProjectItem> items)
         {
             foreach (var treeItem in treeItems)
             {
@@ -41,7 +41,7 @@ namespace MonoGame.Content.Builder.Editor.Project
                 }
             }
 
-            projectExplorer.TreeView.ReloadData();
+            projectPad.TreeView.ReloadData();
         }
     }
 }

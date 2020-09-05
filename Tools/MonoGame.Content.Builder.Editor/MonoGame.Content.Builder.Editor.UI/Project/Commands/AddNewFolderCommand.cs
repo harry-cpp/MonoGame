@@ -26,25 +26,25 @@ namespace MonoGame.Content.Builder.Editor.Project
             return "Add New Folder...";
         }
 
-        public override async void Clicked(ProjectPad projectExplorer, List<TreeGridItem> treeItems, List<IProjectItem> items)
+        public override async void Clicked(ProjectPad projectPad, List<TreeGridItem> treeItems, List<IProjectItem> items)
         {
             var dialog = new NewFolderDialog();
-            await dialog.ShowModalAsync(projectExplorer);
+            await dialog.ShowModalAsync();
             
             if (dialog.Result != DialogResult.Ok)
                 return;
 
             var baseRelativePath = items[0] is PipelineProject ? string.Empty : items[0].OriginalPath;
-            var dirPath = Path.Combine(Controller.GetFullPath(baseRelativePath), dialog.Text);
+            var dirPath = Path.Combine(projectPad.GetFullPath(baseRelativePath), dialog.Text);
 
             if (!Directory.Exists(dirPath))
                 Directory.CreateDirectory(dirPath);
 
             Eto.Forms.Application.Instance.Invoke(() =>
             {
-                projectExplorer.AddItem(treeItems[0], new DirectoryItem(dialog.Text, baseRelativePath), dialog.Text);
+                projectPad.AddItem(treeItems[0], new DirectoryItem(dialog.Text, baseRelativePath), dialog.Text);
                 treeItems[0].Expanded = true;
-                projectExplorer.TreeView.ReloadData();
+                projectPad.TreeView.ReloadData();
             });
         }
     }

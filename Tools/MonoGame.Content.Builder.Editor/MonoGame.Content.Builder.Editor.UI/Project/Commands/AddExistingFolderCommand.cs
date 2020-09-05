@@ -26,20 +26,20 @@ namespace MonoGame.Content.Builder.Editor.Project
             return "Add Existing Folder...";
         }
 
-        public override void Clicked(ProjectPad projectExplorer, List<TreeGridItem> treeItems, List<IProjectItem> items)
+        public override void Clicked(ProjectPad projectPad, List<TreeGridItem> treeItems, List<IProjectItem> items)
         {
             var basePath = items[0] is PipelineProject ? string.Empty : items[0].OriginalPath;
             var dialog = new SelectFolderDialog();
             dialog.Title = "Select Folder to Import";
-            dialog.Directory = Controller.GetFullPath(basePath);
+            dialog.Directory = projectPad.GetFullPath(basePath);
 
-            var result = dialog.ShowDialog(projectExplorer) == DialogResult.Ok;
+            var result = dialog.Show() == DialogResult.Ok;
             var dirName = Path.GetFileName(dialog.Directory);
             var dirItem = new DirectoryItem(basePath, dirName);
 
-            var treeItem = projectExplorer.AddItem(treeItems[0], dirItem, dirName);
-            ProcessDirectory(projectExplorer, treeItem, dirItem, dialog.Directory);
-            projectExplorer.TreeView.ReloadData();
+            var treeItem = projectPad.AddItem(treeItems[0], dirItem, dirName);
+            ProcessDirectory(projectPad, treeItem, dirItem, dialog.Directory);
+            projectPad.TreeView.ReloadData();
         }
 
         private void ProcessDirectory(ProjectPad projectExplorer, TreeGridItem baseTreeItem, IProjectItem basseItem, string dirPath)

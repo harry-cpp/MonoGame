@@ -19,7 +19,6 @@ namespace MonoGame.Content.Builder.Editor.Project
 
         public NewFileDialog()
         {
-            
             DisplayMode =  DialogDisplayMode.Attached;
             Resizable = false;
             Size = new Size(300, 400);
@@ -79,7 +78,7 @@ namespace MonoGame.Content.Builder.Editor.Project
             {
                 await LoadTemplates(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Templates"));
             }
-            await LoadTemplates(Path.Combine(Controller.ProjectLocation, "MGTemplates"));
+            // await LoadTemplates(Path.Combine(Controller.ProjectLocation, "MGTemplates"));
         }
 
         private async Task LoadTemplates(string directoryPath)

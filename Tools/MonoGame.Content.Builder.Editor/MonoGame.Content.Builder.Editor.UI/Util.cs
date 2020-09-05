@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 
 namespace MonoGame.Content.Builder.Editor
 {
-    public static class Util
+    static class Util
     {
         public static bool IsMac => true;
 

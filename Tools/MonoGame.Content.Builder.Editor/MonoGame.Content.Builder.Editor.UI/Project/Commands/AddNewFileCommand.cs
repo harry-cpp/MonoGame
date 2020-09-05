@@ -25,10 +25,10 @@ namespace MonoGame.Content.Builder.Editor.Project
             return "Add New File...";
         }
 
-        public override async void Clicked(ProjectPad projectExplorer, List<TreeGridItem> treeItems, List<IProjectItem> items)
+        public override async void Clicked(ProjectPad projectPad, List<TreeGridItem> treeItems, List<IProjectItem> items)
         {
             var dialog = new NewFileDialog();
-            await dialog.ShowModalAsync(projectExplorer);
+            await dialog.ShowModalAsync();
         }
     }
 }
