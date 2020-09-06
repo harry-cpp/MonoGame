@@ -1,24 +1,27 @@
 ﻿using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using Eto.Forms;
 
 namespace MonoGame.Content.Builder.Editor
 {
-    static class Util
+    public static class Util
     {
-        public static bool IsMac => true;
+        public static bool IsMac { get; set; }
 
-        public static bool IsLinux => false;
+        public static bool IsLinux { get; set; }
 
-        public static bool IsWindows => false;
+        public static bool IsWindows { get; set; }
 
-        public static bool IsGtk => true;
+        public static bool IsGtk { get; set; }
 
-        public static bool IsXamarinMac => false;
+        public static bool IsXamarinMac { get; set; }
 
-        public static bool IsWpf => false;
+        public static bool IsWpf { get; set; }
 
-        public static bool IsIde => false;
+        public static bool IsIde { get; set; }
+
+        public static Window MainWindow { get; set; }
 
         [DllImport("libc")]
         private static extern string realpath(string path, IntPtr resolved_path);
@@ -72,14 +75,14 @@ namespace MonoGame.Content.Builder.Editor
             return true;
         }
 
-        public static T Show<T>(this Eto.Forms.Dialog<T> dialog)
+        public static T Show<T>(this Dialog<T> dialog)
         {
-            return dialog.ShowModal(null);
+            return dialog.ShowModal(MainWindow);
         }
 
-        public static Eto.Forms.DialogResult Show(this Eto.Forms.CommonDialog dialog)
+        public static DialogResult Show(this CommonDialog dialog)
         {
-            return dialog.ShowDialog(null);
+            return dialog.ShowDialog(MainWindow);
         }
     }
 }

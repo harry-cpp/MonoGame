@@ -2,6 +2,7 @@
 
 using AppKit;
 using Eto.Drawing;
+using Eto.Mac.Drawing;
 using Foundation;
 using MonoGame.Content.Builder.Editor;
 
@@ -9,6 +10,8 @@ namespace MonoGame.Content.Builder.Editor.Mac
 {
     public partial class ViewController : NSViewController, IView
     {
+        public static IController ApplicationController;
+
         private IController _controller;
 
         public ViewController(IntPtr handle) : base(handle)
@@ -20,17 +23,29 @@ namespace MonoGame.Content.Builder.Editor.Mac
         {
             base.ViewDidLoad();
 
-            _controller = new Controller(this);
+            Util.IsMac = true;
+            Util.IsXamarinMac = true;
+
+            ApplicationController = new Controller(this);
+        }
+
+        public override void ViewDidAppear()
+        {
+            base.ViewDidAppear();
+
+            Util.MainWindow = Eto.Forms.XamMac2Helpers.ToEtoWindow(View.Window);
         }
 
         public void Attach(IController controller, Pad projectPad, Pad propertyPad)
         {
+            ApplicationController = controller;
             _controller = controller;
 
             var projectView = projectPad.Control.ToNative();
-            projectView.Frame = new CoreGraphics.CGRect(0, 0, ProjectExplorerBox.Bounds.Size.Width, ProjectExplorerBox.Bounds.Size.Height);
+            var parentView = ProjectExplorerBox.Subviews[0];
+            projectView.Frame = new CoreGraphics.CGRect(0, 0, parentView.Bounds.Size.Width, parentView.Bounds.Size.Height);
             projectView.AutoresizingMask |= NSViewResizingMask.HeightSizable | NSViewResizingMask.WidthSizable;
-            ProjectExplorerBox.AddSubview(projectView);
+            parentView.AddSubview(projectView);
         }
 
         public void UpdateEnabledCommands()
@@ -40,17 +55,18 @@ namespace MonoGame.Content.Builder.Editor.Mac
 
         public Image GetFileIcon(string filePath)
         {
-            throw new NotImplementedException();
+            return new Bitmap(new BitmapHandler(NSWorkspace.SharedWorkspace.IconForFile(filePath)));
         }
 
         public Image GetFolderIcon()
         {
-            throw new NotImplementedException();
+            return new Bitmap(new BitmapHandler(NSWorkspace.SharedWorkspace.IconForFile("/Library/Apple")));
         }
 
         public Image GetLinkIcon()
         {
-            throw new NotImplementedException();
+            // TODO
+            return new Bitmap(new BitmapHandler(NSWorkspace.SharedWorkspace.IconForFile("/Library/Apple")));
         }
 
         public override NSObject RepresentedObject

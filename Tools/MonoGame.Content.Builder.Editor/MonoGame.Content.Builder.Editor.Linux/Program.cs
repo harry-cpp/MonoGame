@@ -30,6 +30,9 @@ namespace MonoGame.Content.Builder.Editor.Linux
             var window = new MainWindow();
             app.AddWindow(window);
 
+            Util.IsMac = true;
+            Util.IsGtk = true;
+            Util.MainWindow = Eto.Forms.Gtk3Helpers.ToEtoWindow(window);
             var controller = new Controller(window);
 
             window.Show();
