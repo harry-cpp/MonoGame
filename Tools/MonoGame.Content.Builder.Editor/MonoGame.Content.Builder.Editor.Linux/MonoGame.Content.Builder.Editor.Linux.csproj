@@ -7,7 +7,6 @@
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
     <AssemblyName>mgcb-editor-gtk</AssemblyName>
     <AssemblyTitle>MGCB Editor</AssemblyTitle>
-    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

@@ -20,13 +20,13 @@ namespace MonoGame.Content.Builder.Editor.Project
         private Image _iconRoot;
         private List<ProjectPadCommand> _commands;
         private TreeGridView _treeView;
+        private ContextMenu _contextMenu;
 
         public ProjectPad(IController controller)
         {
             _controller = controller;
 
             _treeView = new TreeGridView();
-            _treeView.ContextMenu = new ContextMenu();
             _treeView.ShowHeader = false;
             _treeView.AllowMultipleSelection = true;
             _treeView.Columns.Add(new GridColumn
@@ -34,6 +34,8 @@ namespace MonoGame.Content.Builder.Editor.Project
                 DataCell = new ImageTextCell(0, 1),
                 Editable = true
             });
+
+            _contextMenu = new ContextMenu();
 
             _itemBase = new TreeGridItem();
             _itemRoot = new TreeGridItem();
@@ -75,7 +77,23 @@ namespace MonoGame.Content.Builder.Editor.Project
             _treeView.CellEditing += TreeView_CellEditing;
             _treeView.CellEdited += TreeView_CellEdited;
             _treeView.SelectionChanged += TreeView_SelectionChanged;
-            _treeView.ContextMenu.Opening += TreeView_SelectionChanged;
+
+            // Workarond for the Eto.Forms Gtk backend not properly resizing
+            // the context menu to fit all of the items in it.
+            if (Util.IsGtk)
+            {
+                _treeView.MouseUp += (o, e) =>
+                {
+                    if (e.Buttons == MouseButtons.Alternate)
+                    {
+                        _contextMenu.Show();
+                    }
+                };
+            }
+            else
+            {
+                _treeView.ContextMenu = _contextMenu;
+            }
         }
 
         public TreeGridView TreeView => _treeView;
@@ -194,9 +212,13 @@ namespace MonoGame.Content.Builder.Editor.Project
                 }
             }
 
+            // Populate property grid
+
+            MonoGame.Content.Builder.Editor.Property.PropertyPad.Instance.SetObjects(items);
+
             // Populate context menu
 
-            _treeView.ContextMenu = new ContextMenu();
+            _contextMenu.Items.Clear();
 
             var lastGroupNum = -1;
 
@@ -211,7 +233,7 @@ namespace MonoGame.Content.Builder.Editor.Project
                 if (groupIndex > lastGroupNum)
                 {
                     if (lastGroupNum != -1)
-                        _treeView.ContextMenu.Items.Add(new SeparatorMenuItem());
+                        _contextMenu.Items.Add(new SeparatorMenuItem());
                     lastGroupNum = groupIndex;
                 }
 
@@ -223,7 +245,7 @@ namespace MonoGame.Content.Builder.Editor.Project
                     {
                         var buttonMenuItem = new ButtonMenuItem();
                         buttonMenuItem.Text = item.Category;
-                        _treeView.ContextMenu.Items.Add(buttonMenuItem);
+                        _contextMenu.Items.Add(buttonMenuItem);
 
                         dic[item.Category] = buttonMenuItem.Items;
                     }
@@ -232,7 +254,7 @@ namespace MonoGame.Content.Builder.Editor.Project
                 }
                 else
                 {
-                    _treeView.ContextMenu.Items.Add(item.CreateMenuItem());
+                    _contextMenu.Items.Add(item.CreateMenuItem());
                 }
             }
         }

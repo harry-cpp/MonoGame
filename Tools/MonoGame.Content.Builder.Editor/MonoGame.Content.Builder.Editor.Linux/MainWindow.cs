@@ -56,8 +56,8 @@ namespace MonoGame.Content.Builder.Editor.Linux
             hpanned.Pack2(new TextView(), true, false);
             hpanned.Position = 200;
 
-            vpanned.Pack1(projectPad.Control.ToNative(), true, false);
-            vpanned.Pack2(propertyPad.Control.ToNative(), true, false);
+            vpanned.Pack1(new GtkPad(projectPad), true, false);
+            vpanned.Pack2(new GtkPad(propertyPad), true, false);
 
             ConnectAction("new", controller.Commands.NewProject);
             ConnectAction("open", controller.Commands.OpenProject);

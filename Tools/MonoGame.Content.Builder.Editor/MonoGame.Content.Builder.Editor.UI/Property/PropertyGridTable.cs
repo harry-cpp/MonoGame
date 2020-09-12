@@ -5,26 +5,25 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using Eto.Drawing;
 using Eto.Forms;
 
 namespace MonoGame.Content.Builder.Editor.Property
 {
-    public partial class PropertyGridTable : Scrollable
+    public partial class PropertyPadTable : Scrollable
     {
-        private const int _spacing = 12;
+        private const int _spacing = 18;
         private const int _separatorWidth = 8;
         private const int _separatorSafeDistance = 30;
 
         public bool Group { get; set; }
 
+        private PropertyPad _propertyPad;
         PixelLayout pixel1;
         Drawable drawable;
-        private IEnumerable<Type> _cellTypes;
         private CursorType _currentCursor;
-        private CellBase _selectedCell;
-        private List<CellBase> _cells;
+        private ICell _selectedCell;
+        private List<ICell> _cells;
         private Point _mouseLocation;
         private int _separatorPos, _moveSeparatorAmount;
         private bool _moveSeparator;
@@ -32,8 +31,9 @@ namespace MonoGame.Content.Builder.Editor.Property
         private bool _skipEdit;
         private Cursor _cursorNormal, _cursorResize;
 
-        public PropertyGridTable()
+        public PropertyPadTable(PropertyPad propertyPad)
         {
+            _propertyPad = propertyPad;
             BackgroundColor = DrawInfo.BackColor;
             ExpandContentWidth = true;
 
@@ -53,10 +53,9 @@ namespace MonoGame.Content.Builder.Editor.Property
             drawable.MouseLeave += Drawable_MouseLeave;
             SizeChanged += PropertyGridTable_SizeChanged;
 
-            _cellTypes = Assembly.GetExecutingAssembly().GetTypes().Where(t => t.IsClass && t.IsSubclassOf(typeof(CellBase)));
             _separatorPos = 100;
             _mouseLocation = new Point(-1, -1);
-            _cells = new List<CellBase>();
+            _cells = new List<ICell>();
             _moveSeparator = false;
             _skipEdit = false;
             _cursorResize = new Cursor(CursorType.VerticalSplit);
@@ -78,46 +77,34 @@ namespace MonoGame.Content.Builder.Editor.Property
 
             foreach (var control in children)
             {
-                if (control != drawable && control.Tag is CellBase cell)
+                if (control != drawable && control.Tag is ICell cell)
                 {
-                    if (cell.OnKill != null)
-                        cell.OnKill();
-
                     pixel1.Remove(control);
                 }
             }
 
             if (ret)
+            {
                 drawable.Invalidate();
+            }
 
             return ret;
         }
 
-        private Type GetCellType(IEnumerable<Type> types, string name, Type type)
+        private Type GetCellType(Type type)
         {
-            foreach (var ct in types)
-            {
-                var attrs = ct.GetCustomAttributes(typeof(CellAttribute), true);
-
-                foreach (CellAttribute a in attrs)
-                {
-                    if (a.Type == type || type.IsSubclassOf(a.Type))
-                    {
-                        return ct;
-                    }
-                }
-            }
+            if (type == typeof(string))
+                return typeof(CellString);
 
             return null;
         }
 
-        public void AddEntry(string category, string name, object value, Type type, EventHandler eventHandler = null, bool editable = true)
+        public void AddEntry(string category, string name, object value, Type type, bool editable, Action<object> callback)
         {
-            var cellType = GetCellType(_cellTypes, name, type);
+            var cellType = GetCellType(type);
 
-            var cell = (cellType == null) ? new CellText() : (CellBase)Activator.CreateInstance(cellType);
-            cell.Create(category, name, value, type, eventHandler);
-            cell.Editable = (cellType != null) && editable;
+            var cell = (cellType == null) ? new CellString() : (ICell)Activator.CreateInstance(cellType);
+            cell.OnInitialize(_propertyPad, category, name, value, cellType == null ? false : editable, callback);
 
             _cells.Add(cell);
         }
@@ -125,9 +112,9 @@ namespace MonoGame.Content.Builder.Editor.Property
         public void Update()
         {
             if (Group)
-                _cells.Sort((x, y) => string.Compare(x.Category + x.Text, y.Category + y.Text) + (x.Category.Contains("Proc") ? 100 : 0) + (y.Category.Contains("Proc") ? -100 : 0));
+                _cells.Sort((x, y) => string.Compare(x.Category + x.Name, y.Category + y.Name) + (x.Category == "Processor Parameters" ? 100 : 0) + (y.Category == "Processor Parameters" ? -100 : 0));
             else
-                _cells.Sort((x, y) => string.Compare(x.Text, y.Text) + (x.Category.Contains("Proc") ? 100 : 0) + (y.Category.Contains("Proc") ? -100 : 0));
+                _cells.Sort((x, y) => string.Compare(x.Name, y.Name) + (x.Category == "Processor Parameters" ? 100 : 0) + (y.Category == "Processor Parameters" ? -100 : 0));
 
             drawable.Invalidate();
         }
@@ -149,16 +136,11 @@ namespace MonoGame.Content.Builder.Editor.Property
             }
         }
 
-        private void DrawGroup(Graphics g, Rectangle rec, string text)
-        {
-            g.FillRectangle(DrawInfo.BorderColor, rec);
-            g.DrawText(DrawInfo.TextFont, DrawInfo.TextColor, rec.X + 1, rec.Y + (rec.Height - DrawInfo.TextFont.LineHeight) / 2, text);
-        }
-
         private void Drawable_Paint(object sender, PaintEventArgs e)
         {
             var g = e.Graphics;
             DrawInfo.SetPixelsPerPoint(g);
+
             var rec = new Rectangle(0, 0, drawable.Width - 1, DrawInfo.TextHeight + _spacing);
             var overGroup = false;
             var prevCategory = string.Empty;
@@ -170,14 +152,16 @@ namespace MonoGame.Content.Builder.Editor.Property
 
             foreach (var c in _cells)
             {
-                rec.Height = c.Height + _spacing;
+                rec.Height = (c.Height == 0) ? (DrawInfo.TextHeight + _spacing) : c.Height;
 
                 // Draw group
                 if (prevCategory != c.Category)
                 {
-                    if (c.Category.Contains("Proc") || Group)
+                    if (Group)
                     {
-                        DrawGroup(g, rec, c.Category);
+                        g.FillRectangle(DrawInfo.BorderColor, rec);
+                        g.DrawText(DrawInfo.TextFont, DrawInfo.TextColor, rec.X + 1, rec.Y + (rec.Height - DrawInfo.TextFont.LineHeight) / 2, c.Category);
+
                         prevCategory = c.Category;
                         overGroup |= rec.Contains(_mouseLocation);
                         rec.Y += DrawInfo.TextHeight + _spacing;
@@ -188,12 +172,12 @@ namespace MonoGame.Content.Builder.Editor.Property
                 var selected = rec.Contains(_mouseLocation);
                 if (selected)
                     _selectedCell = c;
-                c.Draw(g, rec, _separatorPos, selected);
+                c.OnDraw(g, rec, _separatorPos, selected);
 
                 // Draw separator for the current row
-                g.FillRectangle(DrawInfo.BorderColor, _separatorPos - 1, rec.Y, 1, rec.Height);
+                g.FillRectangle(DrawInfo.BorderColor, _separatorPos - 1, rec.Y, 1, c.Height);
 
-                rec.Y += c.Height + _spacing;
+                rec.Y += c.Height;
             }
 
             // Draw separator for not filled rows
@@ -231,17 +215,17 @@ namespace MonoGame.Content.Builder.Editor.Property
             {
                 var action = new Action(() =>
                 {
-                    if (Util.IsGtk && !_selectedCell.HasDialog)
+                    if (Util.IsGtk)
                     {
                         pixel1.RemoveAll();
                         pixel1 = new PixelLayout();
                         pixel1.Add(drawable, 0, 0);
-                        _selectedCell.Edit(pixel1);
+                        _selectedCell.OnEdit(pixel1);
                         Content = pixel1;
                     }
                     else
                     {
-                        _selectedCell.Edit(pixel1);
+                        _selectedCell.OnEdit(pixel1);
                     }
 
                     drawable.Invalidate();

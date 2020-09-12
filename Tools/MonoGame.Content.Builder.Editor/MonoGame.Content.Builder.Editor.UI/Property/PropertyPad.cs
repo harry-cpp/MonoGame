@@ -13,13 +13,17 @@ namespace MonoGame.Content.Builder.Editor.Property
 {
     public partial class PropertyPad : Pad
     {
+        public static PropertyPad Instance;
+
         private DynamicLayout _layout;
-        private PropertyGridTable _propertyTable;
+        private PropertyPadTable _propertyTable;
         private RadioCommand _cmdSortAbc, _cmdSortGroup;
         private List<object> _objects;
 
         public PropertyPad()
         {
+            Instance = this;
+
             _layout = new DynamicLayout();
             _layout.BeginVertical();
 
@@ -28,7 +32,7 @@ namespace MonoGame.Content.Builder.Editor.Property
 
             _layout.Add(subLayout);
 
-            _propertyTable = new PropertyGridTable();
+            _propertyTable = new PropertyPadTable(this);
             _layout.Add(_propertyTable);
 
             _cmdSortAbc = new RadioCommand();
@@ -39,6 +43,7 @@ namespace MonoGame.Content.Builder.Editor.Property
             _cmdSortGroup = new RadioCommand();
             _cmdSortGroup.Controller = _cmdSortAbc;
             _cmdSortGroup.MenuText = "Sort by Category";
+            _cmdSortGroup.Checked = true;
             _cmdSortGroup.CheckedChanged += CmdSort_CheckedChanged;
             AddViewItem(_cmdSortGroup);
 
@@ -60,12 +65,6 @@ namespace MonoGame.Content.Builder.Editor.Property
             _propertyTable.Update();
         }
 
-        private void BtnGroup_Click(object sender, EventArgs e)
-        {
-            _propertyTable.Group = true;
-            _propertyTable.Update();
-        }
-
         public void SetObjects(List<IProjectItem> objects)
         {
             _objects = objects.Cast<object>().ToList();
@@ -77,7 +76,7 @@ namespace MonoGame.Content.Builder.Editor.Property
             _propertyTable.Clear();
 
             if (_objects.Count != 0)
-                LoadProps(_objects);
+                LoadProperties(_objects);
             
             _propertyTable.Update();
         }
@@ -94,7 +93,7 @@ namespace MonoGame.Content.Builder.Editor.Property
             return true;
         }
 
-        private void LoadProps(List<object> objects)
+        private void LoadProperties(List<object> objects)
         {
             var props = objects[0].GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public);
 
@@ -128,12 +127,11 @@ namespace MonoGame.Content.Builder.Editor.Property
                 if (!browsable)
                     continue;
 
-                _propertyTable.AddEntry(category, name, value, p.PropertyType, (sender, e) =>
+                _propertyTable.AddEntry(category, name, value, p.PropertyType, p.CanWrite, val =>
                 {
-                    /*var action = new UpdatePropertyAction(MainWindow.Instance, objects, p, sender);
-                    PipelineController.Instance.AddAction(action);
-                    action.Do();*/
-                }, p.CanWrite);
+                    foreach (var obj in objects)
+                        p.SetValue(obj, val, null);
+                });
 
                 if (value is ProcessorTypeDescription)
                     LoadProcessorParams(_objects.Cast<ContentItem>().ToList());
@@ -157,12 +155,11 @@ namespace MonoGame.Content.Builder.Editor.Property
                     }
                 }
 
-                _propertyTable.AddEntry("Processor Parameters", p.DisplayName, value, p.Type, (sender, e) =>
+                _propertyTable.AddEntry("Processor Parameters", p.DisplayName, value, p.Type, true, val =>
                 {
-                    /*var action = new UpdateProcessorAction(MainWindow.Instance, objects.Cast<ContentItem>().ToList(), p.Name, sender);
-                    PipelineController.Instance.AddAction(action);
-                    action.Do();*/
-                }, true);
+                    foreach (var obj in objects)
+                        obj.ProcessorParams[p.Name] = val;
+                });
             }
         }
 
