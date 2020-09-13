@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Content.Builder.Editor.UI", "MonoGame.Content.Builder.Editor.UI\MonoGame.Content.Builder.Editor.UI.csproj", "{207975FD-B256-4E28-B2D0-0A38334F7BBB}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Content.Builder.Editor.Linux", "MonoGame.Content.Builder.Editor.Linux\MonoGame.Content.Builder.Editor.Linux.csproj", "{BA6EDF8E-5AEA-4094-ADD8-5333E8397769}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Content.Builder.Editor", "MonoGame.Content.Builder.Editor\MonoGame.Content.Builder.Editor.csproj", "{3EF3FD4B-7515-4773-A186-D75F2F8AFABC}"

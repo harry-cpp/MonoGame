@@ -2,7 +2,6 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Linq;
@@ -13,72 +12,57 @@ namespace MonoGame.Content.Builder.Editor.Property
 {
     public partial class PropertyPad : Pad
     {
-        public static PropertyPad Instance;
-
-        private DynamicLayout _layout;
-        private PropertyPadTable _propertyTable;
-        private RadioCommand _cmdSortAbc, _cmdSortGroup;
         private List<object> _objects;
+        private PropertyTable _propertyTable;
+        private RadioCommand _cmdSortAbc, _cmdSortGroup;
 
         public PropertyPad()
         {
-            Instance = this;
+            _objects = new List<object>();
 
-            _layout = new DynamicLayout();
-            _layout.BeginVertical();
-
-            var subLayout = new StackLayout();
-            subLayout.Orientation = Orientation.Horizontal;
-
-            _layout.Add(subLayout);
-
-            _propertyTable = new PropertyPadTable(this);
-            _layout.Add(_propertyTable);
+            _propertyTable = new PropertyTable(this);
 
             _cmdSortAbc = new RadioCommand();
             _cmdSortAbc.MenuText = "Sort Alphabetically";
-            _cmdSortAbc.CheckedChanged += CmdSort_CheckedChanged;
             AddViewItem(_cmdSortAbc);
 
             _cmdSortGroup = new RadioCommand();
             _cmdSortGroup.Controller = _cmdSortAbc;
             _cmdSortGroup.MenuText = "Sort by Category";
             _cmdSortGroup.Checked = true;
-            _cmdSortGroup.CheckedChanged += CmdSort_CheckedChanged;
             AddViewItem(_cmdSortGroup);
 
-            _objects = new List<object>();
+            _cmdSortAbc.CheckedChanged += (o, e) => Reload();
+            _cmdSortGroup.CheckedChanged += (o, e) => Reload();
         }
 
-        public override Control Control => _layout;
+        public override Control Control => _propertyTable;
 
         public override string Title => "Properties";
+
+        public List<object> Objects
+        {
+            get => _objects;
+            set
+            {
+                _objects = value;
+                Reload();
+            }
+        }
 
         public override void UpdateEnabledCommands(Commands commands)
         {
             
         }
 
-        private void CmdSort_CheckedChanged(object sender, EventArgs e)
-        {
-            _propertyTable.Group = _cmdSortGroup.Checked;
-            _propertyTable.Update();
-        }
-
-        public void SetObjects(List<IProjectItem> objects)
-        {
-            _objects = objects.Cast<object>().ToList();
-            Reload();
-        }
-
         public void Reload()
         {
             _propertyTable.Clear();
 
-            if (_objects.Count != 0)
+            if (_objects != null && _objects.Count != 0)
                 LoadProperties(_objects);
             
-            _propertyTable.Update();
+            _propertyTable.Update(_cmdSortGroup.Checked);
         }
 
         private bool CompareVariables(ref object a, object b, PropertyInfo p)
@@ -134,11 +118,11 @@ namespace MonoGame.Content.Builder.Editor.Property
                 });
 
                 if (value is ProcessorTypeDescription)
-                    LoadProcessorParams(_objects.Cast<ContentItem>().ToList());
+                    LoadProcessorParameters(_objects.Cast<ContentItem>().ToList());
             }
         }
 
-        private void LoadProcessorParams(List<ContentItem> objects)
+        private void LoadProcessorParameters(List<ContentItem> objects)
         {
             foreach (var p in objects[0].Processor.Properties)
             {
@@ -161,11 +145,6 @@ namespace MonoGame.Content.Builder.Editor.Property
                         obj.ProcessorParams[p.Name] = val;
                 });
             }
-        }
-
-        public void SetWidth()
-        {
-            _propertyTable.SetWidth();
         }
     }
 }

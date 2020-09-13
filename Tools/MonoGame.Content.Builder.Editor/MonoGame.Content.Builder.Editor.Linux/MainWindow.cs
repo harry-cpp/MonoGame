@@ -2,7 +2,6 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System.Collections.Generic;
 using System.IO;
 using Gtk;
 using Eto.Drawing;
@@ -77,9 +76,9 @@ namespace MonoGame.Content.Builder.Editor.Linux
             _boxSeparator.Visible = _buildBox.Visible || _cancelBox.Visible;
         }
 
-        public Eto.Drawing.Image GetFileIcon(string? filePath)
+        public Bitmap GetFileIcon(string filePath)
         {
-            Gdk.Pixbuf? icon = null;
+            Gdk.Pixbuf icon = null;
 
             if (File.Exists(filePath))
             {
@@ -102,12 +101,12 @@ namespace MonoGame.Content.Builder.Editor.Linux
             return new Bitmap(new BitmapHandler(icon ?? _theme.LoadIcon("text-x-generic", 16, 0)));
         }
 
-        public Eto.Drawing.Image GetFolderIcon()
+        public Bitmap GetFolderIcon()
         {
             return new Bitmap(new BitmapHandler(_theme.LoadIcon("folder", 16, 0)));
         }
 
-        public Eto.Drawing.Image GetLinkIcon()
+        public Bitmap GetLinkIcon()
         {
             var linkIcon = new Gdk.Pixbuf(Gdk.Colorspace.Rgb, true, 8, 16, 16);
             linkIcon.Fill(0x00000000);

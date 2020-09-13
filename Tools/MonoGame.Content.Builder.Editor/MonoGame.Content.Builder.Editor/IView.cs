@@ -12,10 +12,10 @@ namespace MonoGame.Content.Builder.Editor
 
         void UpdateEnabledCommands();
 
-        Image GetFileIcon(string filePath);
+        Bitmap GetFileIcon(string filePath);
 
-        Image GetFolderIcon();
+        Bitmap GetFolderIcon();
 
-        Image GetLinkIcon();
+        Bitmap GetLinkIcon();
     }
 }

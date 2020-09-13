@@ -8,7 +8,7 @@ using Eto.Forms;
 
 namespace MonoGame.Content.Builder.Editor.Property
 {
-    public abstract class ICell
+    public abstract class PropertyCell
     {
         private Rectangle _cellRectangle;
         private object _value;
@@ -17,7 +17,6 @@ namespace MonoGame.Content.Builder.Editor.Property
         public string Category { get; protected set; }
         public string Name { get; protected set; }
         public bool Editable { get; protected set; }
-        public PropertyPad Parent { get; private set; }
 
         public int Height => _cellRectangle.Height;
         public object Value
@@ -30,7 +29,7 @@ namespace MonoGame.Content.Builder.Editor.Property
             }
         }
 
-        public void OnInitialize(PropertyPad propertyTable, string category, string name, object value, bool editable, Action<object> callback)
+        public void OnInitialize(string category, string name, object value, bool editable, Action<object> callback)
         {
             _cellRectangle = Rectangle.Empty;
             _value = value;
@@ -39,7 +38,6 @@ namespace MonoGame.Content.Builder.Editor.Property
             Category = category;
             Name = name;
             Editable = editable;
-            Parent = propertyTable;
 
             Initialize();
         }

@@ -10,58 +10,64 @@ using Eto.Forms;
 
 namespace MonoGame.Content.Builder.Editor.Property
 {
-    public partial class PropertyPadTable : Scrollable
+    public partial class PropertyTable : Scrollable
     {
         private const int _spacing = 18;
         private const int _separatorWidth = 8;
         private const int _separatorSafeDistance = 30;
 
-        public bool Group { get; set; }
+        private static Dictionary<Type, Type> _cellTypes = GetCellTypes();
+        private static Dictionary<Type, Type> GetCellTypes()
+        {
+            var ret = new Dictionary<Type, Type>();
+            ret[typeof(string)] = typeof(StringPropertyCell);
+            ret[typeof(Enum)] = typeof(EnumPropertyCell);
+
+            return ret;
+        }
 
         private PropertyPad _propertyPad;
-        PixelLayout pixel1;
-        Drawable drawable;
+        private PixelLayout _pixel1;
+        private Drawable _drawable;
         private CursorType _currentCursor;
-        private ICell _selectedCell;
-        private List<ICell> _cells;
+        private PropertyCell _selectedCell;
+        private List<PropertyCell> _cells;
         private Point _mouseLocation;
         private int _separatorPos, _moveSeparatorAmount;
         private bool _moveSeparator;
         private int _height;
-        private bool _skipEdit;
+        private bool _skipEdit, _gruop;
         private Cursor _cursorNormal, _cursorResize;
 
-        public PropertyPadTable(PropertyPad propertyPad)
+        public PropertyTable(PropertyPad propertyPad)
         {
             _propertyPad = propertyPad;
             BackgroundColor = DrawInfo.BackColor;
             ExpandContentWidth = true;
 
-            pixel1 = new PixelLayout();
-            pixel1.BackgroundColor = DrawInfo.BackColor;
+            _pixel1 = new PixelLayout();
+            _pixel1.BackgroundColor = DrawInfo.BackColor;
 
-            drawable = new Drawable();
-            drawable.Height = 100;
-            pixel1.Add(drawable, 0, 0);
+            _drawable = new Drawable();
+            _drawable.Height = 100;
+            _pixel1.Add(_drawable, 0, 0);
 
-            Content = pixel1;
+            Content = _pixel1;
 
-            drawable.Paint += Drawable_Paint;
-            drawable.MouseDown += Drawable_MouseDown;
-            drawable.MouseUp += Drawable_MouseUp;
-            drawable.MouseMove += Drawable_MouseMove;
-            drawable.MouseLeave += Drawable_MouseLeave;
+            _drawable.Paint += Drawable_Paint;
+            _drawable.MouseDown += Drawable_MouseDown;
+            _drawable.MouseUp += Drawable_MouseUp;
+            _drawable.MouseMove += Drawable_MouseMove;
+            _drawable.MouseLeave += Drawable_MouseLeave;
             SizeChanged += PropertyGridTable_SizeChanged;
 
             _separatorPos = 100;
             _mouseLocation = new Point(-1, -1);
-            _cells = new List<ICell>();
+            _cells = new List<PropertyCell>();
             _moveSeparator = false;
             _skipEdit = false;
             _cursorResize = new Cursor(CursorType.VerticalSplit);
             _cursorNormal = new Cursor(CursorType.Arrow);
-
-            Group = true;
         }
 
         public void Clear()
@@ -72,20 +78,20 @@ namespace MonoGame.Content.Builder.Editor.Property
 
         private bool ClearChildren()
         {
-            var children = pixel1.Children.ToList();
+            var children = _pixel1.Children.ToList();
             var ret = children.Count > 1;
 
             foreach (var control in children)
             {
-                if (control != drawable && control.Tag is ICell cell)
+                if (control != _drawable && control.Tag is PropertyCell cell)
                 {
-                    pixel1.Remove(control);
+                    _pixel1.Remove(control);
                 }
             }
 
             if (ret)
             {
-                drawable.Invalidate();
+                _drawable.Invalidate();
             }
 
             return ret;
@@ -93,30 +99,40 @@ namespace MonoGame.Content.Builder.Editor.Property
 
         private Type GetCellType(Type type)
         {
-            if (type == typeof(string))
-                return typeof(CellString);
+            if (_cellTypes.TryGetValue(type, out Type cellType))
+                return cellType;
+
+            foreach (var pair in _cellTypes)
+            {
+                if (type.IsSubclassOf(pair.Key))
+                {
+                    return pair.Value;
+                }
+            }
 
             return null;
         }
 
+
         public void AddEntry(string category, string name, object value, Type type, bool editable, Action<object> callback)
         {
-            var cellType = GetCellType(type);
+            Type cellType = GetCellType(type);
 
-            var cell = (cellType == null) ? new CellString() : (ICell)Activator.CreateInstance(cellType);
-            cell.OnInitialize(_propertyPad, category, name, value, cellType == null ? false : editable, callback);
+            var cell = (cellType == null) ? new StringPropertyCell() : (PropertyCell)Activator.CreateInstance(cellType);
+            cell.OnInitialize(category, name, value, cellType == null ? false : editable, callback);
 
             _cells.Add(cell);
         }
 
-        public void Update()
+        public void Update(bool group)
         {
-            if (Group)
+            if (group)
                 _cells.Sort((x, y) => string.Compare(x.Category + x.Name, y.Category + y.Name) + (x.Category == "Processor Parameters" ? 100 : 0) + (y.Category == "Processor Parameters" ? -100 : 0));
             else
                 _cells.Sort((x, y) => string.Compare(x.Name, y.Name) + (x.Category == "Processor Parameters" ? 100 : 0) + (y.Category == "Processor Parameters" ? -100 : 0));
 
-            drawable.Invalidate();
+            _gruop = group;
+            _drawable.Invalidate();
         }
 
         private void SetCursor(CursorType cursor)
@@ -128,10 +144,10 @@ namespace MonoGame.Content.Builder.Editor.Property
             switch (cursor)
             {
                 case CursorType.VerticalSplit:
-                    drawable.Cursor = _cursorResize;
+                    _drawable.Cursor = _cursorResize;
                     break;
                 default:
-                    drawable.Cursor = Util.IsGtk ? null : _cursorNormal;
+                    _drawable.Cursor = Util.IsGtk ? null : _cursorNormal;
                     break;
             }
         }
@@ -139,9 +155,9 @@ namespace MonoGame.Content.Builder.Editor.Property
         private void Drawable_Paint(object sender, PaintEventArgs e)
         {
             var g = e.Graphics;
-            DrawInfo.SetPixelsPerPoint(g);
+            DrawInfo.Update(g);
 
-            var rec = new Rectangle(0, 0, drawable.Width - 1, DrawInfo.TextHeight + _spacing);
+            var rec = new Rectangle(0, 0, _drawable.Width - 1, DrawInfo.TextHeight + _spacing);
             var overGroup = false;
             var prevCategory = string.Empty;
 
@@ -157,7 +173,7 @@ namespace MonoGame.Content.Builder.Editor.Property
                 // Draw group
                 if (prevCategory != c.Category)
                 {
-                    if (Group)
+                    if (_gruop)
                     {
                         g.FillRectangle(DrawInfo.BorderColor, rec);
                         g.DrawText(DrawInfo.TextFont, DrawInfo.TextColor, rec.X + 1, rec.Y + (rec.Height - DrawInfo.TextFont.LineHeight) / 2, c.Category);
@@ -187,7 +203,7 @@ namespace MonoGame.Content.Builder.Editor.Property
             var newHeight = Math.Max(rec.Y + 1, Height - 2);
             if (_height != newHeight)
             {
-                drawable.Height = _height = newHeight;
+                _drawable.Height = _height = newHeight;
                 SetWidth();
             }
 
@@ -217,18 +233,18 @@ namespace MonoGame.Content.Builder.Editor.Property
                 {
                     if (Util.IsGtk)
                     {
-                        pixel1.RemoveAll();
-                        pixel1 = new PixelLayout();
-                        pixel1.Add(drawable, 0, 0);
-                        _selectedCell.OnEdit(pixel1);
-                        Content = pixel1;
+                        _pixel1.RemoveAll();
+                        _pixel1 = new PixelLayout();
+                        _pixel1.Add(_drawable, 0, 0);
+                        _selectedCell.OnEdit(_pixel1);
+                        Content = _pixel1;
                     }
                     else
                     {
-                        _selectedCell.OnEdit(pixel1);
+                        _selectedCell.OnEdit(_pixel1);
                     }
 
-                    drawable.Invalidate();
+                    _drawable.Invalidate();
                 });
 
 #if WINDOWS
@@ -251,20 +267,20 @@ namespace MonoGame.Content.Builder.Editor.Property
             if (_moveSeparator)
                 _separatorPos = _moveSeparatorAmount + _mouseLocation.X;
 
-            drawable.Invalidate();
+            _drawable.Invalidate();
         }
 
         private void Drawable_MouseLeave(object sender, MouseEventArgs e)
         {
             _mouseLocation = new Point(-1, -1);
             _moveSeparator = false;
-            drawable.Invalidate();
+            _drawable.Invalidate();
         }
 
         private void PropertyGridTable_SizeChanged(object sender, EventArgs e)
         {
             SetWidth();
-            drawable.Invalidate();
+            _drawable.Invalidate();
         }
 
         public void SetWidth()
@@ -283,11 +299,11 @@ namespace MonoGame.Content.Builder.Editor.Property
             (drawable.ControlObject as System.Windows.Controls.Canvas).Dispatcher.BeginInvoke(action,
                 System.Windows.Threading.DispatcherPriority.ContextIdle, null);
 #else
-            drawable.Width = pixel1.Width = Width - 2;
+            _drawable.Width = _pixel1.Width = Width - 2;
 
-            foreach (var child in pixel1.Children)
-                if (child != drawable)
-                    child.Width = drawable.Width - _separatorPos;
+            foreach (var child in _pixel1.Children)
+                if (child != _drawable)
+                    child.Width = _drawable.Width - _separatorPos;
 #endif
         }
     }

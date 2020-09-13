@@ -159,8 +159,8 @@ namespace MonoGame.Content.Builder.Editor.Project
             if (projectItem is PipelineProject || projectItem == null || projectItem.Name == newFileName)
                 return;
 
-            // If original path is not the same as destination path
-            // than the item is a link, and now move operation needs to happen
+            // If original path is the same as the destionation path,
+            // than the item is not a link, so we should move the source file.
             if (projectItem.OriginalPath == projectItem.DestinationPath)
             {
                 var progressDialog = new FileProgressDialog(() =>
@@ -214,7 +214,7 @@ namespace MonoGame.Content.Builder.Editor.Project
 
             // Populate property grid
 
-            MonoGame.Content.Builder.Editor.Property.PropertyPad.Instance.SetObjects(items);
+            _controller.LoadProperties(items);
 
             // Populate context menu
 

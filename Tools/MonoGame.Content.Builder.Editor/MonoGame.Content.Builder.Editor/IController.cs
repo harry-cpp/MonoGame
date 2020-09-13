@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Eto.Drawing;
 
 namespace MonoGame.Content.Builder.Editor
@@ -13,5 +14,7 @@ namespace MonoGame.Content.Builder.Editor
         Image GetFolderIcon();
 
         void UpdateEnabledCommands();
+
+        void LoadProperties(List<IProjectItem> items);
     }
 }

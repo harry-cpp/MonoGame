@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using Eto.Drawing;
 using Eto.Forms;
 using MonoGame.Content.Builder.Editor.Project;
@@ -21,6 +22,9 @@ namespace MonoGame.Content.Builder.Editor
         private ProjectPad _projectPad;
         private PropertyPad _propertyPad;
         private bool _isProjectDirty;
+        private Dictionary<string, Bitmap> _files;
+        private Bitmap _folder;
+        private Bitmap _link;
 
         public Controller(IView view)
         {
@@ -28,6 +32,7 @@ namespace MonoGame.Content.Builder.Editor
             _mgcbFileFilter = new FileFilter("MonoGame Content Build Project (*.mgcb)", new[] { ".mgcb" });
             _allFileFilter = new FileFilter("All Files (*.*)", new[] { ".*" });
             _xnaFileFilter = new FileFilter("XNA Content Projects (*.contentproj)", new[] { ".contentproj" });
+            _files = new Dictionary<string, Bitmap>();
             View = view;
 
             _commands.NewProject.Executed += (o, e) => NewProject();
@@ -41,6 +46,9 @@ namespace MonoGame.Content.Builder.Editor
             _propertyPad = new PropertyPad();
 
             view.Attach(this, _projectPad, _propertyPad);
+
+            _folder = view.GetFolderIcon();
+            _link = view.GetLinkIcon();
 
             UpdateEnabledCommands();
         }
@@ -56,8 +64,6 @@ namespace MonoGame.Content.Builder.Editor
                 return ret;
             }
         }
-
-        public ProjectPad ProjectPad => _projectPad;
 
         public bool IsProjectOpen => Project != null;
 
@@ -218,6 +224,7 @@ namespace MonoGame.Content.Builder.Editor
                 View.UpdateEnabledCommands();
 
                 _projectPad.Open(Project);
+                LoadProperties(new List<IProjectItem>(new[] { Project }));
 #if !DEBUG
             }
             catch (Exception)
@@ -248,7 +255,8 @@ namespace MonoGame.Content.Builder.Editor
             IsProjectDirty = false;
             Project = null;
 
-            _projectPad.Open(Project);
+            LoadProperties(null);
+            _projectPad.Open(null);
         }
 
         public bool MoveProject(string newname)
@@ -364,17 +372,32 @@ namespace MonoGame.Content.Builder.Editor
 
         public void LoadProperties(List<IProjectItem> items)
         {
-            _propertyPad.SetObjects(items);
+            _propertyPad.Objects = items.Cast<object>().ToList();
         }
 
-        public Image GetFileIcon(string path, bool link)
+        public Image GetFileIcon(string filePath, bool link)
         {
-            return View.GetFileIcon(path);
+            var key = (link ? '1' : '0') + Path.GetExtension(filePath);
+            if (_files.ContainsKey(key))
+                return _files[key];
+
+            var icon = View.GetFileIcon(filePath);
+            if (link)
+            {
+                var g = new Graphics(icon);
+                g.DrawImage(_link, Point.Empty);
+                g.Flush();
+            }
+
+            if (File.Exists(filePath))
+                _files.Add(key, icon);
+
+            return icon;
         }
 
         public Image GetFolderIcon()
         {
-            return View.GetFolderIcon();
+            return _folder;
         }
 
         public void UpdateEnabledCommands()
@@ -388,7 +411,7 @@ namespace MonoGame.Content.Builder.Editor
 
             _projectPad.UpdateEnabledCommands(_commands);
             _propertyPad.UpdateEnabledCommands(_commands);
-            
+
             View.UpdateEnabledCommands();
         }
     }

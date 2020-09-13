@@ -7,7 +7,7 @@ using Eto.Forms;
 
 namespace MonoGame.Content.Builder.Editor.Property
 {
-    public class CellString : ICell
+    public class StringPropertyCell : PropertyCell
     {
         public override void Edit(PixelLayout control, Rectangle rec)
         {
@@ -28,7 +28,7 @@ namespace MonoGame.Content.Builder.Editor.Property
             {
                 if (e.Key == Keys.Enter)
                 {
-                    Parent.Reload();
+                    // Parent.Reload();
                 }
             };
         }
