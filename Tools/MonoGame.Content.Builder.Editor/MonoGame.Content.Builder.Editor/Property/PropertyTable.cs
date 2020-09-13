@@ -16,16 +16,6 @@ namespace MonoGame.Content.Builder.Editor.Property
         private const int _separatorWidth = 8;
         private const int _separatorSafeDistance = 30;
 
-        private static Dictionary<Type, Type> _cellTypes = GetCellTypes();
-        private static Dictionary<Type, Type> GetCellTypes()
-        {
-            var ret = new Dictionary<Type, Type>();
-            ret[typeof(string)] = typeof(StringPropertyCell);
-            ret[typeof(Enum)] = typeof(EnumPropertyCell);
-
-            return ret;
-        }
-
         private PropertyPad _propertyPad;
         private PixelLayout _pixel1;
         private Drawable _drawable;
@@ -97,30 +87,10 @@ namespace MonoGame.Content.Builder.Editor.Property
             return ret;
         }
 
-        private Type GetCellType(Type type)
+
+        public void AddEntry(string category, string name, object value, PropertyCell cell, bool editable, Action<object> callback)
         {
-            if (_cellTypes.TryGetValue(type, out Type cellType))
-                return cellType;
-
-            foreach (var pair in _cellTypes)
-            {
-                if (type.IsSubclassOf(pair.Key))
-                {
-                    return pair.Value;
-                }
-            }
-
-            return null;
-        }
-
-
-        public void AddEntry(string category, string name, object value, Type type, bool editable, Action<object> callback)
-        {
-            Type cellType = GetCellType(type);
-
-            var cell = (cellType == null) ? new StringPropertyCell() : (PropertyCell)Activator.CreateInstance(cellType);
-            cell.OnInitialize(category, name, value, cellType == null ? false : editable, callback);
-
+            cell.OnInitialize(category, name, value, editable, callback);
             _cells.Add(cell);
         }
 
@@ -129,7 +99,7 @@ namespace MonoGame.Content.Builder.Editor.Property
             if (group)
                 _cells.Sort((x, y) => string.Compare(x.Category + x.Name, y.Category + y.Name) + (x.Category == "Processor Parameters" ? 100 : 0) + (y.Category == "Processor Parameters" ? -100 : 0));
             else
-                _cells.Sort((x, y) => string.Compare(x.Name, y.Name) + (x.Category == "Processor Parameters" ? 100 : 0) + (y.Category == "Processor Parameters" ? -100 : 0));
+                _cells.Sort((x, y) => string.Compare(x.Name, y.Name));
 
             _gruop = group;
             _drawable.Invalidate();

@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Linq;
 using System.ComponentModel;
 using Eto.Forms;
+using System;
 
 namespace MonoGame.Content.Builder.Editor.Property
 {
@@ -15,6 +16,16 @@ namespace MonoGame.Content.Builder.Editor.Property
         private List<object> _objects;
         private PropertyTable _propertyTable;
         private RadioCommand _cmdSortAbc, _cmdSortGroup;
+
+        private static Dictionary<Type, Type> _cellTypes = GetCellTypes();
+        private static Dictionary<Type, Type> GetCellTypes()
+        {
+            var ret = new Dictionary<Type, Type>();
+            ret[typeof(string)] = typeof(StringPropertyCell);
+            ret[typeof(Enum)] = typeof(EnumPropertyCell);
+
+            return ret;
+        }
 
         public PropertyPad()
         {
@@ -77,6 +88,22 @@ namespace MonoGame.Content.Builder.Editor.Property
             return true;
         }
 
+        private Type GetCellType(Type type)
+        {
+            if (_cellTypes.TryGetValue(type, out Type cellType))
+                return cellType;
+
+            foreach (var pair in _cellTypes)
+            {
+                if (type.IsSubclassOf(pair.Key))
+                {
+                    return pair.Value;
+                }
+            }
+
+            return null;
+        }
+
         private void LoadProperties(List<object> objects)
         {
             var props = objects[0].GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public);
@@ -87,6 +114,8 @@ namespace MonoGame.Content.Builder.Editor.Property
                 var name = p.Name;
                 var browsable = true;
                 var category = "Mics";
+                var cellEditor = GetCellType(p.PropertyType);
+                var editable = p.CanWrite;
 
                 foreach (var a in attrs)
                 {
@@ -96,6 +125,15 @@ namespace MonoGame.Content.Builder.Editor.Property
                         category = categoryAttribute.Category;
                     else if (a is DisplayNameAttribute displayNameAttribute)
                         name = displayNameAttribute.DisplayName;
+                    else if (a is EditorAttribute editorAttribute && Type.GetType(editorAttribute.EditorBaseTypeName) == typeof(PropertyCell))
+                        cellEditor = Type.GetType(editorAttribute.EditorTypeName);
+                    
+                }
+
+                if (cellEditor == null)
+                {
+                    cellEditor = typeof(StringPropertyCell);
+                    editable = false;
                 }
 
                 object value = p.GetValue(objects[0], null);
@@ -111,7 +149,7 @@ namespace MonoGame.Content.Builder.Editor.Property
                 if (!browsable)
                     continue;
 
-                _propertyTable.AddEntry(category, name, value, p.PropertyType, p.CanWrite, val =>
+                _propertyTable.AddEntry(category, name, value, (PropertyCell)Activator.CreateInstance(cellEditor), editable, val =>
                 {
                     foreach (var obj in objects)
                         p.SetValue(obj, val, null);
@@ -129,6 +167,9 @@ namespace MonoGame.Content.Builder.Editor.Property
                 if (!p.Browsable)
                     continue;
 
+                var cellEditor = GetCellType(p.Type);
+                var editable = true;
+
                 object value = objects[0].ProcessorParams[p.Name];
                 foreach (ContentItem o in objects)
                 {
@@ -139,7 +180,13 @@ namespace MonoGame.Content.Builder.Editor.Property
                     }
                 }
 
-                _propertyTable.AddEntry("Processor Parameters", p.DisplayName, value, p.Type, true, val =>
+                if (cellEditor == null)
+                {
+                    cellEditor = typeof(StringPropertyCell);
+                    editable = false;
+                }
+
+                _propertyTable.AddEntry("Processor Parameters", p.DisplayName, value, (PropertyCell)Activator.CreateInstance(cellEditor), editable, val =>
                 {
                     foreach (var obj in objects)
                         obj.ProcessorParams[p.Name] = val;

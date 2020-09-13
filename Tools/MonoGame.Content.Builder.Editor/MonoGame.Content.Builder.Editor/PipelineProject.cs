@@ -8,6 +8,7 @@ using System.ComponentModel;
 using System.IO;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Content.Builder.Editor.Property;
 
 namespace MonoGame.Content.Builder.Editor
 {
@@ -50,6 +51,7 @@ namespace MonoGame.Content.Builder.Editor
 
         public string IntermediateDir { get; set; }
 
+        [Editor(typeof(ReferencePropertyCell), typeof(PropertyCell))]
         public List<string> References { get; set; }
 
         public TargetPlatform Platform { get; set; }
