@@ -32,6 +32,7 @@
 
   <ItemGroup>
     <PackageReference Include="Eto.Forms" Version="2.5.5" />
+    <PackageReference Include="Eto.Serialization.Xaml" Version="2.5.5" />
   </ItemGroup>
 
   <ItemGroup>
@@ -41,4 +42,12 @@
     </ProjectReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="Project\Dialogs\NewFolderDialog.xeto" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Project\Dialogs\NewFolderDialog.xeto.cs">
+      <DependentUpon>NewFolderDialog.xeto</DependentUpon>
+    </Compile>
+  </ItemGroup>
 </Project>

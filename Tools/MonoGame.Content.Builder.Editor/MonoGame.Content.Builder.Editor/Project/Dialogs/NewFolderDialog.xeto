@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Dialog xmlns="http://schema.picoe.ca/eto.forms" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Width="300" Title="NewFolder" Padding="8">
+    <DynamicLayout Spacing="8,8">
+        <Label>Folder Name:</Label>
+        <TextBox x:Name="_textBoxName" Text="Folder" TextChanged="TextBoxName_TextChanged" KeyUp="TextBoxName_KeyUp" />
+    </DynamicLayout>
+    <Dialog.PositiveButtons>
+        <Button x:Name="_buttonCreate" Text="Create Folder" Click="ButtonCreate_Click" />
+    </Dialog.PositiveButtons>
+    <Dialog.NegativeButtons>
+        <Button x:Name="_buttonCancel" Text="Cancel" Click="ButtonCancel_Click" />
+    </Dialog.NegativeButtons>
+</Dialog>
