@@ -28,7 +28,6 @@ namespace MonoGame.Content.Builder.Editor.Property
                 _callback.Invoke(value);
             }
         }
-        public virtual string DisplayValue => (Value ?? "").ToString();
 
         public void OnInitialize(string category, string name, object value, bool editable, Action<object> callback)
         {
@@ -67,7 +66,7 @@ namespace MonoGame.Content.Builder.Editor.Property
             _cellRectangle = rec;
             _cellRectangle.X += separatorPos;
             _cellRectangle.Width -= separatorPos - 1;
-            _cellRectangle.Height = Draw(g, _cellRectangle, selected);
+            _cellRectangle.Height = DrawCell(g, _cellRectangle, (Value ?? "").ToString(), selected);
         }
 
         public virtual void Initialize()
@@ -77,14 +76,14 @@ namespace MonoGame.Content.Builder.Editor.Property
 
         public abstract Control Edit();
 
-        public virtual int Draw(Graphics g, Rectangle rec, bool selected)
+        public virtual int DrawCell(Graphics g, Rectangle rec, string displayValue, bool selected)
         {
             g.DrawText(
                 font: DrawInfo.TextFont,
                 color: DrawInfo.GetTextColor(selected, !Editable),
                 x: rec.X + 5,
                 y: rec.Y + 6,
-                text: DisplayValue
+                text: displayValue
             );
             return rec.Height;
         }

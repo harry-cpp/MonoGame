@@ -41,7 +41,7 @@ namespace MonoGame.Content.Builder.Editor.Property
                 return Colors.White;
         }
 
-        public override int Draw(Graphics g, Rectangle rec, bool selected)
+        public override int DrawCell(Graphics g, Rectangle rec, string displayValue, bool selected)
         {
             g.FillRectangle(new Color(_color, 1f), new Rectangle(rec.X + 4, rec.Y + 4, rec.Width - 8, rec.Height - 8));
             g.DrawText(

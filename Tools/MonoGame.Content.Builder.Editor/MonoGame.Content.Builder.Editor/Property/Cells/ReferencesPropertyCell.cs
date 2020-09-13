@@ -15,7 +15,7 @@ namespace MonoGame.Content.Builder.Editor.Property
             return null;
         }
 
-        public override int Draw(Graphics g, Rectangle rec, bool selected)
+        public override int DrawCell(Graphics g, Rectangle rec, string displayValue, bool selected)
         {
             var refs = Value as List<string> ?? new List<string>();
             refs = new List<string>(new[] { "asd.dll", "be.dll", "yo.dll" });

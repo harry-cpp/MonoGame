@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System.ComponentModel;
+using Eto.Drawing;
 using Eto.Forms;
 
 namespace MonoGame.Content.Builder.Editor.Property
@@ -10,22 +11,6 @@ namespace MonoGame.Content.Builder.Editor.Property
     class NumberPropertyCell : PropertyCell
     {
         private TypeConverter _converter;
-
-        public override string DisplayValue
-        {
-            get
-            {
-                var type = Value.GetType();
-                if (type == typeof(float))
-                    return ((float)Value).ToString("0.00");
-                else if(type == typeof(double))
-                    return ((double)Value).ToString("0.00");
-                else if (type == typeof(decimal))
-                    return ((decimal)Value).ToString("0.00");
-
-                return Value.ToString();
-            }
-        }
 
         public override void Initialize()
         {
@@ -57,6 +42,19 @@ namespace MonoGame.Content.Builder.Editor.Property
             };
 
             return textBox;
+        }
+
+        public override int DrawCell(Graphics g, Rectangle rec, string displayValue, bool selected)
+        {
+            var type = Value.GetType();
+            if (type == typeof(float))
+                displayValue = ((float)Value).ToString("0.00");
+            else if (type == typeof(double))
+                displayValue = ((double)Value).ToString("0.00");
+            else if (type == typeof(decimal))
+                displayValue = ((decimal)Value).ToString("0.00");
+
+            return base.DrawCell(g, rec, displayValue, selected);
         }
     }
 }

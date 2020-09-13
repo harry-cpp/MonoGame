@@ -2,14 +2,13 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using Eto.Drawing;
 using Eto.Forms;
 
 namespace MonoGame.Content.Builder.Editor.Property
 {
     class ImporterPropertyCell : PropertyCell
     {
-        public override string DisplayValue => (Value as ImporterTypeDescription).DisplayName;
-
         public override Control Edit()
         {
             var combo = new DropDown();
@@ -26,6 +25,11 @@ namespace MonoGame.Content.Builder.Editor.Property
             combo.SelectedIndexChanged += (o, e) => Value = values.GetValue(combo.SelectedIndex);
 
             return combo;
+        }
+
+        public override int DrawCell(Graphics g, Rectangle rec, string displayValue, bool selected)
+        {
+            return base.DrawCell(g, rec, (Value as ImporterTypeDescription).DisplayName, selected);
         }
     }
 }
