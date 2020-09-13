@@ -23,6 +23,7 @@ namespace MonoGame.Content.Builder.Editor.Property
             var ret = new Dictionary<Type, Type>();
             ret[typeof(string)] = typeof(StringPropertyCell);
             ret[typeof(Enum)] = typeof(EnumPropertyCell);
+            ret[typeof(Microsoft.Xna.Framework.Color)] = typeof(ColorPropertyCell);
 
             return ret;
         }

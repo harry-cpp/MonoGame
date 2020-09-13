@@ -201,17 +201,15 @@ namespace MonoGame.Content.Builder.Editor.Property
             {
                 var action = new Action(() =>
                 {
-                    if (Util.IsGtk)
+                    _selectedCell.OnEdit(_pixel1);
+
+                    if (Util.IsGtk && _pixel1.Children.Count() > 1)
                     {
                         _pixel1.RemoveAll();
                         _pixel1 = new PixelLayout();
                         _pixel1.Add(_drawable, 0, 0);
                         _selectedCell.OnEdit(_pixel1);
                         Content = _pixel1;
-                    }
-                    else
-                    {
-                        _selectedCell.OnEdit(_pixel1);
                     }
 
                     _drawable.Invalidate();

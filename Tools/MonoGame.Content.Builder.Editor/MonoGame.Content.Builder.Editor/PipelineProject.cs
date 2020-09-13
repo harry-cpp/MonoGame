@@ -51,7 +51,7 @@ namespace MonoGame.Content.Builder.Editor
 
         public string IntermediateDir { get; set; }
 
-        [Editor(typeof(ReferencePropertyCell), typeof(PropertyCell))]
+        [Editor(typeof(ReferencesPropertyCell), typeof(PropertyCell))]
         public List<string> References { get; set; }
 
         public TargetPlatform Platform { get; set; }

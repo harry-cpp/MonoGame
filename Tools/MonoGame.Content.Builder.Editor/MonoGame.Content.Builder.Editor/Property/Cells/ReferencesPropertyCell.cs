@@ -2,14 +2,13 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
 using System.Collections.Generic;
 using Eto.Drawing;
 using Eto.Forms;
 
 namespace MonoGame.Content.Builder.Editor.Property
 {
-    public class ReferencePropertyCell : PropertyCell
+    public class ReferencesPropertyCell : PropertyCell
     {
         public override void Edit(PixelLayout control, Rectangle rec)
         {

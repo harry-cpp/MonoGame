@@ -28,7 +28,7 @@ namespace MonoGame.Content.Builder.Editor.Property
             {
                 if (e.Key == Keys.Enter)
                 {
-                    // Parent.Reload();
+                    control.Remove(textBox);
                 }
             };
         }
