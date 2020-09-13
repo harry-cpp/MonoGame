@@ -3,7 +3,6 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using Eto.Drawing;
 using Eto.Forms;
 
 namespace MonoGame.Content.Builder.Editor.Property
@@ -12,11 +11,9 @@ namespace MonoGame.Content.Builder.Editor.Property
     {
         public override string DisplayValue => (Value as ProcessorTypeDescription).DisplayName;
 
-        public override void Edit(PixelLayout control, Rectangle rec)
+        public override Control Edit()
         {
             var combo = new DropDown();
-            combo.Width = rec.Width;
-            combo.Height = rec.Height;
 
             var values = PipelineTypes.Processors;
             Type inputType = null;
@@ -43,9 +40,9 @@ namespace MonoGame.Content.Builder.Editor.Property
                 }
             }
 
-            control.Add(combo, rec.X, rec.Y);
-
             combo.SelectedIndexChanged += (o, e) => Value = values.GetValue(combo.SelectedIndex);
+
+            return combo;
         }
     }
 }

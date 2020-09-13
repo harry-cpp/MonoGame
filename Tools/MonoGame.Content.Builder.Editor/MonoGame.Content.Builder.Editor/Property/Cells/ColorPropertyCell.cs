@@ -17,7 +17,7 @@ namespace MonoGame.Content.Builder.Editor.Property
             _color = new Color(xnaColor.R / 255f, xnaColor.G / 255f, xnaColor.B / 255f, xnaColor.A / 255f);
         }
 
-        public override void Edit(PixelLayout control, Rectangle rec)
+        public override Control Edit()
         {
             var dialog = new ColorDialog();
             dialog.Color = _color;
@@ -27,6 +27,8 @@ namespace MonoGame.Content.Builder.Editor.Property
                 _color = dialog.Color;
                 Value = new Microsoft.Xna.Framework.Color(dialog.Color.Rb, dialog.Color.Gb, dialog.Color.Bb, dialog.Color.Ab);
             }
+
+            return null;
         }
 
         private Color GetContrastColor(Color color)
@@ -46,7 +48,7 @@ namespace MonoGame.Content.Builder.Editor.Property
                 font: DrawInfo.TextFont,
                 color: GetContrastColor(_color),
                 x: rec.X + 5,
-                y: rec.Y + 9,
+                y: rec.Y + 6,
                 text: " " + _color.ToHex()
             );
 

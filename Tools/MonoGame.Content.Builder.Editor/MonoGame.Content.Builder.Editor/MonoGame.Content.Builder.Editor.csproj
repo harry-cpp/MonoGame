@@ -41,13 +41,5 @@
       <AdditionalProperties>CopyContentFiles=False</AdditionalProperties>
     </ProjectReference>
   </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="Project\Dialogs\NewFolderDialog.xeto" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Update="Project\Dialogs\NewFolderDialog.xeto.cs">
-      <DependentUpon>NewFolderDialog.xeto</DependentUpon>
-    </Compile>
-  </ItemGroup>
+  
 </Project>

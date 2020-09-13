@@ -104,9 +104,9 @@
     <ProjectReference Include="..\..\..\MonoGame.Framework.Content.Pipeline\MonoGame.Framework.Content.Pipeline.csproj">
       <AdditionalProperties>CopyContentFiles=False</AdditionalProperties>
     </ProjectReference>
-    <ProjectReference Include="..\MonoGame.Content.Builder.Editor.UI\MonoGame.Content.Builder.Editor.UI.csproj">
+    <ProjectReference Include="..\MonoGame.Content.Builder.Editor\MonoGame.Content.Builder.Editor.csproj">
       <Project>{207975FD-B256-4E28-B2D0-0A38334F7BBB}</Project>
-      <Name>MonoGame.Content.Builder.Editor.UI</Name>
+      <Name>MonoGame.Content.Builder.Editor</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />

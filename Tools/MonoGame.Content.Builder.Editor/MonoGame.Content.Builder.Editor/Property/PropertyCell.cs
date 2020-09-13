@@ -43,9 +43,17 @@ namespace MonoGame.Content.Builder.Editor.Property
             Initialize();
         }
 
-        public void OnEdit(PixelLayout control)
+        public void OnEdit(PixelLayout layout)
         {
-            Edit(control, _cellRectangle);
+            var control = Edit();
+
+            if (control != null)
+            {
+                control.Width = _cellRectangle.Width;
+                control.Height = _cellRectangle.Height;
+
+                layout.Add(control, _cellRectangle.X, _cellRectangle.Y);
+            }
         }
 
         public void OnDraw(Graphics g, Rectangle rec, int separatorPos, bool selected)
@@ -53,7 +61,7 @@ namespace MonoGame.Content.Builder.Editor.Property
             if (selected)
                 g.FillRectangle(DrawInfo.HoverBackColor, rec);
 
-            g.DrawText(DrawInfo.TextFont, DrawInfo.GetTextColor(selected, false), rec.X + 5, rec.Y + 9, Name);
+            g.DrawText(DrawInfo.TextFont, DrawInfo.GetTextColor(selected, false), rec.X + 5, rec.Y + 6, Name);
             g.FillRectangle(DrawInfo.GetBackgroundColor(selected), separatorPos - 6, rec.Y, rec.Width, rec.Height);
 
             _cellRectangle = rec;
@@ -67,7 +75,7 @@ namespace MonoGame.Content.Builder.Editor.Property
 
         }
 
-        public abstract void Edit(PixelLayout control, Rectangle rectangle);
+        public abstract Control Edit();
 
         public virtual int Draw(Graphics g, Rectangle rec, bool selected)
         {
@@ -75,7 +83,7 @@ namespace MonoGame.Content.Builder.Editor.Property
                 font: DrawInfo.TextFont,
                 color: DrawInfo.GetTextColor(selected, !Editable),
                 x: rec.X + 5,
-                y: rec.Y + 9,
+                y: rec.Y + 6,
                 text: DisplayValue
             );
             return rec.Height;

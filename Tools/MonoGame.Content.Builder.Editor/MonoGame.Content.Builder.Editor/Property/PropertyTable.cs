@@ -12,7 +12,7 @@ namespace MonoGame.Content.Builder.Editor.Property
 {
     public partial class PropertyTable : Scrollable
     {
-        private const int _spacing = 18;
+        private const int _spacing = 12;
         private const int _separatorWidth = 8;
         private const int _separatorSafeDistance = 30;
 
@@ -131,6 +131,10 @@ namespace MonoGame.Content.Builder.Editor.Property
             var rec = new Rectangle(0, 0, _drawable.Width - 1, DrawInfo.TextHeight + _spacing);
             var overGroup = false;
             var prevCategory = string.Empty;
+            var skipCellDraw = new List<int>();
+
+            foreach (var child in _pixel1.Children)
+                skipCellDraw.Add(PixelLayout.GetLocation(child).Y);
 
             _separatorPos = Math.Min(Width - _separatorSafeDistance, Math.Max(_separatorSafeDistance, _separatorPos));
             _selectedCell = null;
@@ -156,10 +160,13 @@ namespace MonoGame.Content.Builder.Editor.Property
                 }
 
                 // Draw cell
-                var selected = rec.Contains(_mouseLocation);
+                var selected = skipCellDraw.Count == 1 && rec.Contains(_mouseLocation);
                 if (selected)
                     _selectedCell = c;
                 c.OnDraw(g, rec, _separatorPos, selected);
+
+                if (skipCellDraw.Contains(rec.Y))
+                    g.FillRectangle(DrawInfo.BackColor, _separatorPos, rec.Y, rec.Width - _separatorPos, rec.Height);
 
                 // Draw separator for the current row
                 g.FillRectangle(DrawInfo.BorderColor, _separatorPos - 1, rec.Y, 1, c.Height);

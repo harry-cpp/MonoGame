@@ -10,9 +10,9 @@ namespace MonoGame.Content.Builder.Editor.Property
 {
     class ReferencesPropertyCell : PropertyCell
     {
-        public override void Edit(PixelLayout control, Rectangle rec)
+        public override Control Edit()
         {
-
+            return null;
         }
 
         public override int Draw(Graphics g, Rectangle rec, bool selected)
@@ -20,7 +20,7 @@ namespace MonoGame.Content.Builder.Editor.Property
             var refs = Value as List<string> ?? new List<string>();
             refs = new List<string>(new[] { "asd.dll", "be.dll", "yo.dll" });
 
-            var ypos = rec.Y + 9;
+            var ypos = rec.Y + 6;
 
             foreach (var r in refs)
             {
@@ -32,7 +32,7 @@ namespace MonoGame.Content.Builder.Editor.Property
                     text: r
                 );
 
-                ypos += DrawInfo.TextHeight + 9;
+                ypos += DrawInfo.TextHeight + 6;
             }
 
             return ypos - rec.Y;

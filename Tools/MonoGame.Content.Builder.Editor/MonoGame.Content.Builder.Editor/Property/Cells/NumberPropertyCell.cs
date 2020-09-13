@@ -3,7 +3,6 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System.ComponentModel;
-using Eto.Drawing;
 using Eto.Forms;
 
 namespace MonoGame.Content.Builder.Editor.Property
@@ -33,14 +32,10 @@ namespace MonoGame.Content.Builder.Editor.Property
             _converter = TypeDescriptor.GetConverter(Value.GetType());
         }
 
-        public override void Edit(PixelLayout control, Rectangle rec)
+        public override Control Edit()
         {
             var textBox = new TextBox();
-            textBox.Width = rec.Width;
-            textBox.Height = rec.Height;
             textBox.Text = Value.ToString();
-
-            control.Add(textBox, rec.X, rec.Y);
 
             textBox.Focus();
             textBox.CaretIndex = textBox.Text.Length;
@@ -57,9 +52,11 @@ namespace MonoGame.Content.Builder.Editor.Property
             {
                 if (e.Key == Keys.Enter)
                 {
-                    control.Remove(textBox);
+                    (textBox.Parent as PixelLayout)?.Remove(textBox);
                 }
             };
+
+            return textBox;
         }
     }
 }

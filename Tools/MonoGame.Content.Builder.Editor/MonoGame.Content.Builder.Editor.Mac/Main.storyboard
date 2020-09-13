@@ -168,17 +168,21 @@
                                         <autoresizingMask key="autoresizingMask"/>
                                         <subviews>
                                             <box fixedFrame="YES" borderType="none" title="Project Explorer" id="jCW-U3-1Mf">
-                                                <rect key="frame" x="-3" y="0.0" width="249" height="344"/>
+                                                <rect key="frame" x="-3" y="0.0" width="249" height="362"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                                 <view key="contentView" id="EU8-k3-v4f">
-                                                    <rect key="frame" x="0.0" y="0.0" width="249" height="329"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="249" height="347"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 </view>
                                             </box>
-                                            <customView fixedFrame="YES" id="jh7-z1-HZF">
-                                                <rect key="frame" x="0.0" y="341" width="243" height="359"/>
+                                            <box fixedFrame="YES" borderType="none" title="Properties" id="cJX-38-8qw">
+                                                <rect key="frame" x="-3" y="359" width="249" height="345"/>
                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                            </customView>
+                                                <view key="contentView" id="ZUb-Sh-Cai">
+                                                    <rect key="frame" x="0.0" y="0.0" width="249" height="330"/>
+                                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                </view>
+                                            </box>
                                         </subviews>
                                         <holdingPriorities>
                                             <real value="250"/>
@@ -203,6 +207,7 @@
                     </view>
                     <connections>
                         <outlet property="ProjectExplorerBox" destination="jCW-U3-1Mf" id="243-o9-EJM"/>
+                        <outlet property="PropertiesBox" destination="cJX-38-8qw" id="z3y-Qe-MvQ"/>
                     </connections>
                 </viewController>
                 <customObject id="rPt-NT-nkU" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>

@@ -46,6 +46,12 @@ namespace MonoGame.Content.Builder.Editor.Mac
             projectView.Frame = new CoreGraphics.CGRect(0, 0, parentView.Bounds.Size.Width, parentView.Bounds.Size.Height);
             projectView.AutoresizingMask |= NSViewResizingMask.HeightSizable | NSViewResizingMask.WidthSizable;
             parentView.AddSubview(projectView);
+
+            var propertiesView = propertyPad.Control.ToNative();
+            parentView = PropertiesBox.Subviews[0];
+            propertiesView.Frame = new CoreGraphics.CGRect(0, 0, parentView.Bounds.Size.Width, parentView.Bounds.Size.Height);
+            propertiesView.AutoresizingMask |= NSViewResizingMask.HeightSizable | NSViewResizingMask.WidthSizable;
+            parentView.AddSubview(propertiesView);
         }
 
         public void UpdateEnabledCommands()
@@ -53,17 +59,17 @@ namespace MonoGame.Content.Builder.Editor.Mac
 
         }
 
-        public Image GetFileIcon(string filePath)
+        public Bitmap GetFileIcon(string filePath)
         {
             return new Bitmap(new BitmapHandler(NSWorkspace.SharedWorkspace.IconForFile(filePath)));
         }
 
-        public Image GetFolderIcon()
+        public Bitmap GetFolderIcon()
         {
             return new Bitmap(new BitmapHandler(NSWorkspace.SharedWorkspace.IconForFile("/Library/Apple")));
         }
 
-        public Image GetLinkIcon()
+        public Bitmap GetLinkIcon()
         {
             // TODO
             return new Bitmap(new BitmapHandler(NSWorkspace.SharedWorkspace.IconForFile("/Library/Apple")));

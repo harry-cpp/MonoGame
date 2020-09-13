@@ -14,12 +14,20 @@ namespace MonoGame.Content.Builder.Editor.Mac
 	{
 		[Outlet]
 		AppKit.NSBox ProjectExplorerBox { get; set; }
+
+		[Outlet]
+		AppKit.NSBox PropertiesBox { get; set; }
 		
 		void ReleaseDesignerOutlets ()
 		{
 			if (ProjectExplorerBox != null) {
 				ProjectExplorerBox.Dispose ();
 				ProjectExplorerBox = null;
+			}
+
+			if (PropertiesBox != null) {
+				PropertiesBox.Dispose ();
+				PropertiesBox = null;
 			}
 		}
 	}
