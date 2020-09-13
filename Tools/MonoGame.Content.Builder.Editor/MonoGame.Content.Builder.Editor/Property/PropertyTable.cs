@@ -73,7 +73,7 @@ namespace MonoGame.Content.Builder.Editor.Property
 
             foreach (var control in children)
             {
-                if (control != _drawable && control.Tag is PropertyCell cell)
+                if (control != _drawable)
                 {
                     _pixel1.Remove(control);
                 }
@@ -82,6 +82,7 @@ namespace MonoGame.Content.Builder.Editor.Property
             if (ret)
             {
                 _drawable.Invalidate();
+                _propertyPad.Reload();
             }
 
             return ret;

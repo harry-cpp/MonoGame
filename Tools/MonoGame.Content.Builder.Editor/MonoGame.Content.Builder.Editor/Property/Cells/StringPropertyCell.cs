@@ -12,8 +12,6 @@ namespace MonoGame.Content.Builder.Editor.Property
         public override void Edit(PixelLayout control, Rectangle rec)
         {
             var textBox = new TextBox();
-            textBox.Tag = this;
-            textBox.Style = "OverrideSize";
             textBox.Width = rec.Width;
             textBox.Height = rec.Height;
             textBox.Text = (Value ?? "").ToString();

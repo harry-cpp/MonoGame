@@ -5,6 +5,7 @@
 using System.ComponentModel;
 using System.Globalization;
 using Microsoft.Xna.Framework.Content.Pipeline;
+using MonoGame.Content.Builder.Editor.Property;
 
 namespace MonoGame.Content.Builder.Editor
 {
@@ -84,6 +85,7 @@ namespace MonoGame.Content.Builder.Editor
         [Category("Settings")]
         [Description("The importer used to load the content file.")]
         [TypeConverter(typeof(ImporterConverter))]
+        [Editor(typeof(ImporterPropertyCell), typeof(PropertyCell))]
         public ImporterTypeDescription Importer
         {
             get => _importer;
@@ -107,6 +109,7 @@ namespace MonoGame.Content.Builder.Editor
         [Category("Settings")]
         [Description("The processor used to transform the content for runtime use.")]
         [TypeConverter(typeof(ProcessorConverter))]
+        [Editor(typeof(ProcessorPropertyCell), typeof(PropertyCell))]
         public ProcessorTypeDescription Processor
         {
             get => _processor;

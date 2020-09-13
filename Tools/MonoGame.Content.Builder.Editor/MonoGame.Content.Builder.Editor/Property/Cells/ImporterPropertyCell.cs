@@ -2,26 +2,27 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
 using Eto.Drawing;
 using Eto.Forms;
 
 namespace MonoGame.Content.Builder.Editor.Property
 {
-    public class EnumPropertyCell : PropertyCell
+    public class ImporterPropertyCell : PropertyCell
     {
+        public override string DisplayValue => (Value as ImporterTypeDescription).DisplayName;
+
         public override void Edit(PixelLayout control, Rectangle rec)
         {
             var combo = new DropDown();
             combo.Width = rec.Width;
             combo.Height = rec.Height;
 
-            var values = Enum.GetValues(Value.GetType());
-            foreach (var value in values)
+            var values = PipelineTypes.Importers;
+            foreach (var v in values)
             {
-                combo.Items.Add(value.ToString());
+                combo.Items.Add(v.DisplayName);
 
-                if (Value != null && value.ToString() == Value.ToString())
+                if (Value != null && v.DisplayName == (Value as ImporterTypeDescription).DisplayName)
                     combo.SelectedIndex = combo.Items.Count - 1;
             }
 

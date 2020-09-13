@@ -28,6 +28,7 @@ namespace MonoGame.Content.Builder.Editor.Property
                 _callback.Invoke(value);
             }
         }
+        public virtual string DisplayValue => (Value ?? "").ToString();
 
         public void OnInitialize(string category, string name, object value, bool editable, Action<object> callback)
         {
@@ -75,7 +76,7 @@ namespace MonoGame.Content.Builder.Editor.Property
                 color: DrawInfo.GetTextColor(selected, !Editable),
                 x: rec.X + 5,
                 y: rec.Y + 9,
-                text: (Value ?? "").ToString()
+                text: DisplayValue
             );
             return rec.Height;
         }
