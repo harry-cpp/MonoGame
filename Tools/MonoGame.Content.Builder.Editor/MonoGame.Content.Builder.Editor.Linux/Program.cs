@@ -3,8 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using GLib;
-using Gtk;
+using Eto.GtkSharp.Forms;
 using Application = Gtk.Application;
 
 namespace MonoGame.Content.Builder.Editor.Linux
@@ -21,14 +20,21 @@ namespace MonoGame.Content.Builder.Editor.Linux
         {
             Application.Init();
 
-            var app = App = new Application("net.monogame.mgcb-editor", ApplicationFlags.None);
-            app.Register(GLib.Cancellable.Current);
-
             var etoApp = new Eto.Forms.Application(Eto.Platforms.Gtk);
+
+            Eto.Style.Add<ApplicationHandler>("MGCBEditor", h =>
+            {
+                App = h.Control;
+            });
+            etoApp.Style = "MGCBEditor";
+
+            // var app = App = new Application("net.monogame.mgcb-editor", ApplicationFlags.None);
+            // app.Register(GLib.Cancellable.Current);
+
             etoApp.Attach();
 
             var window = new MainWindow();
-            app.AddWindow(window);
+            App.AddWindow(window);
 
             Util.IsMac = true;
             Util.IsGtk = true;

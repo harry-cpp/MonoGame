@@ -62,7 +62,7 @@ namespace MonoGame.Content.Builder.Editor.Project
                         File.Copy(filePath, destPath);
                     }
                 });
-                await progressDialog.ShowModalAsync();
+                await progressDialog.ShowAsync();
 
                 if (!progressDialog.IsSuccess)
                     return;

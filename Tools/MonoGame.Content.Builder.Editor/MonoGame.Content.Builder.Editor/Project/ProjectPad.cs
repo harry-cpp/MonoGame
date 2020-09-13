@@ -177,7 +177,7 @@ namespace MonoGame.Content.Builder.Editor.Project
                         throw new Exception("How did this happen?");
                 });
 
-                await progressDialog.ShowModalAsync();
+                await progressDialog.ShowAsync();
 
                 if (!progressDialog.IsSuccess)
                 {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using Eto.Forms;
 
 namespace MonoGame.Content.Builder.Editor
@@ -78,6 +79,11 @@ namespace MonoGame.Content.Builder.Editor
         public static T Show<T>(this Dialog<T> dialog)
         {
             return dialog.ShowModal(MainWindow);
+        }
+
+        public static Task ShowAsync(this Dialog dialog)
+        {
+            return dialog.ShowModalAsync(MainWindow);
         }
 
         public static DialogResult Show(this CommonDialog dialog)

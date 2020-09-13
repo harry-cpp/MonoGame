@@ -28,7 +28,7 @@ namespace MonoGame.Content.Builder.Editor.Project
         public override async void Clicked(ProjectPad projectPad, List<TreeGridItem> treeItems, List<IProjectItem> items)
         {
             var dialog = new NewFileDialog();
-            await dialog.ShowModalAsync();
+            await dialog.ShowAsync();
         }
     }
 }
