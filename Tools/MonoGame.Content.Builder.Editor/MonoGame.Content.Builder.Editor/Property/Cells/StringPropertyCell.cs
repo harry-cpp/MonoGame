@@ -7,7 +7,7 @@ using Eto.Forms;
 
 namespace MonoGame.Content.Builder.Editor.Property
 {
-    public class StringPropertyCell : PropertyCell
+    class StringPropertyCell : PropertyCell
     {
         public override void Edit(PixelLayout control, Rectangle rec)
         {

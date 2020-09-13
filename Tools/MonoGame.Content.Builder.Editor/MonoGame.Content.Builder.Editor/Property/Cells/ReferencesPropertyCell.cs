@@ -8,7 +8,7 @@ using Eto.Forms;
 
 namespace MonoGame.Content.Builder.Editor.Property
 {
-    public class ReferencesPropertyCell : PropertyCell
+    class ReferencesPropertyCell : PropertyCell
     {
         public override void Edit(PixelLayout control, Rectangle rec)
         {

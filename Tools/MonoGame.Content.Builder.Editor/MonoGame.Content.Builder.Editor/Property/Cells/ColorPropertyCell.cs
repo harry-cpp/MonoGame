@@ -7,7 +7,7 @@ using Eto.Forms;
 
 namespace MonoGame.Content.Builder.Editor.Property
 {
-    public class ColorPropertyCell : PropertyCell
+    class ColorPropertyCell : PropertyCell
     {
         private Color _color;
 
@@ -41,7 +41,7 @@ namespace MonoGame.Content.Builder.Editor.Property
 
         public override int Draw(Graphics g, Rectangle rec, bool selected)
         {
-            g.FillRectangle(_color, new Rectangle(rec.X + 4, rec.Y + 4, rec.Width - 8, rec.Height - 8));
+            g.FillRectangle(new Color(_color, 1f), new Rectangle(rec.X + 4, rec.Y + 4, rec.Width - 8, rec.Height - 8));
             g.DrawText(
                 font: DrawInfo.TextFont,
                 color: GetContrastColor(_color),

@@ -7,7 +7,7 @@ using Eto.Forms;
 
 namespace MonoGame.Content.Builder.Editor.Property
 {
-    public class ImporterPropertyCell : PropertyCell
+    class ImporterPropertyCell : PropertyCell
     {
         public override string DisplayValue => (Value as ImporterTypeDescription).DisplayName;
 

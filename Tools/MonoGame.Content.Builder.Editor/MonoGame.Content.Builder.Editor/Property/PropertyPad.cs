@@ -21,6 +21,19 @@ namespace MonoGame.Content.Builder.Editor.Property
         private static Dictionary<Type, Type> GetCellTypes()
         {
             var ret = new Dictionary<Type, Type>();
+            ret[typeof(bool)] = typeof(BooleanPropertyCell);
+            ret[typeof(byte)] = typeof(NumberPropertyCell);
+            ret[typeof(sbyte)] = typeof(NumberPropertyCell);
+            ret[typeof(char)] = typeof(NumberPropertyCell);
+            ret[typeof(decimal)] = typeof(NumberPropertyCell);
+            ret[typeof(double)] = typeof(NumberPropertyCell);
+            ret[typeof(float)] = typeof(NumberPropertyCell);
+            ret[typeof(int)] = typeof(NumberPropertyCell);
+            ret[typeof(uint)] = typeof(NumberPropertyCell);
+            ret[typeof(long)] = typeof(NumberPropertyCell);
+            ret[typeof(ulong)] = typeof(NumberPropertyCell);
+            ret[typeof(short)] = typeof(NumberPropertyCell);
+            ret[typeof(ushort)] = typeof(NumberPropertyCell);
             ret[typeof(string)] = typeof(StringPropertyCell);
             ret[typeof(Enum)] = typeof(EnumPropertyCell);
             ret[typeof(Microsoft.Xna.Framework.Color)] = typeof(ColorPropertyCell);

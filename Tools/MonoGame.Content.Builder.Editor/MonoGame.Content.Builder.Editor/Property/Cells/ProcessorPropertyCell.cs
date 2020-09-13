@@ -8,7 +8,7 @@ using Eto.Forms;
 
 namespace MonoGame.Content.Builder.Editor.Property
 {
-    public class ProcessorPropertyCell : PropertyCell
+    class ProcessorPropertyCell : PropertyCell
     {
         public override string DisplayValue => (Value as ProcessorTypeDescription).DisplayName;
 
