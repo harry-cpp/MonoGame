@@ -10,13 +10,15 @@ namespace MonoGame.Content.Builder.Editor.Property
     {
         public override Control Edit()
         {
-            var pathDialog = new PathDialog();
+            var basePath = string.Empty;
+            if (ParentObjects.Count > 0 && ParentObjects[0] is PipelineProject projectItem)
+                basePath = projectItem.Location;
+
+            var pathDialog = new PathDialog(basePath);
             pathDialog.FolderPath = Value.ToString();
 
             if (pathDialog.Show() == DialogResult.Ok)
-            {
                 Value = pathDialog.FolderPath;
-            }
 
             return null;
         }

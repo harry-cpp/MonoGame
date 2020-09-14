@@ -89,9 +89,9 @@ namespace MonoGame.Content.Builder.Editor.Property
         }
 
 
-        public void AddEntry(string category, string name, object value, PropertyCell cell, bool editable, Action<object> callback)
+        public void AddEntry(List<object> parentObjects, string category, string name, object value, PropertyCell cell, bool editable, Action<object> callback)
         {
-            cell.OnInitialize(category, name, value, editable, callback);
+            cell.OnInitialize(parentObjects, category, name, value, editable, callback);
             _cells.Add(cell);
         }
 

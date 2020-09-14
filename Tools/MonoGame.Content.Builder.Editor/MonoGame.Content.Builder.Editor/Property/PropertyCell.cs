@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Collections.Generic;
 using Eto.Drawing;
 using Eto.Forms;
 
@@ -14,9 +15,10 @@ namespace MonoGame.Content.Builder.Editor.Property
         private object _value;
         private Action<object> _callback;
 
-        public string Category { get; protected set; }
-        public string Name { get; protected set; }
-        public bool Editable { get; protected set; }
+        public List<object> ParentObjects { get; private set; }
+        public string Category { get; private set; }
+        public string Name { get; private set; }
+        public bool Editable { get; private set; }
 
         public int Height => _cellRectangle.Height;
         public object Value
@@ -29,12 +31,13 @@ namespace MonoGame.Content.Builder.Editor.Property
             }
         }
 
-        public void OnInitialize(string category, string name, object value, bool editable, Action<object> callback)
+        public void OnInitialize(List<object> parentObjects, string category, string name, object value, bool editable, Action<object> callback)
         {
             _cellRectangle = Rectangle.Empty;
             _value = value;
             _callback = callback;
 
+            ParentObjects = parentObjects;
             Category = category;
             Name = name;
             Editable = editable;

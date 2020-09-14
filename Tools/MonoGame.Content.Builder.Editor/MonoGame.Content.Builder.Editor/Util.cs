@@ -32,37 +32,8 @@ namespace MonoGame.Content.Builder.Editor
             // resolve symlinks on Unix systems
             if (Environment.OSVersion.Platform == PlatformID.Unix)
                 return realpath(path, IntPtr.Zero);
-            
+
             return path;
-        }
-
-        /// <summary>        
-        /// Returns the path 'filspec' made relative path 'folder'.
-        /// 
-        /// If 'folder' is not an absolute path, throws ArgumentException.
-        /// If 'filespec' is not an absolute path, returns 'filespec' unmodified.
-        /// </summary>
-        public static string GetRelativePath(string filespec, string folder)
-        {
-            if (!Path.IsPathRooted(filespec))
-                return filespec;
-
-            if (!Path.IsPathRooted(folder))
-                throw new ArgumentException("Must be an absolute path.", "folder");
-
-            filespec = Path.GetFullPath(filespec).TrimEnd(new[] { '/', '\\' });
-            folder = Path.GetFullPath(folder).TrimEnd(new[] { '/', '\\' });
-
-            if (filespec == folder)
-                return string.Empty;
-
-            var pathUri = new Uri(filespec);
-            var folderUri = new Uri(folder + Path.DirectorySeparatorChar);
-            var result = folderUri.MakeRelativeUri(pathUri).ToString();
-            result = result.Replace('/', Path.DirectorySeparatorChar);
-            result = Uri.UnescapeDataString(result);
-
-            return result;
         }
 
         public static bool CheckString(string s)
@@ -74,6 +45,18 @@ namespace MonoGame.Content.Builder.Editor
                     return false;
 
             return true;
+        }
+
+        public static string GetRelativePath(string relativeTo, string path)
+        {
+            var dirUri = new Uri(relativeTo.TrimEnd('\\', '/') + "/");
+            var fileUri = new Uri(path);
+            var relativeUri = dirUri.MakeRelativeUri(fileUri);
+
+            if (relativeUri == null)
+                return path;
+
+            return Uri.UnescapeDataString(relativeUri.ToString());
         }
 
         public static T Show<T>(this Dialog<T> dialog)

@@ -163,7 +163,7 @@ namespace MonoGame.Content.Builder.Editor.Property
                 if (!browsable)
                     continue;
 
-                _propertyTable.AddEntry(category, name, value, (PropertyCell)Activator.CreateInstance(cellEditor), editable, val =>
+                _propertyTable.AddEntry(_objects, category, name, value, (PropertyCell)Activator.CreateInstance(cellEditor), editable, val =>
                 {
                     foreach (var obj in objects)
                         p.SetValue(obj, val, null);
@@ -200,7 +200,7 @@ namespace MonoGame.Content.Builder.Editor.Property
                     editable = false;
                 }
 
-                _propertyTable.AddEntry("Processor Parameters", p.DisplayName, value, (PropertyCell)Activator.CreateInstance(cellEditor), editable, val =>
+                _propertyTable.AddEntry(_objects, "Processor Parameters", p.DisplayName, value, (PropertyCell)Activator.CreateInstance(cellEditor), editable, val =>
                 {
                     foreach (var obj in objects)
                         obj.ProcessorParams[p.Name] = val;

@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.IO;
 using Eto.Forms;
 using Eto.Serialization.Xaml;
 
@@ -10,25 +11,28 @@ namespace MonoGame.Content.Builder.Editor.Property
 {
     public class PathDialog : Dialog<DialogResult>
     {
+        private string _basePath;
         private TextBox _textBoxPath = null;
 
-        public PathDialog()
+        public PathDialog(string basePath)
         {
+            _basePath = basePath;
             XamlReader.Load(this, "MonoGame.Content.Builder.Editor.Property.Dialogs.PathDialog.xeto");
         }
 
         public string FolderPath
         {
-            get => _textBoxPath.Text;
+            get => _textBoxPath.Text.Replace('\\', '/');
             set => _textBoxPath.Text = value;
         }
 
         private void ButtonBrowse_Click(object sender, EventArgs args)
         {
             var openFolderDialog = new SelectFolderDialog();
-            // TODO: openFolderDialog.Directory start location
+            openFolderDialog.Directory = Path.Combine(_basePath, _textBoxPath.Text);
+
             if (openFolderDialog.Show() == DialogResult.Ok)
-                _textBoxPath.Text = openFolderDialog.Directory;
+                _textBoxPath.Text = Util.GetRelativePath(_basePath, openFolderDialog.Directory);
         }
 
         private void ButtonSymbol_Click(object sender, EventArgs e)

@@ -18,7 +18,7 @@ namespace MonoGame.Content.Builder.Editor.Property
             {
                 combo.Items.Add(v.DisplayName);
 
-                if (Value != null && Value is ImporterTypeDescription importer && v.DisplayName == importer.DisplayName)
+                if (Value is ImporterTypeDescription importer && v.DisplayName == importer.DisplayName)
                     combo.SelectedIndex = combo.Items.Count - 1;
             }
 

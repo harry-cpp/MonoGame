@@ -18,14 +18,8 @@ namespace MonoGame.Content.Builder.Editor.Property
             Type inputType = null;
             
             // Find the input type
-            foreach (var v in PipelineTypes.Processors)
-            {
-                if (Value != null && v.DisplayName == (Value as ProcessorTypeDescription).DisplayName)
-                {
-                    inputType = v.InputType;
-                    break;
-                }
-            }
+            if (ParentObjects.Count > 0 && ParentObjects[0] is ContentItem contentItem && contentItem.Processor != null)
+                inputType = contentItem.Processor.InputType;
 
             // Load entries to dropdown only if they match the input type
             foreach (var v in PipelineTypes.Processors)
@@ -34,7 +28,7 @@ namespace MonoGame.Content.Builder.Editor.Property
                 {
                     combo.Items.Add(v.DisplayName);
 
-                    if (Value != null && Value is ProcessorTypeDescription processor && v.DisplayName == processor.DisplayName)
+                    if (Value is ProcessorTypeDescription processor && v.DisplayName == processor.DisplayName)
                         combo.SelectedIndex = combo.Items.Count - 1;
                 }
             }
