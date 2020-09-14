@@ -100,12 +100,17 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\MonoGame.Framework\MonoGame.Framework.DesktopGL.csproj" />
+    <ProjectReference Include="..\..\..\MonoGame.Framework\MonoGame.Framework.DesktopGL.csproj">
+      <Project>{5B5871CA-AD66-4B5E-B097-B7144CF1B570}</Project>
+      <Name>MonoGame.Framework.DesktopGL</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\MonoGame.Framework.Content.Pipeline\MonoGame.Framework.Content.Pipeline.csproj">
       <AdditionalProperties>CopyContentFiles=False</AdditionalProperties>
+      <Project>{EE9F056F-8B59-4F41-9AC4-B54E43CD89B5}</Project>
+      <Name>MonoGame.Framework.Content.Pipeline</Name>
     </ProjectReference>
     <ProjectReference Include="..\MonoGame.Content.Builder.Editor\MonoGame.Content.Builder.Editor.csproj">
-      <Project>{207975FD-B256-4E28-B2D0-0A38334F7BBB}</Project>
+      <Project>{C831007E-E9AA-427F-A63D-C05963015B83}</Project>
       <Name>MonoGame.Content.Builder.Editor</Name>
     </ProjectReference>
   </ItemGroup>

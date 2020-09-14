@@ -47,8 +47,12 @@ namespace MonoGame.Content.Builder.Editor
         [Browsable(false)]
         public bool LaunchDebugger { get; set; }         
 
+        [DisplayName("Output Directory")]
+        [Editor(typeof(PathPropertyCell), typeof(PropertyCell))]
         public string OutputDir { get; set; }
 
+        [DisplayName("Intermediate Directory")]
+        [Editor(typeof(PathPropertyCell), typeof(PropertyCell))]
         public string IntermediateDir { get; set; }
 
         [Editor(typeof(ReferencesPropertyCell), typeof(PropertyCell))]

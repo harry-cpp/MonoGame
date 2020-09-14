@@ -86,6 +86,16 @@ namespace MonoGame.Content.Builder.Editor
             return dialog.ShowModalAsync(MainWindow);
         }
 
+        public static Task<DialogResult> ShowAsync(this Dialog<DialogResult> dialog)
+        {
+            return dialog.ShowModalAsync(MainWindow);
+        }
+
+        public static DialogResult Show(this Dialog<DialogResult> dialog)
+        {
+            return dialog.ShowModal(MainWindow);
+        }
+
         public static DialogResult Show(this CommonDialog dialog)
         {
             return dialog.ShowDialog(MainWindow);

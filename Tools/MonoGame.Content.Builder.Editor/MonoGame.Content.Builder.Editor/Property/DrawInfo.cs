@@ -20,7 +20,7 @@ namespace MonoGame.Content.Builder.Editor.Property
             HoverTextColor = SystemColors.HighlightText;
             HoverBackColor = SystemColors.Highlight;
             DisabledTextColor = new Color(SystemColors.ControlText, 0.6f);
-            BorderColor = SystemColors.Control;
+            BorderColor = Util.IsGtk ? SystemColors.WindowBackground : SystemColors.Control;
         }
 
         public static Font TextFont { get; set; }

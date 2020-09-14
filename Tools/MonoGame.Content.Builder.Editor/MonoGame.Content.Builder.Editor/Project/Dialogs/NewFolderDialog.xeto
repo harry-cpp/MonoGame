@@ -1,8 +1,23 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<Dialog xmlns="http://schema.picoe.ca/eto.forms" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Width="300" Title="NewFolder" Padding="8">
+<Dialog xmlns="http://schema.picoe.ca/eto.forms"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="New Folder"
+        Width="300"
+        Padding="8"
+        Resizable="False"
+        DefaultButton="{x:Reference _buttonCreate}"
+        AbortButton="{x:Reference _buttonCancel}">
     <DynamicLayout Spacing="8,8">
-        <Label>Folder Name:</Label>
-        <TextBox x:Name="_textBoxName" Text="Folder" TextChanged="TextBoxName_TextChanged" KeyUp="TextBoxName_KeyUp" />
+        <DynamicRow>
+            <DynamicControl XScale="True" YScale="True">
+                <Label>Folder Name:</Label>
+            </DynamicControl>
+        </DynamicRow>
+        <DynamicRow>
+            <DynamicControl XScale="True" YScale="True">
+                <TextBox x:Name="_textBoxName" Text="Folder" TextChanged="TextBoxName_TextChanged" KeyUp="TextBoxName_KeyUp" />
+            </DynamicControl>
+        </DynamicRow>
     </DynamicLayout>
     <Dialog.PositiveButtons>
         <Button x:Name="_buttonCreate" Text="Create Folder" Click="ButtonCreate_Click" />

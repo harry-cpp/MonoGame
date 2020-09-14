@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Dialog xmlns="http://schema.picoe.ca/eto.forms"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Path Selector"
+        Width="400"
+        Padding="8"
+        Resizable="False"
+        DefaultButton="{x:Reference _buttonSelect}"
+        AbortButton="{x:Reference _buttonCancel}">
+    <DynamicLayout Spacing="4,4">
+        
+        <DynamicRow>
+            <DynamicControl XScale="True" YScale="True">
+                <Label>Directory Path:</Label>
+            </DynamicControl>
+        </DynamicRow>
+        
+        <DynamicRow>
+            <DynamicControl XScale="True" YScale="True">
+                
+                <DynamicLayout Spacing="4,4">
+                    <DynamicRow>
+                        <DynamicControl XScale="True" YScale="True">
+                            <TextBox x:Name="_textBoxPath" />
+                        </DynamicControl>
+                        <DynamicControl XScale="False" YScale="True">
+                            <Button Text="..." MinimumSize="-1,-1" Click="ButtonBrowse_Click" />
+                        </DynamicControl>
+                    </DynamicRow>
+                </DynamicLayout>
+                
+            </DynamicControl>
+        </DynamicRow>
+        
+        <DynamicRow>
+            <DynamicControl XScale="True" YScale="True">
+                
+                <DynamicLayout Spacing="4,4">
+                    <DynamicRow>
+                        <DynamicControl XScale="True" YScale="True">
+                            <Button Text="$(Platform)" Click="ButtonSymbol_Click" />
+                        </DynamicControl>
+                        <DynamicControl XScale="True" YScale="True">
+                            <Button Text="$(Config)" Click="ButtonSymbol_Click" />
+                        </DynamicControl>
+                        <DynamicControl XScale="True" YScale="True">
+                            <Button Text="$(Profile)" Click="ButtonSymbol_Click" />
+                        </DynamicControl>
+                    </DynamicRow>
+                </DynamicLayout>
+                
+            </DynamicControl>
+        </DynamicRow>
+        
+    </DynamicLayout>
+    <Dialog.PositiveButtons>
+        <Button x:Name="_buttonSelect" Text="Select" Click="ButtonSelect_Click" />
+    </Dialog.PositiveButtons>
+    <Dialog.NegativeButtons>
+        <Button x:Name="_buttonCancel" Text="Cancel" Click="ButtonCancel_Click" />
+    </Dialog.NegativeButtons>
+</Dialog>

@@ -160,7 +160,7 @@ namespace MonoGame.Content.Builder.Editor.Property
                 }
 
                 // Draw cell
-                var selected = skipCellDraw.Count == 1 && rec.Contains(_mouseLocation);
+                var selected = skipCellDraw.Count == 1 && !_moveSeparator && _currentCursor != CursorType.VerticalSplit && rec.Contains(_mouseLocation);
                 if (selected)
                     _selectedCell = c;
                 c.OnDraw(g, rec, _separatorPos, selected);

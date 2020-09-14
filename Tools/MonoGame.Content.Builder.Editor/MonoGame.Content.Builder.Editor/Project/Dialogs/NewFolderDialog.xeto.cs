@@ -1,26 +1,25 @@
-﻿using System;
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
+using System;
 using Eto.Forms;
 using Eto.Serialization.Xaml;
 
 namespace MonoGame.Content.Builder.Editor.Project
 {
-    public class NewFolderDialog : Dialog
+    public class NewFolderDialog : Dialog<DialogResult>
     {
         private TextBox _textBoxName = null;
         private Button _buttonCreate = null;
-        private Button _buttonCancel = null;
 
         public NewFolderDialog()
         {
             XamlReader.Load(this, "MonoGame.Content.Builder.Editor.Project.Dialogs.NewFolderDialog.xeto");
-
-            DefaultButton = _buttonCreate;
-            AbortButton = _buttonCancel;
+            Result = DialogResult.Cancel;
         }
 
-        public DialogResult Result { get; private set; }
-
-        public string Text => _textBoxName.Text;
+        public string FolderName => _textBoxName.Text;
 
         private void TextBoxName_TextChanged(object sender, EventArgs args)
         {
