@@ -8,19 +8,19 @@ using Eto.Forms;
 
 namespace MonoGame.Content.Builder.Editor.Property
 {
-    class NumberPropertyCell : PropertyCell
+    class NumberPropertyCell<T> : PropertyCell
     {
         private TypeConverter _converter;
 
         public override void Initialize()
         {
-            _converter = TypeDescriptor.GetConverter(Value.GetType());
+            _converter = TypeDescriptor.GetConverter(typeof(T));
         }
 
         public override Control Edit()
         {
             var textBox = new TextBox();
-            textBox.Text = Value.ToString();
+            textBox.Text = (Value ?? "").ToString();
 
             textBox.Focus();
             textBox.CaretIndex = textBox.Text.Length;
@@ -46,13 +46,16 @@ namespace MonoGame.Content.Builder.Editor.Property
 
         public override int DrawCell(Graphics g, Rectangle rec, string displayValue, bool selected)
         {
-            var type = Value.GetType();
-            if (type == typeof(float))
-                displayValue = ((float)Value).ToString("0.00");
-            else if (type == typeof(double))
-                displayValue = ((double)Value).ToString("0.00");
-            else if (type == typeof(decimal))
-                displayValue = ((decimal)Value).ToString("0.00");
+            if (Value != null)
+            {
+                var type = typeof(T);
+                if (type == typeof(float))
+                    displayValue = ((float)Value).ToString("0.00");
+                else if (type == typeof(double))
+                    displayValue = ((double)Value).ToString("0.00");
+                else if (type == typeof(decimal))
+                    displayValue = ((decimal)Value).ToString("0.00");
+            }
 
             return base.DrawCell(g, rec, displayValue, selected);
         }

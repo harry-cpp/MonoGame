@@ -18,7 +18,7 @@ namespace MonoGame.Content.Builder.Editor.Property
             {
                 combo.Items.Add(v.DisplayName);
 
-                if (Value != null && v.DisplayName == (Value as ImporterTypeDescription).DisplayName)
+                if (Value != null && Value is ImporterTypeDescription importer && v.DisplayName == importer.DisplayName)
                     combo.SelectedIndex = combo.Items.Count - 1;
             }
 
@@ -29,7 +29,10 @@ namespace MonoGame.Content.Builder.Editor.Property
 
         public override int DrawCell(Graphics g, Rectangle rec, string displayValue, bool selected)
         {
-            return base.DrawCell(g, rec, (Value as ImporterTypeDescription).DisplayName, selected);
+            if (Value is ImporterTypeDescription importer)
+                displayValue = importer.DisplayName;
+
+            return base.DrawCell(g, rec, displayValue, selected);
         }
     }
 }

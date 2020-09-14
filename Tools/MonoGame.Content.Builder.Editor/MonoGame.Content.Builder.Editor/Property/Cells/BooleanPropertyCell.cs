@@ -13,7 +13,7 @@ namespace MonoGame.Content.Builder.Editor.Property
             var combo = new DropDown();
             combo.Items.Add("True");
             combo.Items.Add("False");
-            combo.SelectedIndex = (bool)Value ? 0 : 1;
+            combo.SelectedIndex = (Value == null || (bool)Value) ? 0 : 1;
 
             combo.SelectedIndexChanged += (o, e) => Value = combo.SelectedIndex == 0;
 

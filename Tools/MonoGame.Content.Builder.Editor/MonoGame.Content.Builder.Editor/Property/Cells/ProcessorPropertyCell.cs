@@ -34,7 +34,7 @@ namespace MonoGame.Content.Builder.Editor.Property
                 {
                     combo.Items.Add(v.DisplayName);
 
-                    if (Value != null && v.DisplayName == (Value as ProcessorTypeDescription).DisplayName)
+                    if (Value != null && Value is ProcessorTypeDescription processor && v.DisplayName == processor.DisplayName)
                         combo.SelectedIndex = combo.Items.Count - 1;
                 }
             }
@@ -46,7 +46,10 @@ namespace MonoGame.Content.Builder.Editor.Property
 
         public override int DrawCell(Graphics g, Rectangle rec, string displayValue, bool selected)
         {
-            return base.DrawCell(g, rec, (Value as ProcessorTypeDescription).DisplayName, selected);
+            if (Value is ProcessorTypeDescription processor)
+                displayValue = processor.DisplayName;
+
+            return base.DrawCell(g, rec, displayValue, selected);
         }
     }
 }
