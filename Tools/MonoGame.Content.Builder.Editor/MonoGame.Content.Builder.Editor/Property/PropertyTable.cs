@@ -12,7 +12,6 @@ namespace MonoGame.Content.Builder.Editor.Property
 {
     public partial class PropertyTable : Scrollable
     {
-        private const int _spacing = 12;
         private const int _separatorWidth = 8;
         private const int _separatorSafeDistance = 30;
 
@@ -128,7 +127,7 @@ namespace MonoGame.Content.Builder.Editor.Property
             var g = e.Graphics;
             DrawInfo.Update(g);
 
-            var rec = new Rectangle(0, 0, _drawable.Width - 1, DrawInfo.TextHeight + _spacing);
+            var rec = new Rectangle(0, 0, _drawable.Width - 1, DrawInfo.TextHeight + DrawInfo.Spacing);
             var overGroup = false;
             var prevCategory = string.Empty;
             var skipCellDraw = new List<int>();
@@ -143,7 +142,7 @@ namespace MonoGame.Content.Builder.Editor.Property
 
             foreach (var c in _cells)
             {
-                rec.Height = (c.Height == 0) ? (DrawInfo.TextHeight + _spacing) : c.Height;
+                rec.Height = (c.Height == 0) ? (DrawInfo.TextHeight + DrawInfo.Spacing) : c.Height;
 
                 // Draw group
                 if (prevCategory != c.Category)
@@ -155,7 +154,7 @@ namespace MonoGame.Content.Builder.Editor.Property
 
                         prevCategory = c.Category;
                         overGroup |= rec.Contains(_mouseLocation);
-                        rec.Y += DrawInfo.TextHeight + _spacing;
+                        rec.Y += DrawInfo.TextHeight + DrawInfo.Spacing;
                     }
                 }
 
@@ -187,7 +186,7 @@ namespace MonoGame.Content.Builder.Editor.Property
 
             if (overGroup) // TODO: Group collapsing/expanding?
                 SetCursor(CursorType.Arrow);
-            else if ((new Rectangle(_separatorPos - _separatorWidth / 2, 0, _separatorWidth, Height)).Contains(_mouseLocation))
+            else if ((new Rectangle(_separatorPos - _separatorWidth / 2, 0, _separatorWidth, newHeight)).Contains(_mouseLocation))
                 SetCursor(CursorType.VerticalSplit);
             else
                 SetCursor(CursorType.Arrow);

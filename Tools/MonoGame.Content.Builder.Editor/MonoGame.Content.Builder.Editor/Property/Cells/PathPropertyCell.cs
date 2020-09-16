@@ -15,6 +15,7 @@ namespace MonoGame.Content.Builder.Editor.Property
                 basePath = projectItem.Location;
 
             var pathDialog = new PathDialog(basePath);
+            pathDialog.DisplayMode = DialogDisplayMode.Attached;
             pathDialog.FolderPath = Value.ToString();
 
             if (pathDialog.Show() == DialogResult.Ok)

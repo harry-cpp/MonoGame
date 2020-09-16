@@ -13,7 +13,7 @@ namespace MonoGame.Content.Builder.Editor.Property
     {
         static DrawInfo()
         {
-            TextFont = SystemFonts.Default();
+            TextFont = SystemFonts.Label();
             TextHeight = (int)SystemFonts.Default().LineHeight;
             TextColor = SystemColors.ControlText;
             BackColor = SystemColors.ControlBackground;
@@ -38,6 +38,8 @@ namespace MonoGame.Content.Builder.Editor.Property
         public static Color DisabledTextColor { get; set; }
 
         public static Color BorderColor { get; set; }
+
+        public static int Spacing => Util.IsGtk ? TextHeight : TextHeight / 2;
 
         public static void Update(Graphics g)
         {

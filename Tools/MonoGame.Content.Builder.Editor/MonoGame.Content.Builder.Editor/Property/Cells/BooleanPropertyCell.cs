@@ -10,14 +10,23 @@ namespace MonoGame.Content.Builder.Editor.Property
     {
         public override Control Edit()
         {
-            var combo = new DropDown();
-            combo.Items.Add("True");
-            combo.Items.Add("False");
-            combo.SelectedIndex = (Value == null || (bool)Value) ? 0 : 1;
+            var check = new CheckBox();
+            check.Checked = (bool?)Value;
+            check.Text = Value == null ? "Null" : Value.ToString();
+            check.ThreeState = (Value == null);
 
-            combo.SelectedIndexChanged += (o, e) => Value = combo.SelectedIndex == 0;
+            check.CheckedChanged += (o, e) => 
+            {
+                Value = check.Checked;
+                check.ThreeState = false;
+                check.Text = check.Checked.ToString();
+            };
 
-            return combo;
+            var box = new DynamicLayout();
+            box.DefaultPadding = new Eto.Drawing.Padding(4, 0, 0, 0);
+            box.Add(check, true, true);
+
+            return box;
         }
     }
 }

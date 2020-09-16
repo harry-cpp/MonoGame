@@ -48,7 +48,7 @@ namespace MonoGame.Content.Builder.Editor.Property
                 font: DrawInfo.TextFont,
                 color: GetContrastColor(_color),
                 x: rec.X + 5,
-                y: rec.Y + 6,
+                y: rec.Y + DrawInfo.Spacing / 2,
                 text: " " + _color.ToHex()
             );
 

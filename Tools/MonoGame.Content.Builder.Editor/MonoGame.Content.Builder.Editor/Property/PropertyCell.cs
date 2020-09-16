@@ -63,7 +63,7 @@ namespace MonoGame.Content.Builder.Editor.Property
             if (selected)
                 g.FillRectangle(DrawInfo.HoverBackColor, rec);
 
-            g.DrawText(DrawInfo.TextFont, DrawInfo.GetTextColor(selected, false), rec.X + 5, rec.Y + 6, Name);
+            g.DrawText(DrawInfo.TextFont, DrawInfo.GetTextColor(selected, false), rec.X + 5, rec.Y + DrawInfo.Spacing / 2, Name);
             g.FillRectangle(DrawInfo.GetBackgroundColor(selected), separatorPos - 6, rec.Y, rec.Width, rec.Height);
 
             _cellRectangle = rec;
@@ -85,7 +85,7 @@ namespace MonoGame.Content.Builder.Editor.Property
                 font: DrawInfo.TextFont,
                 color: DrawInfo.GetTextColor(selected, !Editable),
                 x: rec.X + 5,
-                y: rec.Y + 6,
+                y: rec.Y + DrawInfo.Spacing / 2,
                 text: displayValue
             );
             return rec.Height;

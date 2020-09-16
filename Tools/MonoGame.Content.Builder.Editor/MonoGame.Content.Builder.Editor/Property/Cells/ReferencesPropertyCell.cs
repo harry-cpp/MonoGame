@@ -20,7 +20,7 @@ namespace MonoGame.Content.Builder.Editor.Property
             var refs = Value as List<string> ?? new List<string>();
             refs = new List<string>(new[] { "asd.dll", "be.dll", "yo.dll" });
 
-            var ypos = rec.Y + 6;
+            var ypos = rec.Y + (DrawInfo.Spacing / 2);
 
             foreach (var r in refs)
             {
@@ -32,7 +32,7 @@ namespace MonoGame.Content.Builder.Editor.Property
                     text: r
                 );
 
-                ypos += DrawInfo.TextHeight + 6;
+                ypos += DrawInfo.TextHeight + (DrawInfo.Spacing / 2);
             }
 
             return ypos - rec.Y;
