@@ -131,7 +131,6 @@ namespace MonoGame.Content.Builder.Editor.Property
             DrawInfo.Update(g);
 
             var rec = new Rectangle(0, 0, _drawable.Width - 1, DrawInfo.TextHeight + DrawInfo.Spacing);
-            var isOverCategory = false;
             var prevCategory = string.Empty;
             var skipCellDraw = new List<int>();
 
@@ -144,7 +143,7 @@ namespace MonoGame.Content.Builder.Editor.Property
 
             g.Clear(DrawInfo.BackColor);
 
-            var selectionAllowed = skipCellDraw.Count == 1 && !_moveSeparator && _currentCursor != CursorType.VerticalSplit;
+            var selectionAllowed = skipCellDraw.Count == 1 && !_moveSeparator;
 
             foreach (var c in _cells)
             {
@@ -163,7 +162,6 @@ namespace MonoGame.Content.Builder.Editor.Property
                         g.DrawText(DrawInfo.TextFont, DrawInfo.TextColor, rec.X + 1, rec.Y + (rec.Height - DrawInfo.TextFont.LineHeight) / 2, categoryExpander + c.Category);
 
                         prevCategory = c.Category;
-                        isOverCategory |= rec.Contains(_mouseLocation);
 
                         if (categorySelected)
                             _selectedCategory = c.Category;
@@ -176,7 +174,7 @@ namespace MonoGame.Content.Builder.Editor.Property
                 }
 
                 // Draw cell
-                var cellSelected = selectionAllowed && rec.Contains(_mouseLocation);
+                var cellSelected = selectionAllowed && rec.Contains(_mouseLocation) && _currentCursor != CursorType.VerticalSplit;
                 c.OnDraw(g, rec, _separatorPos, cellSelected);
 
                 if (skipCellDraw.Contains(rec.Y))
@@ -203,7 +201,7 @@ namespace MonoGame.Content.Builder.Editor.Property
 
             if (!_moveSeparator)
             {
-                if (isOverCategory) // TODO: Group collapsing/expanding?
+                if (!string.IsNullOrEmpty(_selectedCategory))
                     SetCursor(CursorType.Arrow);
                 else if ((new Rectangle(_separatorPos - _separatorWidth / 2, 0, _separatorWidth, newHeight)).Contains(_mouseLocation))
                     SetCursor(CursorType.VerticalSplit);
@@ -243,6 +241,7 @@ namespace MonoGame.Content.Builder.Editor.Property
                                 Content = _pixel1;
                             }
 
+                            _mouseLocation = new Point(-1, -1);
                             _drawable.Invalidate();
                         });
 
@@ -252,10 +251,6 @@ namespace MonoGame.Content.Builder.Editor.Property
     #else
                         action.Invoke();
     #endif
-                    }
-                    else
-                    {
-                        // TODO: Show description in messagebox?
                     }
                 }
                 else if (!string.IsNullOrEmpty(_selectedCategory))

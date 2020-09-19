@@ -58,5 +58,21 @@ namespace MonoGame.Content.Builder.Editor.Property
         {
             return selected ? HoverBackColor : BackColor;
         }
+
+        public static string Shorten(this string text, int width)
+        {
+            var ret = text;
+            var retWidth = DrawInfo.TextFont.MeasureString(ret).Width;
+            var less = 0;
+
+            while (retWidth > width && !string.IsNullOrEmpty(ret))
+            {
+                less++;
+                ret = text.Remove(text.Length - less) + "...";
+                retWidth = DrawInfo.TextFont.MeasureString(ret).Width;
+            }
+
+            return ret;
+        }
     }
 }
