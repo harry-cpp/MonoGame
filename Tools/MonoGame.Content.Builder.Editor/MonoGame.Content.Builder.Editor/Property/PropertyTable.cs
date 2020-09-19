@@ -25,8 +25,10 @@ namespace MonoGame.Content.Builder.Editor.Property
         private int _separatorPos, _moveSeparatorAmount;
         private bool _moveSeparator;
         private int _height;
-        private bool _skipEdit, _gruop;
+        private bool _skipClick, _isGrouped;
         private Cursor _cursorNormal, _cursorResize;
+        private List<string> _collapsedCategories;
+        private string _selectedCategory;
 
         public PropertyTable(PropertyPad propertyPad)
         {
@@ -54,9 +56,10 @@ namespace MonoGame.Content.Builder.Editor.Property
             _mouseLocation = new Point(-1, -1);
             _cells = new List<PropertyCell>();
             _moveSeparator = false;
-            _skipEdit = false;
+            _skipClick = false;
             _cursorResize = new Cursor(CursorType.VerticalSplit);
             _cursorNormal = new Cursor(CursorType.Arrow);
+            _collapsedCategories = new List<string>();
         }
 
         public void Clear()
@@ -94,14 +97,14 @@ namespace MonoGame.Content.Builder.Editor.Property
             _cells.Add(cell);
         }
 
-        public void Update(bool group)
+        public void Update(bool grouped)
         {
-            if (group)
+            if (grouped)
                 _cells.Sort((x, y) => string.Compare(x.Category + x.Name, y.Category + y.Name) + (x.Category == "Processor Parameters" ? 100 : 0) + (y.Category == "Processor Parameters" ? -100 : 0));
             else
                 _cells.Sort((x, y) => string.Compare(x.Name, y.Name));
 
-            _gruop = group;
+            _isGrouped = grouped;
             _drawable.Invalidate();
         }
 
@@ -128,7 +131,7 @@ namespace MonoGame.Content.Builder.Editor.Property
             DrawInfo.Update(g);
 
             var rec = new Rectangle(0, 0, _drawable.Width - 1, DrawInfo.TextHeight + DrawInfo.Spacing);
-            var overGroup = false;
+            var isOverCategory = false;
             var prevCategory = string.Empty;
             var skipCellDraw = new List<int>();
 
@@ -137,32 +140,44 @@ namespace MonoGame.Content.Builder.Editor.Property
 
             _separatorPos = Math.Min(Width - _separatorSafeDistance, Math.Max(_separatorSafeDistance, _separatorPos));
             _selectedCell = null;
+            _selectedCategory = null;
 
             g.Clear(DrawInfo.BackColor);
+
+            var selectionAllowed = skipCellDraw.Count == 1 && !_moveSeparator && _currentCursor != CursorType.VerticalSplit;
 
             foreach (var c in _cells)
             {
                 rec.Height = (c.Height == 0) ? (DrawInfo.TextHeight + DrawInfo.Spacing) : c.Height;
 
                 // Draw group
-                if (prevCategory != c.Category)
+                if (_isGrouped)
                 {
-                    if (_gruop)
+                    if (prevCategory != c.Category)
                     {
-                        g.FillRectangle(DrawInfo.BorderColor, rec);
-                        g.DrawText(DrawInfo.TextFont, DrawInfo.TextColor, rec.X + 1, rec.Y + (rec.Height - DrawInfo.TextFont.LineHeight) / 2, c.Category);
+                        var categorySelected = selectionAllowed && rec.Contains(_mouseLocation);
+                        var categoryBackColor = categorySelected ? DrawInfo.HoverBackColor : DrawInfo.BorderColor;
+                        var categoryExpander = _collapsedCategories.Contains(c.Category) ? " ►  " : " ▼  ";
+
+                        g.FillRectangle(categoryBackColor, rec);
+                        g.DrawText(DrawInfo.TextFont, DrawInfo.TextColor, rec.X + 1, rec.Y + (rec.Height - DrawInfo.TextFont.LineHeight) / 2, categoryExpander + c.Category);
 
                         prevCategory = c.Category;
-                        overGroup |= rec.Contains(_mouseLocation);
+                        isOverCategory |= rec.Contains(_mouseLocation);
+
+                        if (categorySelected)
+                            _selectedCategory = c.Category;
                         rec.Y += DrawInfo.TextHeight + DrawInfo.Spacing;
                     }
+
+                    // If our current category is collapsed, skip drawing any cells from it
+                    if (_collapsedCategories.Contains(prevCategory))
+                        continue;
                 }
 
                 // Draw cell
-                var selected = skipCellDraw.Count == 1 && !_moveSeparator && _currentCursor != CursorType.VerticalSplit && rec.Contains(_mouseLocation);
-                if (selected)
-                    _selectedCell = c;
-                c.OnDraw(g, rec, _separatorPos, selected);
+                var cellSelected = selectionAllowed && rec.Contains(_mouseLocation);
+                c.OnDraw(g, rec, _separatorPos, cellSelected);
 
                 if (skipCellDraw.Contains(rec.Y))
                     g.FillRectangle(DrawInfo.BackColor, _separatorPos, rec.Y, rec.Width - _separatorPos, rec.Height);
@@ -170,6 +185,8 @@ namespace MonoGame.Content.Builder.Editor.Property
                 // Draw separator for the current row
                 g.FillRectangle(DrawInfo.BorderColor, _separatorPos - 1, rec.Y, 1, c.Height);
 
+                if (cellSelected)
+                    _selectedCell = c;
                 rec.Y += c.Height;
             }
 
@@ -184,17 +201,20 @@ namespace MonoGame.Content.Builder.Editor.Property
                 SetWidth();
             }
 
-            if (overGroup) // TODO: Group collapsing/expanding?
-                SetCursor(CursorType.Arrow);
-            else if ((new Rectangle(_separatorPos - _separatorWidth / 2, 0, _separatorWidth, newHeight)).Contains(_mouseLocation))
-                SetCursor(CursorType.VerticalSplit);
-            else
-                SetCursor(CursorType.Arrow);
+            if (!_moveSeparator)
+            {
+                if (isOverCategory) // TODO: Group collapsing/expanding?
+                    SetCursor(CursorType.Arrow);
+                else if ((new Rectangle(_separatorPos - _separatorWidth / 2, 0, _separatorWidth, newHeight)).Contains(_mouseLocation))
+                    SetCursor(CursorType.VerticalSplit);
+                else
+                    SetCursor(CursorType.Arrow);
+            }
         }
 
         private void Drawable_MouseDown(object sender, MouseEventArgs e)
         {
-            _skipEdit = ClearChildren();
+            _skipClick = ClearChildren();
             if (_currentCursor == CursorType.VerticalSplit)
             {
                 _moveSeparator = true;
@@ -204,30 +224,49 @@ namespace MonoGame.Content.Builder.Editor.Property
 
         private void Drawable_MouseUp(object sender, MouseEventArgs e)
         {
-            if (!_moveSeparator && e.Location.X >= _separatorPos && _selectedCell != null && _selectedCell.Editable && !_skipEdit)
+            if (!_moveSeparator && !_skipClick)
             {
-                var action = new Action(() =>
+                if (_selectedCell != null && _selectedCell.Editable)
                 {
-                    _selectedCell.OnEdit(_pixel1);
-
-                    if (Util.IsGtk && _pixel1.Children.Count() > 1)
+                    if (e.Location.X >= _separatorPos)
                     {
-                        _pixel1.RemoveAll();
-                        _pixel1 = new PixelLayout();
-                        _pixel1.Add(_drawable, 0, 0);
-                        _selectedCell.OnEdit(_pixel1);
-                        Content = _pixel1;
+                        var action = new Action(() =>
+                        {
+                            _selectedCell.OnEdit(_pixel1);
+
+                            if (Util.IsGtk && _pixel1.Children.Count() > 1)
+                            {
+                                _pixel1.RemoveAll();
+                                _pixel1 = new PixelLayout();
+                                _pixel1.Add(_drawable, 0, 0);
+                                _selectedCell.OnEdit(_pixel1);
+                                Content = _pixel1;
+                            }
+
+                            _drawable.Invalidate();
+                        });
+
+    #if WINDOWS
+                        (drawable.ControlObject as System.Windows.Controls.Canvas).Dispatcher.BeginInvoke(action,
+                            System.Windows.Threading.DispatcherPriority.ContextIdle, null);
+    #else
+                        action.Invoke();
+    #endif
                     }
+                    else
+                    {
+                        // TODO: Show description in messagebox?
+                    }
+                }
+                else if (!string.IsNullOrEmpty(_selectedCategory))
+                {
+                    if (_collapsedCategories.Contains(_selectedCategory))
+                        _collapsedCategories.Remove(_selectedCategory);
+                    else
+                        _collapsedCategories.Add(_selectedCategory);
 
                     _drawable.Invalidate();
-                });
-
-#if WINDOWS
-                (drawable.ControlObject as System.Windows.Controls.Canvas).Dispatcher.BeginInvoke(action,
-                    System.Windows.Threading.DispatcherPriority.ContextIdle, null);
-#else
-                action.Invoke();
-#endif
+                }
             }
             else
             {
