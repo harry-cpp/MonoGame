@@ -1,12 +1,81 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<Dialog xmlns="http://schema.picoe.ca/eto.forms" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <StackLayout>
-        <Label>Some Content</Label>
-    </StackLayout>
+<Dialog xmlns="http://schema.picoe.ca/eto.forms"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Color Selector"
+        Width="400"
+        Padding="8"
+        Resizable="False"
+        DefaultButton="{x:Reference _buttonSelect}"
+        AbortButton="{x:Reference _buttonCancel}">
+    <DynamicLayout Spacing="4,4">
+        <DynamicRow>
+            <DynamicControl XScale="False" YScale="True">
+                <GroupBox Text="RGBA" Padding="8">
+                    <DynamicLayout Spacing="4,4">
+                        <DynamicRow>
+                            <DynamicControl XScale="False" YScale="True">
+                                <Label Text="R: " TextAlignment="Left" VerticalAlignment="Center" />
+                            </DynamicControl>
+                            <DynamicControl XScale="True" YScale="True">
+                                <TextBox x:Name="_textBoxRed" Text="255" Width="75" TextChanged="TextBoxRGBA_TextChanged" />
+                            </DynamicControl>
+                        </DynamicRow>
+                        <DynamicRow>
+                            <DynamicControl XScale="False" YScale="True">
+                                <Label Text="G: " TextAlignment="Left" VerticalAlignment="Center" />
+                            </DynamicControl>
+                            <DynamicControl XScale="True" YScale="True">
+                                <TextBox x:Name="_textBoxGreen" Text="255" Width="75" TextChanged="TextBoxRGBA_TextChanged" />
+                            </DynamicControl>
+                        </DynamicRow>
+                        <DynamicRow>
+                            <DynamicControl XScale="False" YScale="True">
+                                <Label Text="B: " TextAlignment="Left" VerticalAlignment="Center" />
+                            </DynamicControl>
+                            <DynamicControl XScale="True" YScale="True">
+                                <TextBox x:Name="_textBoxBlue" Text="255" Width="75" TextChanged="TextBoxRGBA_TextChanged" />
+                            </DynamicControl>
+                        </DynamicRow>
+                        <DynamicRow>
+                            <DynamicControl XScale="False" YScale="True">
+                                <Label Text="A: " TextAlignment="Left" VerticalAlignment="Center" />
+                            </DynamicControl>
+                            <DynamicControl XScale="True" YScale="True">
+                                <TextBox x:Name="_textBoxAlpha" Text="255" Width="75" TextChanged="TextBoxRGBA_TextChanged" />
+                            </DynamicControl>
+                        </DynamicRow>
+                    </DynamicLayout>
+                </GroupBox>
+            </DynamicControl>
+            <DynamicControl XScale="True" YScale="False">
+                <DynamicLayout Spacing="4,4">
+                    <DynamicRow>
+                        <DynamicControl XScale="False" YScale="False">
+                            <GroupBox Text="HEX" Padding="8">
+                                <TextBox x:Name="_textBoxHex" Text="000000FF" Width="100" TextChanged="TextBoxHex_TextChanged" />
+                            </GroupBox>
+                        </DynamicControl>
+                    </DynamicRow>
+                    <DynamicRow>
+                        <DynamicControl XScale="False" YScale="False">
+                            <GroupBox Text="Picker" Padding="8">
+                                <ColorPicker x:Name="_colorPicker" ValueChanged="ColorPicker_ValueChanged" />
+                            </GroupBox>
+                        </DynamicControl>
+                    </DynamicRow>
+                    <DynamicRow>
+                        <DynamicControl XScale="True" YScale="True">
+                            <Label Text="" />
+                        </DynamicControl>
+                    </DynamicRow>
+                </DynamicLayout>
+            </DynamicControl>
+        </DynamicRow>
+    </DynamicLayout>
     <Dialog.PositiveButtons>
-        <Button Text="Ok" />
+        <Button x:Name="_buttonSelect" Text="Select" Click="ButtonSelect_Click" />
     </Dialog.PositiveButtons>
     <Dialog.NegativeButtons>
-        <Button Text="Cancel" />
+        <Button x:Name="_buttonCancel" Text="Cancel" Click="ButtonCancel_Click" />
     </Dialog.NegativeButtons>
 </Dialog>

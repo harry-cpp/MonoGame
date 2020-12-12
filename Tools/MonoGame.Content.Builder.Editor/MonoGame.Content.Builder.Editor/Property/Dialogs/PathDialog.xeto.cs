@@ -11,8 +11,9 @@ namespace MonoGame.Content.Builder.Editor.Property
 {
     public class PathDialog : Dialog<DialogResult>
     {
-        private string _basePath;
         private TextBox _textBoxPath = null;
+
+        private string _basePath;
 
         public PathDialog(string basePath)
         {

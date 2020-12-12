@@ -19,14 +19,15 @@ namespace MonoGame.Content.Builder.Editor.Property
 
         public override Control Edit()
         {
-            var dialog = new ColorDialog();
-            /*dialog.Color = _color;
+            var colorDialog = new ColorDialog();
+            colorDialog.DisplayMode = DialogDisplayMode.Attached;
+            colorDialog.Color = _color;
 
-            if (dialog.Show() == DialogResult.Ok)
+            if (colorDialog.Show() == DialogResult.Ok)
             {
-                _color = dialog.Color;
-                Value = new Microsoft.Xna.Framework.Color(dialog.Color.Rb, dialog.Color.Gb, dialog.Color.Bb, dialog.Color.Ab);
-            }*/
+                _color = colorDialog.Color;
+                Value = new Microsoft.Xna.Framework.Color(_color.Rb, _color.Gb, _color.Bb, _color.Ab);
+            }
 
             return null;
         }
@@ -49,7 +50,7 @@ namespace MonoGame.Content.Builder.Editor.Property
                 color: GetContrastColor(_color),
                 x: rec.X + 5,
                 y: rec.Y + DrawInfo.Spacing / 2,
-                text: " " + _color.ToHex()
+                text: " " + _color.ToHex(false) + _color.Ab.ToString("X2")
             );
 
             return rec.Height;

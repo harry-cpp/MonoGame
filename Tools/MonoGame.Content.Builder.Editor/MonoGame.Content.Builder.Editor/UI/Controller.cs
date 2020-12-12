@@ -22,9 +22,9 @@ namespace MonoGame.Content.Builder.Editor
         private ProjectPad _projectPad;
         private PropertyPad _propertyPad;
         private bool _isProjectDirty;
-        private Dictionary<string, Bitmap> _files;
-        private Bitmap _folder;
-        private Bitmap _link;
+        private Dictionary<string, Image> _files;
+        private Image _folder;
+        private Image _link;
 
         public Controller(IView view)
         {
@@ -32,7 +32,7 @@ namespace MonoGame.Content.Builder.Editor
             _mgcbFileFilter = new FileFilter("MonoGame Content Build Project (*.mgcb)", new[] { ".mgcb" });
             _allFileFilter = new FileFilter("All Files (*.*)", new[] { ".*" });
             _xnaFileFilter = new FileFilter("XNA Content Projects (*.contentproj)", new[] { ".contentproj" });
-            _files = new Dictionary<string, Bitmap>();
+            _files = new Dictionary<string, Image>();
             View = view;
 
             _commands.NewProject.Executed += (o, e) => NewProject();
@@ -41,14 +41,14 @@ namespace MonoGame.Content.Builder.Editor
             _commands.SaveProject.Executed += (o, e) => SaveProject(false);
             _commands.SaveAsProject.Executed += (o, e) => SaveProject(true);
             _commands.CloseProject.Executed += (o, e) => CloseProject();
-
+            
             _projectPad = new ProjectPad(this);
             _propertyPad = new PropertyPad();
 
             view.Attach(this, _projectPad, _propertyPad);
 
-            _folder = view.GetFolderIcon();
-            _link = view.GetLinkIcon();
+            _folder = view.GetFolderIcon().WithSize(16, 16);
+            _link = view.GetLinkIcon().WithSize(16, 16);
 
             UpdateEnabledCommands();
         }
@@ -381,14 +381,15 @@ namespace MonoGame.Content.Builder.Editor
             if (_files.ContainsKey(key))
                 return _files[key];
 
-            var icon = View.GetFileIcon(filePath);
+            Bitmap bitmap = View.GetFileIcon(filePath);
             if (link)
             {
-                var g = new Graphics(icon);
+                var g = new Graphics(bitmap);
                 g.DrawImage(_link, Point.Empty);
                 g.Flush();
             }
 
+            Icon icon = bitmap.WithSize(16, 16);
             if (File.Exists(filePath))
                 _files.Add(key, icon);
 
