@@ -20,13 +20,13 @@ namespace MonoGame.Content.Builder.Editor.Property
         public override Control Edit()
         {
             var dialog = new ColorDialog();
-            dialog.Color = _color;
+            /*dialog.Color = _color;
 
             if (dialog.Show() == DialogResult.Ok)
             {
                 _color = dialog.Color;
                 Value = new Microsoft.Xna.Framework.Color(dialog.Color.Rb, dialog.Color.Gb, dialog.Color.Bb, dialog.Color.Ab);
-            }
+            }*/
 
             return null;
         }

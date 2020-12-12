@@ -8,16 +8,13 @@
         DefaultButton="{x:Reference _buttonSelect}"
         AbortButton="{x:Reference _buttonCancel}">
     <DynamicLayout Spacing="4,4">
-        
         <DynamicRow>
             <DynamicControl XScale="True" YScale="True">
                 <Label>Directory Path:</Label>
             </DynamicControl>
         </DynamicRow>
-        
         <DynamicRow>
             <DynamicControl XScale="True" YScale="True">
-                
                 <DynamicLayout Spacing="4,4">
                     <DynamicRow>
                         <DynamicControl XScale="True" YScale="True">
@@ -28,13 +25,10 @@
                         </DynamicControl>
                     </DynamicRow>
                 </DynamicLayout>
-                
             </DynamicControl>
         </DynamicRow>
-        
         <DynamicRow>
             <DynamicControl XScale="True" YScale="True">
-                
                 <DynamicLayout Spacing="4,4">
                     <DynamicRow>
                         <DynamicControl XScale="True" YScale="True">
@@ -48,10 +42,8 @@
                         </DynamicControl>
                     </DynamicRow>
                 </DynamicLayout>
-                
             </DynamicControl>
         </DynamicRow>
-        
     </DynamicLayout>
     <Dialog.PositiveButtons>
         <Button x:Name="_buttonSelect" Text="Select" Click="ButtonSelect_Click" />
