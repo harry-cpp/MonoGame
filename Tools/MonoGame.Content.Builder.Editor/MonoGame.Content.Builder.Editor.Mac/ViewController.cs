@@ -71,8 +71,7 @@ namespace MonoGame.Content.Builder.Editor.Mac
 
         public Bitmap GetLinkIcon()
         {
-            // TODO
-            return new Bitmap(new BitmapHandler(NSWorkspace.SharedWorkspace.IconForFile("/Library/Apple")));
+            return Bitmap.FromResource("TreeView.Link.png", typeof(IController).Assembly);
         }
 
         public override NSObject RepresentedObject

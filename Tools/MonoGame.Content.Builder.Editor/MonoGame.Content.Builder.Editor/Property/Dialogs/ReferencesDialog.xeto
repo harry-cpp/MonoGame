@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Dialog xmlns="http://schema.picoe.ca/eto.forms"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="References"
+        Padding="8"
+        Resizable="False"
+        DefaultButton="{x:Reference _buttonOk}"
+        AbortButton="{x:Reference _buttonCancel}">
+    <DynamicLayout Spacing="4,4">
+        <DynamicRow>
+            <DynamicControl XScale="True" YScale="True">
+                <TreeGridView x:Name="_treeView" Width="600" Height="400" SelectedItemsChanged="TreeView_SelectedItemsChanged">
+                    <GridColumn HeaderText="Title" Width="180" AutoSize="True" />
+                    <GridColumn HeaderText="Path" Width="400" Editable="True" AutoSize="True" />
+                </TreeGridView>
+            </DynamicControl>
+            <DynamicControl XScale="False" YScale="False">
+                <DynamicLayout Spacing="4,4">
+                    <DynamicRow>
+                        <DynamicControl XScale="False" YScale="False">
+                            <Button x:Name="_buttonAdd" Text="Add" Click="ButtonAdd_Click" />
+                        </DynamicControl>
+                    </DynamicRow>
+                    <DynamicRow>
+                        <DynamicControl XScale="False" YScale="False">
+                            <Button x:Name="_buttonRemove" Text="Remove" Click="ButtonRemove_Click" />
+                        </DynamicControl>
+                    </DynamicRow>
+                    <DynamicRow>
+                        <DynamicControl XScale="True" YScale="True">
+                            <Label />
+                        </DynamicControl>
+                    </DynamicRow>
+                </DynamicLayout>
+            </DynamicControl>
+        </DynamicRow>
+    </DynamicLayout>
+    <Dialog.PositiveButtons>
+        <Button x:Name="_buttonOk" Text="Ok" Click="ButtonOk_Click" />
+    </Dialog.PositiveButtons>
+    <Dialog.NegativeButtons>
+        <Button x:Name="_buttonCancel" Text="Cancel" Click="ButtonCancel_Click" />
+    </Dialog.NegativeButtons>
+</Dialog>

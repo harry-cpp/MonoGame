@@ -112,17 +112,9 @@ namespace MonoGame.Content.Builder.Editor.Project
         public string GetFullPath(string filePath)
         {
             if (_project == null || Path.IsPathRooted(filePath))
-            {
-                if (filePath.Length == 2 && filePath[0] != '/')
-                    filePath += "\\";
                 return filePath;
-            }
 
-            filePath = filePath.Replace("/", Path.DirectorySeparatorChar.ToString());
-            if (filePath.StartsWith("\\"))
-                filePath = filePath.Substring(1);
-
-            return _project.Location + Path.DirectorySeparatorChar + filePath;
+            return Path.Combine(_project.Location, filePath);
         }
 
         public string GetRelativePath(string path)
@@ -130,7 +122,7 @@ namespace MonoGame.Content.Builder.Editor.Project
             if (_project == null)
                 return path;
 
-            var dirUri = new Uri(_project.Location);
+            var dirUri = new Uri(_project.Location.TrimEnd('/', '\\') + "/");
             var fileUri = new Uri(path);
             var relativeUri = dirUri.MakeRelativeUri(fileUri);
 
