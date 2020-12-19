@@ -12,7 +12,6 @@ namespace MonoGame.Content.Builder.Editor.Property
         public override Control Edit()
         {
             var combo = new DropDown();
-
             var values = PipelineTypes.Importers;
             foreach (var v in values)
             {
@@ -22,7 +21,10 @@ namespace MonoGame.Content.Builder.Editor.Property
                     combo.SelectedIndex = combo.Items.Count - 1;
             }
 
-            combo.SelectedIndexChanged += (o, e) => Value = values.GetValue(combo.SelectedIndex);
+            combo.SelectedIndexChanged += (o, e) =>
+            {
+                Value = values.GetValue(combo.SelectedIndex);
+            };
 
             return combo;
         }

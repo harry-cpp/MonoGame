@@ -21,7 +21,6 @@ namespace MonoGame.Content.Builder.Editor.Property
         {
             var textBox = new TextBox();
             textBox.Text = (Value ?? "").ToString();
-
             textBox.Focus();
             textBox.CaretIndex = textBox.Text.Length;
             

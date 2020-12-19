@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Linq;
 using Eto.Drawing;
 using Eto.Forms;
 
@@ -14,14 +15,10 @@ namespace MonoGame.Content.Builder.Editor.Property
         {
             var combo = new DropDown();
 
-            var values = PipelineTypes.Processors;
             Type inputType = null;
-            
-            // Find the input type
             if (ParentObjects.Count > 0 && ParentObjects[0] is ContentItem contentItem && contentItem.Processor != null)
                 inputType = contentItem.Processor.InputType;
 
-            // Load entries to dropdown only if they match the input type
             foreach (var v in PipelineTypes.Processors)
             {
                 if (inputType == null || v.InputType == inputType)
@@ -33,7 +30,13 @@ namespace MonoGame.Content.Builder.Editor.Property
                 }
             }
 
-            combo.SelectedIndexChanged += (o, e) => Value = values.GetValue(combo.SelectedIndex);
+            combo.SelectedIndexChanged += (o, e) =>
+            {
+                if (combo.SelectedValue is string displayName)
+                {
+                    Value = PipelineTypes.Processors.ToList().Find((processor) => processor.DisplayName == displayName);
+                }
+            };
 
             return combo;
         }

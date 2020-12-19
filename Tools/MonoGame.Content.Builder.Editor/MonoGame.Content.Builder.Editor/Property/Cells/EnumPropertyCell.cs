@@ -12,8 +12,8 @@ namespace MonoGame.Content.Builder.Editor.Property
         public override Control Edit()
         {
             var combo = new DropDown();
-
             var values = Enum.GetValues(Value.GetType());
+
             foreach (var value in values)
             {
                 combo.Items.Add(value.ToString());

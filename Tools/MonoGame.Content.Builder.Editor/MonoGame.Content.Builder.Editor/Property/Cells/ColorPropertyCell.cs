@@ -32,22 +32,14 @@ namespace MonoGame.Content.Builder.Editor.Property
             return null;
         }
 
-        private Color GetContrastColor(Color color)
-        {
-            var luminance = 0.299 * color.R + 0.587 * color.G + 0.114 * color.B;
-
-            if (luminance > 0.5)
-                return Colors.Black;
-            else
-                return Colors.White;
-        }
-
         public override int DrawCell(Graphics g, Rectangle rec, string displayValue, bool selected)
         {
+            var luminance = 0.299 * _color.R + 0.587 * _color.G + 0.114 * _color.B;
+
             g.FillRectangle(new Color(_color, 1f), new Rectangle(rec.X + 4, rec.Y + 4, rec.Width - 8, rec.Height - 8));
             g.DrawText(
                 font: DrawInfo.TextFont,
-                color: GetContrastColor(_color),
+                color: (luminance > 0.5) ? Colors.Black : Colors.White,
                 x: rec.X + 5,
                 y: rec.Y + DrawInfo.Spacing / 2,
                 text: " " + _color.ToHex(false) + _color.Ab.ToString("X2")
