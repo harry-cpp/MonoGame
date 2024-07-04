@@ -13,7 +13,7 @@
     <AssemblyTitle>MGCB Editor</AssemblyTitle>
     <MacBundleName>$(AssemblyTitle)</MacBundleName>
     <PublishSingleFile>false</PublishSingleFile>
-    <RuntimeIdentifiers>osx-x64</RuntimeIdentifiers>
+    <RuntimeIdentifiers>osx-x64;osx-arm64</RuntimeIdentifiers>
   </PropertyGroup>
 
   <ItemGroup>

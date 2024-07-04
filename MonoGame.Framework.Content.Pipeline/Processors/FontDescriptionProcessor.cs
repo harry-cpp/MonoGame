@@ -76,7 +76,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                     throw new Exception(string.Format("Could not load {0}", fontFile));
                 }
                 var lineSpacing = 0f;
-                int yOffsetMin = 0;
+                long yOffsetMin = 0;
                 var glyphs = ImportFont(input, out lineSpacing, out yOffsetMin, context, fontFile);
 
                 var glyphData = new HashSet<GlyphData>(glyphs.Select(x => x.Data));
@@ -169,7 +169,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             return output;
         }
 
-        private static Glyph[] ImportFont(FontDescription options, out float lineSpacing, out int yOffsetMin, ContentProcessorContext context, string fontName)
+        private static Glyph[] ImportFont(FontDescription options, out float lineSpacing, out long yOffsetMin, ContentProcessorContext context, string fontName)
         {
             // Which importer knows how to read this source font?
             IFontImporter importer;

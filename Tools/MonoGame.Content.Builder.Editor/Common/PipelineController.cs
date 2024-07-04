@@ -32,6 +32,7 @@ namespace MonoGame.Tools.Pipeline
 #if DEBUG
             Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? "", "../../../MonoGame.Content.Builder/Debug/mgcb.dll"),
             Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? "", "../../../../../../MonoGame.Content.Builder/Debug/mgcb.dll"),
+            "/Users/harry/GitHub/MonoGame/Artifacts/MonoGame.Content.Builder/Debug/mgcb.dll"
 #else
             Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? "", "../../../MonoGame.Content.Builder/Release/mgcb.dll"),
             Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? "", "../../../../../../MonoGame.Content.Builder/Release/mgcb.dll"),
