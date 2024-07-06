@@ -69,8 +69,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
         {
             string ffprobeStdout, ffprobeStderr;
             var ffprobeExitCode = ExternalTool.Run(
-                "ffprobe",
-                string.Format("-i \"{0}\" -show_format -show_entries streams -v quiet -of flat", sourceFile),
+                "dotnet",
+                string.Format("mgcb-ffprobe -i \"{0}\" -show_format -show_entries streams -v quiet -of flat", sourceFile),
                 out ffprobeStdout,
                 out ffprobeStderr);
             if (ffprobeExitCode != 0)
@@ -282,9 +282,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
         {
             string ffmpegStdout, ffmpegStderr;
             var ffmpegExitCode = ExternalTool.Run(
-                "ffmpeg",
+                "dotnet",
                 string.Format(
-                    "-y -i \"{0}\" -vn -c:a pcm_s16le -b:a {2} {3} -f:a wav -strict experimental \"{1}\"",
+                    "mgcb-ffmpeg -y -i \"{0}\" -vn -c:a pcm_s16le -b:a {2} {3} -f:a wav -strict experimental \"{1}\"",
                     content.FileName,
                     saveToFile,
                     bitRate,
@@ -293,7 +293,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                 out ffmpegStdout,
                 out ffmpegStderr);
             if (ffmpegExitCode != 0)
-                throw new InvalidOperationException("ffmpeg exited with non-zero exit code: \n" + ffmpegStdout + "\n" + ffmpegStderr);          
+                throw new InvalidOperationException("mgcb-ffmpeg exited with non-zero exit code: \n" + ffmpegStdout + "\n" + ffmpegStderr);          
         }
 
         public static ConversionQuality ConvertToFormat(AudioContent content, ConversionFormat formatType, ConversionQuality quality, string saveToFile)
@@ -367,9 +367,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                 do
                 {
                     ffmpegExitCode = ExternalTool.Run(
-                        "ffmpeg",
+                        "dotnet",
                         string.Format(
-                            "-y -i \"{0}\" -vn -c:a {1} -b:a {2} -ar {3} -f:a {4} -strict experimental \"{5}\"",
+                            "mgcb-ffmpeg -y -i \"{0}\" -vn -c:a {1} -b:a {2} -ar {3} -f:a {4} -strict experimental \"{5}\"",
                             content.FileName,
                             ffmpegCodecName,
                             QualityToBitRate(quality),
@@ -384,7 +384,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
 
                 if (ffmpegExitCode != 0)
                 {
-                    throw new InvalidOperationException("ffmpeg exited with non-zero exit code: \n" + ffmpegStdout + "\n" + ffmpegStderr);
+                    throw new InvalidOperationException("mgcb-ffmpeg exited with non-zero exit code: \n" + ffmpegStdout + "\n" + ffmpegStderr);
                 }
 
                 byte[] rawData;

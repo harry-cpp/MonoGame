@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "isRoot": true,
+  "tools": {
+    "mgcb-ffmpeg": {
+      "version": "7.0.0.5",
+      "commands": [
+        "mgcb-ffmpeg"
+      ],
+      "rollForward": false
+    },
+    "mgcb-ffprobe": {
+      "version": "7.0.0.5",
+      "commands": [
+        "mgcb-ffprobe"
+      ],
+      "rollForward": false
+    }
+  }
+}

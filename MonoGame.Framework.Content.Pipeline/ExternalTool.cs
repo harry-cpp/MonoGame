@@ -29,6 +29,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
         public static int Run(string command, string arguments, out string stdout, out string stderr, string stdin = null)
         {
+            Console.WriteLine($"Starting process: {command} {arguments}");
+
             // This particular case is likely to be the most common and thus
             // warrants its own specific error message rather than falling
             // back to a general exception from Process.Start()

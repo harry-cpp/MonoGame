@@ -24,6 +24,7 @@
             "args": [
                 "/@:/Users/harry/Projects/ContentTest/Untitled.mgcb", "/rebuild"
             ],
+            "cwd": "/Users/harry/Projects/ContentTest/",
             "console": "internalConsole",
             "stopAtEntry": false
         }
