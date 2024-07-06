@@ -3,14 +3,14 @@
   "isRoot": true,
   "tools": {
     "mgcb-ffmpeg": {
-      "version": "7.0.0.5",
+      "version": "7.0.0.6",
       "commands": [
         "mgcb-ffmpeg"
       ],
       "rollForward": false
     },
     "mgcb-ffprobe": {
-      "version": "7.0.0.5",
+      "version": "7.0.0.6",
       "commands": [
         "mgcb-ffprobe"
       ],
