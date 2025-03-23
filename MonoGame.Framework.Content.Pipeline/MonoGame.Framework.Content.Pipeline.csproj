@@ -15,6 +15,8 @@
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
     <DefineConstants>STBSHARP_INTERNAL</DefineConstants>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
@@ -72,12 +74,12 @@
   <ItemGroup>
     <PackageReference Include="AssimpNetter" Version="5.4.3" />
     <PackageReference Include="BCnEncoder.Net" Version="2.1.0" />
-    <PackageReference Include="Microsoft.NETCore.App" Version="2.1.30" />
     <PackageReference Include="MonoGame.Library.FreeImage" Version="3.18.0.3" />
     <PackageReference Include="MonoGame.Library.FreeType" Version="2.13.2.2" />
     <PackageReference Include="SharpDX" Version="4.0.1" />
     <PackageReference Include="SharpDX.D3DCompiler" Version="4.0.1" />
     <PackageReference Include="LibKTX" Version="0.9.2" />
+    <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(CopyContentFiles)' == 'True'">

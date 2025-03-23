@@ -4,6 +4,7 @@
 
 using System;
 using System.IO;
+using System.Net.Http;
 using MonoGame.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework
@@ -15,13 +16,38 @@ namespace Microsoft.Xna.Framework
     {
         static partial void PlatformInit();
 
-        static TitleContainer() 
+        static TitleContainer()
         {
             Location = string.Empty;
             PlatformInit();
         }
 
         static internal string Location { get; private set; }
+
+        static bool PrepareContent(string filePath)
+        {
+            try
+            {
+                var relativePath = Path.GetRelativePath("Content", filePath); // TODO: Grab ContentManager root info!
+                var dirPath = Path.GetDirectoryName(filePath) ?? "";
+
+                if(!Directory.Exists(dirPath))
+                    Directory.CreateDirectory(dirPath);
+
+                using HttpClient client = new();
+                client.DefaultRequestHeaders.Add("Path", relativePath);
+
+                using var stream = client.GetStreamAsync("http://localhost:8006/").Result;
+                using var fileStream = File.Create(filePath);
+                stream.CopyTo(fileStream);
+
+                return true;
+            }
+            catch
+            { }
+
+            return false;
+        }
 
         /// <summary>
         /// Returns an open stream to an existing file in the title storage area.
@@ -38,6 +64,11 @@ namespace Microsoft.Xna.Framework
             // We do not accept absolute paths here.
             if (Path.IsPathRooted(name))
                 throw new ArgumentException("Invalid filename. TitleContainer.OpenStream requires a relative path.", name);
+
+            if (!File.Exists(name) && !PrepareContent(name))
+            {
+                throw new ArgumentNullException("Could not prepare content: " + name);
+            }
 
             // Normalize the file path.
             var safeName = NormalizeRelativePath(name);
@@ -78,7 +109,7 @@ namespace Microsoft.Xna.Framework
             try
             {
                 stream = PlatformOpenStream(safeName);
-                
+
                 return stream;
             }
             catch (Exception ex)
