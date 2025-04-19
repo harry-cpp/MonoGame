@@ -21,6 +21,8 @@ public abstract class ContentBuilder
     /// <value><see cref="ContentBuildLogger"/> by default.</value>
     public ContentBuildLogger Logger { get; set; } = new ContentBuildLogger();
 
+    public virtual IContentCache ContentCache { get; init; } = new ContentCache();
+
     public abstract IContentCollection CollectContent(ContentBuilderParams args);
 
     // for server!
@@ -28,7 +30,6 @@ public abstract class ContentBuilder
     // public virtual bool CheckNeedsRecollect(pass file watcher changes) => false;
 
     // will have a default implementation, but there are moments where you want to override the default implementation
-    public virtual bool CheckNeedsRebuild(string filePath) => throw new NotImplementedException();
 
     public void ProcessContent(string relativePath, ContentInfo contentInfo)
     {
@@ -63,17 +64,27 @@ public abstract class ContentBuilder
 
         if (!contentInfo.ShouldBuild)
         {
-            Logger.Log($"Copy: {relativePath}");
-            Logger.Log($"Destination: {relativeDestPath}");
+            Logger.Log($"Output: {relativeDestPath}");
+            if (ContentCache.ReadContentFileCache(relativePath)?.IsValid(this) ?? false)
+            {
+                Logger.Log($"Cache: Found");
+                return;
+            }
+            Logger.Log($"Cache: Not Found");
+
             if (File.Exists(outputPath))
             {
                 File.Delete(outputPath);
             }
             File.Copy(filePath, outputPath);
+
+            var copiedFileCache = new ContentFileCache();
+            copiedFileCache.AddDependency(this, relativePath);
+            copiedFileCache.AddOutputFile(this, outputPath);
+            ContentCache.WriteContentFileCache(relativePath, copiedFileCache);
             return;
         }
 
-        Logger.Log($"Building: {relativePath}");
         if (!ContentBuilderHelper.GetImporter(relativePath, contentInfo.Importer, out IContentImporter importer))
         {
             Logger.Log(LogLevel.Warning, "Importer: Not found :(");
@@ -86,24 +97,46 @@ public abstract class ContentBuilder
             return;
         }
         Logger.Log($"Processor: {processor.GetType().Name}");
-
         Logger.Log($"Output: {relativeDestPath}");
 
-        var importContext = new ContentBuilderImporterContext(this);
+        var contentFileCache = ContentCache.ReadContentFileCache(relativePath);
+        if (contentFileCache?.IsValid(this, true, importer, processor) ?? false)
+        {
+            Logger.Log($"Cache: Found");
+            return;
+        }
+        Logger.Log($"Cache: Not Found");
+
+        contentFileCache = new ContentFileCache
+        {
+            CompressContent = Parameters.CompressContent,
+            GraphicsProfile = Parameters.GraphicsProfile,
+            ShouldBuild = true,
+            Importer = importer,
+            Processor = processor
+        };
+        contentFileCache.AddDependency(this, relativePath);
+        contentFileCache.AddOutputFile(this, outputPath);
+
+        var importContext = new ContentBuilderImporterContext(this, contentFileCache);
         var importedObject = importer.Import(filePath, importContext);
 
-        var processorContext = new ContentBuilderProcessorContext(this, outputPath);
+        var processorContext = new ContentBuilderProcessorContext(this, contentFileCache, outputPath);
         var processedObject = processor.Process(importedObject, processorContext);
 
         var compiler = new ContentCompiler();
         using var stream = new FileStream(outputPath, FileMode.Create, FileAccess.Write, FileShare.None);
         compiler.Compile(stream, processedObject, Parameters.Platform, Parameters.GraphicsProfile, Parameters.CompressContent, Parameters.RootedOutputDirectory, outputDir);
+
+        ContentCache.WriteContentFileCache(relativePath, contentFileCache);
     }
 
     public void Run(ContentBuilderParams parameters)
     {
         Parameters = parameters;
         Directory.SetCurrentDirectory(Parameters.WorkingDirectory);
+        
+        ContentCache.LoadCache(this);
         IContentCollection contentCollection = CollectContent(Parameters);
         ScanFiles(contentCollection, Parameters.RootedSourceDirectory);
 
@@ -141,7 +174,6 @@ public abstract class ContentBuilder
 
     private void RunBuild()
     {
-
         foreach (var pair in _content)
         {
             if (_content.TryGetValue(pair.Key, out ContentInfo? contentInfo))
@@ -149,10 +181,17 @@ public abstract class ContentBuilder
                 ProcessContent(pair.Key, contentInfo);
             }
         }
+        
+        ContentCache.FlushCache(this);
     }
 
     private void RunServer()
     {
+        Console.CancelKeyPress += delegate
+        {
+            ContentCache.FlushCache(this);
+        };
+
         Console.WriteLine($"Starting server on: http://localhost:{Parameters.ServerPort}/");
         while (true)
         {

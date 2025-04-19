@@ -6,9 +6,11 @@ using Microsoft.Xna.Framework.Content.Pipeline;
 
 namespace MonoGame.Framework.Content.Pipeline.Builder;
 
-class ContentBuilderImporterContext(ContentBuilder builder) : ContentImporterContext
+class ContentBuilderImporterContext(ContentBuilder builder, ContentFileCache contentFileCache) : ContentImporterContext
 {
-    private ContentBuilder _builder = builder;
+    private readonly ContentBuilder _builder = builder;
+
+    private readonly ContentFileCache _contentFileCache = contentFileCache;
 
     public override string IntermediateDirectory => _builder.Parameters.RootedIntermediateDirectory;
 
@@ -16,5 +18,5 @@ class ContentBuilderImporterContext(ContentBuilder builder) : ContentImporterCon
 
     public override string OutputDirectory => _builder.Parameters.RootedOutputDirectory;
 
-    public override void AddDependency(string filename) { }
+    public override void AddDependency(string filename) => _contentFileCache.AddDependency(_builder, filename);
 }

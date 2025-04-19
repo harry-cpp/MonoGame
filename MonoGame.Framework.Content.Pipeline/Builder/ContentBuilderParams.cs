@@ -161,7 +161,7 @@ public record ContentBuilderParams
     /// <summary>
     /// Gets the rooted location of <see cref="OutputDirectory"/>.
     /// </summary>
-    public string RootedOutputDirectory => Path.Combine(WorkingDirectory, OutputDirectory);
+    public string RootedOutputDirectory => Path.Combine(WorkingDirectory, OutputDirectory, Platform.ToString());
 
     /// <summary>
     /// Gets or sets the location for the intermediate files for content build relative to the <see cref="WorkingDirectory"/>.
@@ -172,7 +172,7 @@ public record ContentBuilderParams
     /// <summary>
     /// Gets the rooted location of <see cref="IntermediateDirectory"/>.
     /// </summary>
-    public string RootedIntermediateDirectory => Path.Combine(WorkingDirectory, IntermediateDirectory);
+    public string RootedIntermediateDirectory => Path.Combine(WorkingDirectory, IntermediateDirectory, Platform.ToString());
 
     /// <summary>
     /// Gets or sets the desired platform for <see cref="ContentBuilder"/> to build the content for.

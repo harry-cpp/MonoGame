@@ -7,9 +7,11 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace MonoGame.Framework.Content.Pipeline.Builder;
 
-class ContentBuilderProcessorContext(ContentBuilder builder, string outputFilename) : ContentProcessorContext
+class ContentBuilderProcessorContext(ContentBuilder builder, ContentFileCache contentFileCache, string outputFilename) : ContentProcessorContext
 {
     private readonly ContentBuilder _builder = builder;
+
+    private readonly ContentFileCache _contentFileCache = contentFileCache;
 
     public override string BuildConfiguration { get; } = "";
 
@@ -29,10 +31,11 @@ class ContentBuilderProcessorContext(ContentBuilder builder, string outputFilena
 
     public override GraphicsProfile TargetProfile => _builder.Parameters.GraphicsProfile;
 
-    public override void AddDependency(string filename) { }
+    public override void AddDependency(string filename) => _contentFileCache.AddDependency(_builder, filename);
 
-    public override void AddOutputFile(string filename) { }
+    public override void AddOutputFile(string filename) => _contentFileCache.AddOutputFile(_builder, filename);
 
+    // TODO: Implement these!
     public override TOutput BuildAndLoadAsset<TInput, TOutput>(ExternalReference<TInput> sourceAsset, string processorName, OpaqueDataDictionary processorParameters, string importerName)
     {
         throw new NotImplementedException();

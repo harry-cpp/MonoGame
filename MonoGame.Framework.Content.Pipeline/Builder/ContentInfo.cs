@@ -15,7 +15,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder;
 /// <param name="outputPath">The desired output path to be setup based on the input path to the content.</param>
 public class ContentInfo(bool shouldBuild = true, IContentImporter? importer = null, IContentProcessor? processor = null, Func<string, string>? outputPath = null)
 {
-    private Func<string, string> _outputPath = outputPath ?? (shouldBuild ? GetDefaultOutputPath : GetDefaultCopyPath);
+    private readonly Func<string, string> _outputPath = outputPath ?? (shouldBuild ? GetDefaultOutputPath : GetDefaultCopyPath);
 
     /// <summary>
     /// <c>true</c> if the content should be built, <c>false</c> if the content should be copied.
