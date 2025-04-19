@@ -135,9 +135,9 @@ public abstract class ContentBuilder
     {
         Parameters = parameters;
         Directory.SetCurrentDirectory(Parameters.WorkingDirectory);
-        
+
         ContentCache.LoadCache(this);
-        IContentCollection contentCollection = CollectContent(Parameters);
+        var contentCollection = CollectContent(Parameters);
         ScanFiles(contentCollection, Parameters.RootedSourceDirectory);
 
         switch (Parameters.Mode)
@@ -181,7 +181,7 @@ public abstract class ContentBuilder
                 ProcessContent(pair.Key, contentInfo);
             }
         }
-        
+
         ContentCache.FlushCache(this);
     }
 
