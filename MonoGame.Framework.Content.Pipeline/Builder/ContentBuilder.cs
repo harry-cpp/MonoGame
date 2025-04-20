@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System.Net;
+using System.Reflection;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler;
 
@@ -12,6 +13,8 @@ public abstract class ContentBuilder
 {
     private readonly Dictionary<string, ContentInfo> _content = [];
     private readonly Dictionary<string, string> _outputContent = [];
+    private uint _succeededToBuild = 0;
+    private uint _failedToBuild = 0;
 
     public ContentBuilderParams Parameters { get; set; } = new ContentBuilderParams();
 
@@ -38,10 +41,12 @@ public abstract class ContentBuilder
         try
         {
             contentFileCache = ProcessContent(relativePath, contentInfo, true).contentFileCache;
+            _succeededToBuild++;
         }
         catch (Exception ex)
         {
             Logger.Log(LogLevel.Error, $"Countent failed to build:\n{ex}");
+            _failedToBuild++;
         }
         Logger.PopFile();
         return contentFileCache;
@@ -52,11 +57,14 @@ public abstract class ContentBuilder
         Logger.PushFile(relativePath);
         try
         {
-            return ProcessContent(relativePath, contentInfo, false);
+            var content = ProcessContent(relativePath, contentInfo, false);
+            _succeededToBuild++;
+            return content;
         }
         catch (Exception ex)
         {
             Logger.Log(LogLevel.Error, $"Countent failed to build:\n{ex}");
+            _failedToBuild++;
         }
         Logger.PopFile();
         return (null, null);
@@ -159,6 +167,16 @@ public abstract class ContentBuilder
         Parameters = parameters;
         Directory.SetCurrentDirectory(Parameters.WorkingDirectory);
 
+        Logger.IndentCharacter = ' ';
+        Logger.IndentCharacterSize = 2;
+
+        Logger.PushFile("Starting Content Builder");
+        foreach (var prop in parameters.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
+        {
+            Logger.Log($"{prop.Name}: {prop.GetValue(parameters)}");
+        }
+        Logger.PopFile();
+
         ContentCache.LoadCache(this);
         var contentCollection = CollectContent(Parameters);
         ScanFiles(contentCollection, Parameters.RootedSourceDirectory);
@@ -210,6 +228,10 @@ public abstract class ContentBuilder
             ContentCache.CleanCache(this);
         }
         ContentCache.FlushCache(this);
+
+        Logger.PushFile("Content Builder Finished");
+        Logger.Log($"{_succeededToBuild} succeeded, {_failedToBuild} failed");
+        Logger.PopFile();
     }
 
     private void RunServer()

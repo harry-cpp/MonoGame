@@ -136,7 +136,7 @@ public record ContentBuilderParams
     }
 
     /// <summary>
-    /// Set the mode in which the content builder is run. See <see cref="ContentBuilderMode"/> for available modes.
+    /// Set the mode in which the content builder is run in. See <see cref="ContentBuilderMode"/> for available modes.
     /// </summary>
     /// <value><see cref="ContentBuilderMode.None"/> by default.</value>
     public ContentBuilderMode Mode { get; init; } = ContentBuilderMode.None;

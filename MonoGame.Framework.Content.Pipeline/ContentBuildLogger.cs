@@ -2,6 +2,8 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System.Diagnostics;
+
 namespace Microsoft.Xna.Framework.Content.Pipeline;
 
 /// <summary>
@@ -15,6 +17,7 @@ public class ContentBuildLogger
     private string _indentString;
     private char _indentCharacter;
     private bool _recreateIndentString;
+    private readonly Stopwatch _stopWatch;
 
     /// <summary>
     /// Initializes a new instance of ContentBuildLogger.
@@ -25,6 +28,8 @@ public class ContentBuildLogger
         _indentCount = 0;
         _indentString = " ";
         _recreateIndentString = false;
+        _stopWatch = new();
+        _stopWatch.Start();
 
         IndentCharacter = '\t';
         IndentCharacterSize = 1;
@@ -101,9 +106,9 @@ public class ContentBuildLogger
             _ => ConsoleColor.Gray
         };
 
-        foreach (var subMessage in message.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries))
+        foreach (var subMessage in message.Split(['\r', '\n'], StringSplitOptions.None))
         {
-            Console.WriteLine($"[{level.ToString()[0]}] {IndentString}{subMessage}");
+            Console.WriteLine($"{_stopWatch.Elapsed:hh\\:mm\\:ss\\.fff} [{level.ToString()[0]}]: {IndentString}{subMessage}");
         }
 
         Console.ForegroundColor = ConsoleColor.Gray;
