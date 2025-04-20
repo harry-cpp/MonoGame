@@ -33,7 +33,7 @@ class ContentBuilderProcessorContext(ContentBuilder builder, ContentFileCache co
 
     public override void AddDependency(string filename) => _contentFileCache.AddDependency(_builder, filename);
 
-    public override void AddOutputFile(string filename) => _contentFileCache.AddOutputFile(_builder, filename);
+    public override void AddOutputFile(string filename) => _contentFileCache.AddOutput(_builder, filename);
 
     // TODO: Implement these!
     public override TOutput BuildAndLoadAsset<TInput, TOutput>(ExternalReference<TInput> sourceAsset, string processorName, OpaqueDataDictionary processorParameters, string importerName)

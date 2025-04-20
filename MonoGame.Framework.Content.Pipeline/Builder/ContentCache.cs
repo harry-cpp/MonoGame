@@ -8,30 +8,95 @@ namespace MonoGame.Framework.Content.Pipeline.Builder;
 
 class ContentCache : IContentCache
 {
-    const string CacheFileName = "cache.yaml";
+    private const string CacheFileName = "cache.yaml";
 
     private Dictionary<string, ContentFileCache> _cache = [];
+    private readonly HashSet<string> _unusedDependencies = [];
+    private readonly HashSet<string> _unusedOutputs = [];
 
     public void LoadCache(ContentBuilder builder)
     {
+        _cache.Clear();
+        _unusedDependencies.Clear();
+        _unusedOutputs.Clear();
+
         var cacheFilePath = Path.Combine(builder.Parameters.RootedIntermediateDirectory, CacheFileName);
+        if (!File.Exists(cacheFilePath))
+        {
+            return;
+        }
+
         try
         {
-            if (File.Exists(cacheFilePath))
-            {
-                var text = File.ReadAllText(cacheFilePath);
-                _cache = ContentBuilderHelper.Deserializer.Deserialize<Dictionary<string, ContentFileCache>>(text) ?? [];
-            }
+            var text = File.ReadAllText(cacheFilePath);
+            _cache = ContentBuilderHelper.Deserializer.Deserialize<Dictionary<string, ContentFileCache>>(text) ?? [];
         }
-        catch
+        catch (Exception ex)
         {
             builder.Logger.Log(LogLevel.Error, "Failed to load the Cache!");
+            builder.Logger.Log(LogLevel.Error, ex.ToString());
+        }
+
+        foreach (var (_, fileCache) in _cache)
+        {
+            foreach (var (depFile, _) in fileCache.Dependencies)
+            {
+                _unusedDependencies.Add(depFile);
+            }
+
+            foreach (var output in fileCache.Outputs)
+            {
+                _unusedOutputs.Add(output);
+            }
         }
     }
 
-    public ContentFileCache? ReadContentFileCache(string relativePath) => _cache.TryGetValue(relativePath, out ContentFileCache? fileCache) ? fileCache : null;
+    public ContentFileCache? ReadContentFileCache(ContentBuilder builder, string relativePath, bool shouldBuild = false, IContentImporter? importer = null, IContentProcessor? processor = null)
+    {
+        if (!_cache.TryGetValue(relativePath, out ContentFileCache? fileCache))
+        {
+            return null;
+        }
 
-    public void WriteContentFileCache(string relativePath, ContentFileCache fileCache) => _cache[relativePath] = fileCache;
+        if (builder.Parameters.GraphicsProfile != fileCache.GraphicsProfile ||
+            builder.Parameters.CompressContent != fileCache.CompressContent ||
+            shouldBuild != fileCache.ShouldBuild ||
+            !ContentBuilderHelper.ArePropsEqual(fileCache.Importer, importer) ||
+            !ContentBuilderHelper.ArePropsEqual(fileCache.Processor, processor))
+        {
+            return null;
+        }
+
+        foreach (var (dependencyFile, cachedModifiedTime) in fileCache.Dependencies)
+        {
+            var dependencyFullPath = Path.Combine(builder.Parameters.RootedSourceDirectory, dependencyFile);
+            var modifiedTime = File.GetLastWriteTimeUtc(dependencyFullPath);
+
+            if (modifiedTime != cachedModifiedTime)
+            {
+                return null;
+            }
+        }
+
+        foreach (var outputPath in fileCache.Outputs)
+        {
+            var fullOutputPath = Path.Combine(builder.Parameters.RootedOutputDirectory, outputPath);
+
+            if (!File.Exists(fullOutputPath))
+            {
+                return null;
+            }
+        }
+
+        MarkUsed(fileCache);
+        return fileCache;
+    }
+
+    public void WriteContentFileCache(ContentBuilder builder, string relativePath, ContentFileCache fileCache)
+    {
+        _cache[relativePath] = fileCache;
+        MarkUsed(fileCache);
+    }
 
     public void FlushCache(ContentBuilder builder)
     {
@@ -49,5 +114,52 @@ class ContentCache : IContentCache
 
         var text = ContentBuilderHelper.Serializer.Serialize(_cache);
         File.WriteAllText(cacheFilePath, text);
+    }
+
+    private void MarkUsed(ContentFileCache fileCache)
+    {
+        foreach (var (depFile, _) in fileCache.Dependencies)
+        {
+            _unusedDependencies.Remove(depFile);
+        }
+
+        foreach (var output in fileCache.Outputs)
+        {
+            _unusedOutputs.Remove(output);
+        }
+    }
+
+    public void CleanCache(ContentBuilder builder)
+    {
+        foreach (var depFile in _unusedDependencies)
+        {
+            _cache.Remove(depFile);
+        }
+
+        foreach (var (_, fileCache) in _cache)
+        {
+            foreach (var depFile in _unusedDependencies)
+            {
+                fileCache.RemoveDependency(builder, depFile);
+            }
+
+            foreach (var outputFile in _unusedOutputs)
+            {
+                fileCache.RemoveOutput(builder, outputFile);
+            }
+        }
+
+        foreach (var outputFile in _unusedOutputs)
+        {
+            var outputFilePath = Path.Combine(builder.Parameters.RootedOutputDirectory, outputFile);
+            if (File.Exists(outputFilePath))
+            {
+                builder.Logger.Log("Deleting: " + outputFile);
+                File.Delete(outputFilePath);
+            }
+        }
+
+        _unusedDependencies.Clear();
+        _unusedOutputs.Clear();
     }
 }

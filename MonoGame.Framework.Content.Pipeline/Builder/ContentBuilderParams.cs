@@ -108,9 +108,15 @@ public record ContentBuilderParams
         var rootOptions = new GlobalBuilderOptions(rootCommand);
 
         var buildCommand = new Command("build", "Build all the content.");
+        var skipCleanOption = new Option<bool>(
+                name: "--skip-clean",
+                description: "Should the builder skip cleaning up old content cache data after the build is finished.",
+                getDefaultValue: () => defaultValues.SkipClean);
+        buildCommand.AddOption(skipCleanOption);
         buildCommand.SetHandler(
-            (contentBuilder) => ret = contentBuilder with { Mode = ContentBuilderMode.Builder },
-            rootOptions);
+            (contentBuilder, skipCleanOption) => ret = contentBuilder with { Mode = ContentBuilderMode.Builder, SkipClean = skipCleanOption },
+            rootOptions,
+            skipCleanOption);
         rootCommand.AddCommand(buildCommand);
 
         var serverCommand = new Command("server", "Start a content server.");
@@ -144,7 +150,7 @@ public record ContentBuilderParams
     /// <summary>
     /// Gets or sets the location of the content relative to the <see cref="WorkingDirectory"/>.
     /// </summary>
-    /// <value>"Content" by default.</value>
+    /// <value><c>Content</c> by default.</value>
     public string SourceDirectory { get; init; } = "Content";
 
     /// <summary>
@@ -155,7 +161,7 @@ public record ContentBuilderParams
     /// <summary>
     /// Gets or sets the location for the content output relative to the <see cref="WorkingDirectory"/>.
     /// </summary>
-    /// <value>"bin/Content" by default.</value>
+    /// <value><c>bin/Content</c> by default.</value>
     public string OutputDirectory { get; init; } = "bin/Content";
 
     /// <summary>
@@ -166,7 +172,7 @@ public record ContentBuilderParams
     /// <summary>
     /// Gets or sets the location for the intermediate files for content build relative to the <see cref="WorkingDirectory"/>.
     /// </summary>
-    /// <value>"obj/Content" by default.</value>
+    /// <value><c>obj/Content</c> by default.</value>
     public string IntermediateDirectory { get; init; } = "obj/Content";
 
     /// <summary>
@@ -189,7 +195,7 @@ public record ContentBuilderParams
     /// <summary>
     /// Gets or sets if <see cref="ContentBuilder"/> should compress each built content file.
     /// </summary>
-    /// <value>false by default.</value>
+    /// <value><c>false</c> by default.</value>
     public bool CompressContent { get; init; } = false;
 
     /// <summary>
@@ -203,4 +209,10 @@ public record ContentBuilderParams
     /// </summary>
     /// <value>8006 by default.</value>
     public ushort ServerPort { get; init; } = 8006;
+
+    /// <summary>
+    /// Should the content builder skip cleaning up old content cache data after the build is finished in <see cref="ContentBuilderMode.Builder"/> mode.
+    /// </summary>
+    /// <value><c>false</c> by default.</value>
+    public bool SkipClean { get; init; } = false;
 }

@@ -65,7 +65,7 @@ public abstract class ContentBuilder
         if (!contentInfo.ShouldBuild)
         {
             Logger.Log($"Output: {relativeDestPath}");
-            if (ContentCache.ReadContentFileCache(relativePath)?.IsValid(this) ?? false)
+            if (ContentCache.ReadContentFileCache(this, relativePath) != null)
             {
                 Logger.Log($"Cache: Found");
                 return;
@@ -80,8 +80,8 @@ public abstract class ContentBuilder
 
             var copiedFileCache = new ContentFileCache();
             copiedFileCache.AddDependency(this, relativePath);
-            copiedFileCache.AddOutputFile(this, outputPath);
-            ContentCache.WriteContentFileCache(relativePath, copiedFileCache);
+            copiedFileCache.AddOutput(this, outputPath);
+            ContentCache.WriteContentFileCache(this, relativePath, copiedFileCache);
             return;
         }
 
@@ -99,15 +99,14 @@ public abstract class ContentBuilder
         Logger.Log($"Processor: {processor.GetType().Name}");
         Logger.Log($"Output: {relativeDestPath}");
 
-        var contentFileCache = ContentCache.ReadContentFileCache(relativePath);
-        if (contentFileCache?.IsValid(this, true, importer, processor) ?? false)
+        if (ContentCache.ReadContentFileCache(this, relativePath, true, importer, processor) != null)
         {
             Logger.Log($"Cache: Found");
             return;
         }
         Logger.Log($"Cache: Not Found");
 
-        contentFileCache = new ContentFileCache
+        var contentFileCache = new ContentFileCache
         {
             CompressContent = Parameters.CompressContent,
             GraphicsProfile = Parameters.GraphicsProfile,
@@ -116,7 +115,7 @@ public abstract class ContentBuilder
             Processor = processor
         };
         contentFileCache.AddDependency(this, relativePath);
-        contentFileCache.AddOutputFile(this, outputPath);
+        contentFileCache.AddOutput(this, outputPath);
 
         var importContext = new ContentBuilderImporterContext(this, contentFileCache);
         var importedObject = importer.Import(filePath, importContext);
@@ -128,7 +127,7 @@ public abstract class ContentBuilder
         using var stream = new FileStream(outputPath, FileMode.Create, FileAccess.Write, FileShare.None);
         compiler.Compile(stream, processedObject, Parameters.Platform, Parameters.GraphicsProfile, Parameters.CompressContent, Parameters.RootedOutputDirectory, outputDir);
 
-        ContentCache.WriteContentFileCache(relativePath, contentFileCache);
+        ContentCache.WriteContentFileCache(this, relativePath, contentFileCache);
     }
 
     public void Run(ContentBuilderParams parameters)
@@ -182,6 +181,10 @@ public abstract class ContentBuilder
             }
         }
 
+        if (!Parameters.SkipClean)
+        {
+            ContentCache.CleanCache(this);
+        }
         ContentCache.FlushCache(this);
     }
 
@@ -189,6 +192,7 @@ public abstract class ContentBuilder
     {
         Console.CancelKeyPress += delegate
         {
+            // We don't want to call CleanCache in server mode as we don't go through all the files!
             ContentCache.FlushCache(this);
         };
 

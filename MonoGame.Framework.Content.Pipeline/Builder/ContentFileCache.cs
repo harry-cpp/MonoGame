@@ -38,15 +38,15 @@ public record ContentFileCache
     /// A dictionary of keys of dependency files that either the <see cref="IContentImporter"/> or <see cref="IContentProcessor"/> included
     /// and values of the last modified times for those files.
     /// </summary>
-    public Dictionary<string, DateTime> DependencyFiles { get; init; } = [];
+    public Dictionary<string, DateTime> Dependencies { get; init; } = [];
 
     /// <summary>
-    /// A list of output files that the <see cref="IContentProcessor"/> included.
+    /// A hashset of output files that the <see cref="IContentProcessor"/> included.
     /// </summary>
-    public List<string> OutputFiles { get; init; } = [];
+    public HashSet<string> Outputs { get; init; } = [];
 
     /// <summary>
-    /// Adds the specified file as a dependency for the current content.
+    /// Adds the specified file as a dependency related to the current content file.
     /// </summary>
     /// <param name="builder">A <see cref="ContentBuilder"/> the added depedency is related to.</param>
     /// <param name="dependencyPath">A relative or absolute path to the dependency file.</param>
@@ -72,7 +72,20 @@ public record ContentFileCache
         }
 
         var lastModifiedTime = File.GetLastWriteTimeUtc(fullDependencyPath);
-        DependencyFiles[relativeDependencyPath] = lastModifiedTime;
+        Dependencies[relativeDependencyPath] = lastModifiedTime;
+    }
+
+    /// <summary>
+    /// Removes the specified file as a dependency related to the current content file.
+    /// </summary>
+    /// <param name="builder">A <see cref="ContentBuilder"/> the added depedency is related to.</param>
+    /// <param name="dependencyPath">A relative or absolute path to the dependency file.</param>
+    public void RemoveDependency(ContentBuilder builder, string dependencyPath)
+    {
+        string relativeDependencyPath = Path.IsPathRooted(dependencyPath) ?
+            Path.GetRelativePath(builder.Parameters.RootedSourceDirectory, dependencyPath) :
+            dependencyPath;
+        Dependencies.Remove(relativeDependencyPath);
     }
 
     /// <summary>
@@ -80,52 +93,24 @@ public record ContentFileCache
     /// </summary>
     /// <param name="builder">A <see cref="ContentBuilder"/> the output file is related to.</param>
     /// <param name="outputPath">A relative or absolute path to the output file.</param>
-    public void AddOutputFile(ContentBuilder builder, string outputPath)
+    public void AddOutput(ContentBuilder builder, string outputPath)
     {
-        var relativeOutputFile = Path.IsPathRooted(outputPath) ? Path.GetRelativePath(builder.Parameters.RootedOutputDirectory, outputPath) : outputPath;
-        OutputFiles.Add(relativeOutputFile);
+        var relativeOutputFile = Path.IsPathRooted(outputPath) ?
+            Path.GetRelativePath(builder.Parameters.RootedOutputDirectory, outputPath) :
+            outputPath;
+        Outputs.Add(relativeOutputFile);
     }
 
     /// <summary>
-    /// Returns if the passed parameters match the current set of information about the content file.
+    /// Removes the specified file as an output related to the current content file.
     /// </summary>
-    /// <param name="builder">A <see cref="ContentBuilder"/> that is compiling the contento.</param>
-    /// <param name="shouldBuild">If the content file will be built or copied.</param>
-    /// <param name="importer">An <see cref="IContentImporter"/> the content file will be passed through.</param>
-    /// <param name="processor">An <see cref="IContentProcessor"/> the content file will be passed through.</param>
-    /// <returns></returns>
-    public bool IsValid(ContentBuilder builder, bool shouldBuild = false, IContentImporter? importer = null, IContentProcessor? processor = null)
+    /// <param name="builder">A <see cref="ContentBuilder"/> the output file is related to.</param>
+    /// <param name="outputPath">A relative or absolute path to the output file.</param>
+    public void RemoveOutput(ContentBuilder builder, string outputPath)
     {
-        if (builder.Parameters.GraphicsProfile != GraphicsProfile ||
-            builder.Parameters.CompressContent != CompressContent ||
-            shouldBuild != ShouldBuild ||
-            !ContentBuilderHelper.ArePropsEqual(Importer, importer) ||
-            !ContentBuilderHelper.ArePropsEqual(Processor, processor))
-        {
-            return false;
-        }
-
-        foreach (var dependency in DependencyFiles)
-        {
-            var dependencyFullPath = Path.Combine(builder.Parameters.RootedSourceDirectory, dependency.Key);
-            var dependencyModifiedTime = File.GetLastWriteTimeUtc(dependencyFullPath);
-
-            if (dependencyModifiedTime != dependency.Value)
-            {
-                return false;
-            }
-        }
-
-        foreach (var outputPath in OutputFiles)
-        {
-            var fullOutputPath = Path.Combine(builder.Parameters.RootedOutputDirectory, outputPath);
-
-            if (!File.Exists(fullOutputPath))
-            {
-                return false;
-            }
-        }
-
-        return true;
+        var relativeOutputFile = Path.IsPathRooted(outputPath) ?
+            Path.GetRelativePath(builder.Parameters.RootedOutputDirectory, outputPath) :
+            outputPath;
+        Outputs.Remove(relativeOutputFile);
     }
 }
