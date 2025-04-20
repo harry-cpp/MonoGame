@@ -136,19 +136,6 @@ class ContentCache : IContentCache
             _cache.Remove(depFile);
         }
 
-        foreach (var (_, fileCache) in _cache)
-        {
-            foreach (var depFile in _unusedDependencies)
-            {
-                fileCache.RemoveDependency(builder, depFile);
-            }
-
-            foreach (var outputFile in _unusedOutputs)
-            {
-                fileCache.RemoveOutput(builder, outputFile);
-            }
-        }
-
         foreach (var outputFile in _unusedOutputs)
         {
             var outputFilePath = Path.Combine(builder.Parameters.RootedOutputDirectory, outputFile);

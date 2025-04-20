@@ -4,6 +4,7 @@
 
 using System;
 using System.IO;
+using System.Reflection;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -62,6 +63,22 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             return (TOutput)processedObject;
         }
 
+        public override TOutput Convert<TInput, TOutput>(TInput input, IContentProcessor processor)
+        {
+            var processorName = processor.GetType().Name.ToString();
+            var processorParameters = new OpaqueDataDictionary();
+
+            foreach (var prop in processor.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
+            {
+                if (prop.CanRead && prop.CanWrite)
+                {
+                    processorParameters.Add(prop.Name, prop.GetValue(processor)!);
+                }
+            }
+
+            return Convert<TInput, TOutput>(input, processorName, processorParameters);
+        }
+
         public override TOutput BuildAndLoadAsset<TInput, TOutput>( ExternalReference<TInput> sourceAsset,
                                                                     string processorName,
                                                                     OpaqueDataDictionary processorParameters,
@@ -92,6 +109,23 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             return (TOutput)processedObject;
         }
 
+        public override TOutput BuildAndLoadAsset<TInput, TOutput>(ExternalReference<TInput> sourceAsset, IContentImporter importer, IContentProcessor processor)
+        {
+            var importerName = importer.GetType().Name;
+            var processorName = processor.GetType().Name;
+            var processorParameters = new OpaqueDataDictionary();
+
+            foreach (var prop in processor.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
+            {
+                if (prop.CanRead && prop.CanWrite)
+                {
+                    processorParameters.Add(prop.Name, prop.GetValue(processor)!);
+                }
+            }
+
+            return BuildAndLoadAsset<TInput, TOutput>(sourceAsset, processorName, processorParameters, importerName);
+        }
+
         public override ExternalReference<TOutput> BuildAsset<TInput, TOutput>( ExternalReference<TInput> sourceAsset,
                                                                                 string processorName,
                                                                                 OpaqueDataDictionary processorParameters,
@@ -108,6 +142,23 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             _pipelineEvent.BuildAsset.AddUnique(buildEvent.DestFile);
 
             return new ExternalReference<TOutput>(buildEvent.DestFile);
+        }
+
+        public override ExternalReference<TOutput> BuildAsset<TInput, TOutput>(ExternalReference<TInput> sourceAsset, IContentImporter importer, IContentProcessor processor, string? assetName)
+        {
+            var importerName = importer.GetType().Name;
+            var processorName = processor.GetType().Name;
+            var processorParameters = new OpaqueDataDictionary();
+
+            foreach (var prop in processor.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
+            {
+                if (prop.CanRead && prop.CanWrite)
+                {
+                    processorParameters.Add(prop.Name, prop.GetValue(processor)!);
+                }
+            }
+
+            return BuildAsset<TInput, TOutput>(sourceAsset, processorName, processorParameters, importerName, assetName);
         }
     }
 }

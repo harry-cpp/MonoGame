@@ -93,7 +93,7 @@ public record ContentFileCache
     /// </summary>
     /// <param name="builder">A <see cref="ContentBuilder"/> the output file is related to.</param>
     /// <param name="outputPath">A relative or absolute path to the output file.</param>
-    public void AddOutput(ContentBuilder builder, string outputPath)
+    public void AddOutputFile(ContentBuilder builder, string outputPath)
     {
         var relativeOutputFile = Path.IsPathRooted(outputPath) ?
             Path.GetRelativePath(builder.Parameters.RootedOutputDirectory, outputPath) :
@@ -106,7 +106,7 @@ public record ContentFileCache
     /// </summary>
     /// <param name="builder">A <see cref="ContentBuilder"/> the output file is related to.</param>
     /// <param name="outputPath">A relative or absolute path to the output file.</param>
-    public void RemoveOutput(ContentBuilder builder, string outputPath)
+    public void RemoveOutputFile(ContentBuilder builder, string outputPath)
     {
         var relativeOutputFile = Path.IsPathRooted(outputPath) ?
             Path.GetRelativePath(builder.Parameters.RootedOutputDirectory, outputPath) :

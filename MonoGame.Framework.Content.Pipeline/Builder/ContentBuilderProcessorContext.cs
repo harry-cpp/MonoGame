@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace MonoGame.Framework.Content.Pipeline.Builder;
 
-class ContentBuilderProcessorContext(ContentBuilder builder, ContentFileCache contentFileCache, string outputFilename) : ContentProcessorContext
+class ContentBuilderProcessorContext(ContentBuilder builder, ContentFileCache contentFileCache, string outputFilename = "") : ContentProcessorContext
 {
     private readonly ContentBuilder _builder = builder;
 
@@ -33,21 +33,93 @@ class ContentBuilderProcessorContext(ContentBuilder builder, ContentFileCache co
 
     public override void AddDependency(string filename) => _contentFileCache.AddDependency(_builder, filename);
 
-    public override void AddOutputFile(string filename) => _contentFileCache.AddOutput(_builder, filename);
+    public override void AddOutputFile(string filename) => _contentFileCache.AddOutputFile(_builder, filename);
 
-    // TODO: Implement these!
-    public override TOutput BuildAndLoadAsset<TInput, TOutput>(ExternalReference<TInput> sourceAsset, string processorName, OpaqueDataDictionary processorParameters, string importerName)
+    public override TOutput BuildAndLoadAsset<TInput, TOutput>(ExternalReference<TInput> sourceAsset,
+        string processorName, OpaqueDataDictionary processorParameters, string importerName)
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException(
+            @"Converting from imposterName and processorName is not supported with the ContentBuilder.
+            Please pass an importer and processor instance to the Convert method instead.");
     }
 
-    public override ExternalReference<TOutput> BuildAsset<TInput, TOutput>(ExternalReference<TInput> sourceAsset, string processorName, OpaqueDataDictionary processorParameters, string importerName, string assetName)
+    public override TOutput BuildAndLoadAsset<TInput, TOutput>(ExternalReference<TInput> sourceAsset, IContentImporter importer, IContentProcessor processor)
     {
-        throw new NotImplementedException();
+        var content = _builder.BuildAndLoadContent(sourceAsset.Filename, new ContentInfo(true, importer, processor));
+        if (content.contentFileCache is ContentFileCache contentFileCache)
+        {
+            // Add its dependencies and built assets to ours.
+            foreach (var (dependencyFile, _) in contentFileCache.Dependencies)
+            {
+                AddDependency(dependencyFile);
+            }
+
+            foreach (var outputFile in contentFileCache.Outputs)
+            {
+                AddOutputFile(outputFile);
+            }
+        }
+
+        return (TOutput)content.processedObject!;
+    }
+
+    public override ExternalReference<TOutput> BuildAsset<TInput, TOutput>(ExternalReference<TInput> sourceAsset,
+        string processorName, OpaqueDataDictionary processorParameters, string importerName, string assetName)
+    {
+        throw new NotSupportedException(
+            @"Converting from imposterName and processorName is not supported with the ContentBuilder.
+            Please pass an importer and processor instance to the Convert method instead.");
+    }
+
+    public override ExternalReference<TOutput> BuildAsset<TInput, TOutput>(ExternalReference<TInput> sourceAsset,
+        IContentImporter importer, IContentProcessor processor, string? assetName)
+    {
+        var outputRelativePath = string.IsNullOrWhiteSpace(assetName) ?
+            ContentInfo.GetDefaultOutputPath(Path.GetRelativePath(_builder.Parameters.RootedSourceDirectory, sourceAsset.Filename)) :
+            assetName;
+        var content = _builder.BuildAndWriteContent(sourceAsset.Filename, new ContentInfo(true, importer, processor, o => outputRelativePath));
+
+        if (content is ContentFileCache contentFileCache)
+        {
+            // Add its dependencies and built assets to ours.
+            foreach (var (dependencyFile, _) in contentFileCache.Dependencies)
+            {
+                AddDependency(dependencyFile);
+            }
+
+            foreach (var outputFile in contentFileCache.Outputs)
+            {
+                AddOutputFile(outputFile);
+            }
+        }
+
+        return new ExternalReference<TOutput>(Path.Combine(_builder.Parameters.RootedOutputDirectory, outputRelativePath));
     }
 
     public override TOutput Convert<TInput, TOutput>(TInput input, string processorName, OpaqueDataDictionary processorParameters)
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException(@"Converting from processorName is not supported with the ContentBuilder.
+            Please pass a processor instance to the Convert method instead.");
+    }
+
+    public override TOutput Convert<TInput, TOutput>(TInput input, IContentProcessor processor)
+    {
+        var contentFileCache = new ContentFileCache();
+        var processContext = new ContentBuilderProcessorContext(_builder, contentFileCache);
+        using var _ = ContextScopeFactory.BeginContext(processContext);
+        var processedObject = processor.Process(input!, processContext);
+
+        // Add its dependencies and built assets to ours.
+        foreach (var (dependencyFile, _) in processContext._contentFileCache.Dependencies)
+        {
+            AddDependency(dependencyFile);
+        }
+
+        foreach (var outputFile in processContext._contentFileCache.Outputs)
+        {
+            AddOutputFile(outputFile);
+        }
+
+        return (TOutput)processedObject;
     }
 }

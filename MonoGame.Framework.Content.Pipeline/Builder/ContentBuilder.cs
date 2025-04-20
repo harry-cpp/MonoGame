@@ -10,8 +10,8 @@ namespace MonoGame.Framework.Content.Pipeline.Builder;
 
 public abstract class ContentBuilder
 {
-    private Dictionary<string, ContentInfo> _content = [];
-    private Dictionary<string, string> _outputContent = [];
+    private readonly Dictionary<string, ContentInfo> _content = [];
+    private readonly Dictionary<string, string> _outputContent = [];
 
     public ContentBuilderParams Parameters { get; set; } = new ContentBuilderParams();
 
@@ -31,22 +31,40 @@ public abstract class ContentBuilder
 
     // will have a default implementation, but there are moments where you want to override the default implementation
 
-    public void ProcessContent(string relativePath, ContentInfo contentInfo)
+    public ContentFileCache? BuildAndWriteContent(string relativePath, ContentInfo contentInfo)
     {
+        ContentFileCache? contentFileCache = null;
         Logger.PushFile(relativePath);
         try
         {
-            ProcessContentInternal(relativePath, contentInfo);
+            contentFileCache = ProcessContent(relativePath, contentInfo, true).contentFileCache;
         }
         catch (Exception ex)
         {
             Logger.Log(LogLevel.Error, $"Countent failed to build:\n{ex}");
         }
         Logger.PopFile();
+        return contentFileCache;
     }
 
-    private void ProcessContentInternal(string relativePath, ContentInfo contentInfo)
+    public (ContentFileCache? contentFileCache, object? processedObject) BuildAndLoadContent(string relativePath, ContentInfo contentInfo)
     {
+        Logger.PushFile(relativePath);
+        try
+        {
+            return ProcessContent(relativePath, contentInfo, false);
+        }
+        catch (Exception ex)
+        {
+            Logger.Log(LogLevel.Error, $"Countent failed to build:\n{ex}");
+        }
+        Logger.PopFile();
+        return (null, null);
+    }
+
+    private (ContentFileCache? contentFileCache, object? processedObject) ProcessContent(string relativePath, ContentInfo contentInfo, bool writeToDisk)
+    {
+        ContentFileCache? contentFileCache = null;
         var filePath = Path.Combine(Parameters.RootedSourceDirectory, relativePath);
         var relativeDestPath = contentInfo.GetOutputPath(relativePath);
         var outputPath = Path.Combine(Parameters.RootedOutputDirectory, relativeDestPath);
@@ -54,7 +72,7 @@ public abstract class ContentBuilder
 
         if (string.IsNullOrWhiteSpace(outputDir))
         {
-            return;
+            return (contentFileCache, null);
         }
 
         if (!Directory.Exists(outputDir))
@@ -65,10 +83,11 @@ public abstract class ContentBuilder
         if (!contentInfo.ShouldBuild)
         {
             Logger.Log($"Output: {relativeDestPath}");
-            if (ContentCache.ReadContentFileCache(this, relativePath) != null)
+            contentFileCache = ContentCache.ReadContentFileCache(this, relativePath);
+            if (contentFileCache != null)
             {
                 Logger.Log($"Cache: Found");
-                return;
+                return (contentFileCache, null);
             }
             Logger.Log($"Cache: Not Found");
 
@@ -78,35 +97,36 @@ public abstract class ContentBuilder
             }
             File.Copy(filePath, outputPath);
 
-            var copiedFileCache = new ContentFileCache();
-            copiedFileCache.AddDependency(this, relativePath);
-            copiedFileCache.AddOutput(this, outputPath);
-            ContentCache.WriteContentFileCache(this, relativePath, copiedFileCache);
-            return;
+            contentFileCache = new ContentFileCache();
+            contentFileCache.AddDependency(this, relativePath);
+            contentFileCache.AddOutputFile(this, outputPath);
+            ContentCache.WriteContentFileCache(this, relativePath, contentFileCache);
+            return (contentFileCache, null);
         }
 
         if (!ContentBuilderHelper.GetImporter(relativePath, contentInfo.Importer, out IContentImporter importer))
         {
             Logger.Log(LogLevel.Warning, "Importer: Not found :(");
-            return;
+            return (contentFileCache, null);
         }
         Logger.Log($"Imposter: {importer.GetType().Name}");
         if (!ContentBuilderHelper.GetProcessor(importer, contentInfo.Processor, out IContentProcessor processor))
         {
             Logger.Log(LogLevel.Warning, "Processor: Not found :(");
-            return;
+            return (contentFileCache, null);
         }
         Logger.Log($"Processor: {processor.GetType().Name}");
         Logger.Log($"Output: {relativeDestPath}");
 
-        if (ContentCache.ReadContentFileCache(this, relativePath, true, importer, processor) != null)
+        contentFileCache = ContentCache.ReadContentFileCache(this, relativePath, true, importer, processor);
+        if (contentFileCache != null)
         {
             Logger.Log($"Cache: Found");
-            return;
+            return (contentFileCache, null);
         }
         Logger.Log($"Cache: Not Found");
 
-        var contentFileCache = new ContentFileCache
+        contentFileCache = new ContentFileCache
         {
             CompressContent = Parameters.CompressContent,
             GraphicsProfile = Parameters.GraphicsProfile,
@@ -115,7 +135,7 @@ public abstract class ContentBuilder
             Processor = processor
         };
         contentFileCache.AddDependency(this, relativePath);
-        contentFileCache.AddOutput(this, outputPath);
+        contentFileCache.AddOutputFile(this, outputPath);
 
         var importContext = new ContentBuilderImporterContext(this, contentFileCache);
         var importedObject = importer.Import(filePath, importContext);
@@ -123,11 +143,15 @@ public abstract class ContentBuilder
         var processorContext = new ContentBuilderProcessorContext(this, contentFileCache, outputPath);
         var processedObject = processor.Process(importedObject, processorContext);
 
-        var compiler = new ContentCompiler();
-        using var stream = new FileStream(outputPath, FileMode.Create, FileAccess.Write, FileShare.None);
-        compiler.Compile(stream, processedObject, Parameters.Platform, Parameters.GraphicsProfile, Parameters.CompressContent, Parameters.RootedOutputDirectory, outputDir);
+        if (writeToDisk)
+        {
+            var compiler = new ContentCompiler();
+            using var stream = new FileStream(outputPath, FileMode.Create, FileAccess.Write, FileShare.None);
+            compiler.Compile(stream, processedObject, Parameters.Platform, Parameters.GraphicsProfile, Parameters.CompressContent, Parameters.RootedOutputDirectory, outputDir);
+            ContentCache.WriteContentFileCache(this, relativePath, contentFileCache);
+        }
 
-        ContentCache.WriteContentFileCache(this, relativePath, contentFileCache);
+        return (contentFileCache, processedObject);
     }
 
     public void Run(ContentBuilderParams parameters)
@@ -177,7 +201,7 @@ public abstract class ContentBuilder
         {
             if (_content.TryGetValue(pair.Key, out ContentInfo? contentInfo))
             {
-                ProcessContent(pair.Key, contentInfo);
+                BuildAndWriteContent(pair.Key, contentInfo);
             }
         }
 
@@ -224,7 +248,7 @@ public abstract class ContentBuilder
                     {
                         if (_content.TryGetValue(inputPath, out ContentInfo? contentInfo))
                         {
-                            ProcessContent(inputPath, contentInfo);
+                            BuildAndWriteContent(inputPath, contentInfo);
                         }
                     }
                     catch (Exception e)
