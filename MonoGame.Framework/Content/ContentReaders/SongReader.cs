@@ -18,8 +18,13 @@ namespace Microsoft.Xna.Framework.Content
 			
 			if (!String.IsNullOrEmpty(path))
 			{
+				// temporary hack!!!!
+				// why are we passing path to song instead of stream
+				// tsk tsk tsk
+				TitleContainer.OpenStream(Path.Combine(input.ContentManager.RootDirectory, Path.GetDirectoryName(input.AssetName), path));
+			
                 // Add the ContentManager's RootDirectory
-                var dirPath = Path.Combine(input.ContentManager.RootDirectoryFullPath, input.AssetName);
+				var dirPath = Path.Combine(input.ContentManager.RootDirectoryFullPath, input.AssetName);
 
                 // Resolve the relative path
                 path = FileHelpers.ResolveRelativePath(dirPath, path);

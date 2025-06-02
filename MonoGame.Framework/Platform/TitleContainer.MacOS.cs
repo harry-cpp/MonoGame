@@ -15,6 +15,8 @@ namespace Microsoft.Xna.Framework
 {
     partial class TitleContainer
     {
+        private static string CacheLocation { get; set; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), CACHE_PATH);
+
         static partial void PlatformInit()
         {
             Location = NSBundle.MainBundle.ResourcePath;
@@ -32,6 +34,12 @@ namespace Microsoft.Xna.Framework
         private static Stream PlatformOpenStream(string safeName)
         {
 #if IOS
+            var cachePath = Path.Combine(CacheLocation, safeName);
+            if (File.Exists(cachePath))
+            {
+                return File.OpenRead(cachePath);
+            }
+
             var absolutePath = Path.Combine(Location, safeName);
             if (SupportRetina)
             {
@@ -46,11 +54,27 @@ namespace Microsoft.Xna.Framework
                         return File.OpenRead(absolutePathX);
                 }
             }
-            return File.OpenRead(absolutePath);
+            if (File.Exists(absolutePath))
+            {
+                return File.OpenRead(absolutePath);
+            }
+
+            return null;
 #else
             var absolutePath = Path.Combine(Location, safeName);
             return File.OpenRead(absolutePath);
 #endif
+        }
+
+        private static Stream PlatformOpenWriteStream(string safeName)
+        {
+            var absolutePath = Path.Combine(CacheLocation, safeName);
+            var dirPath = Path.GetDirectoryName(absolutePath);
+            if (!Directory.Exists(dirPath))
+            {
+                Directory.CreateDirectory(dirPath);
+            }
+            return File.OpenWrite(absolutePath);
         }
     }
 }
