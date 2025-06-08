@@ -37,6 +37,12 @@ public class ContentBuildLogger
     }
 
     /// <summary>
+    /// Indicates if the log should should current time with each logged message as opposed to the time since the logging started.
+    /// </summary>
+    /// <value><c>false</c> by default.</value>
+    public bool ShowRealTime { get; set; }
+
+    /// <summary>
     /// A character to be used for indentation of <see cref="Log(LogLevel, string)"/> messages.
     /// </summary>
     public char IndentCharacter
@@ -108,7 +114,8 @@ public class ContentBuildLogger
 
         foreach (var subMessage in message.Split(['\r', '\n'], StringSplitOptions.None))
         {
-            Console.WriteLine($"{_stopWatch.Elapsed:hh\\:mm\\:ss\\.fff} [{level.ToString()[0]}]: {IndentString}{subMessage}");
+            var time = ShowRealTime ? DateTime.Now.ToString("HH:mm:ss.fff") : _stopWatch.Elapsed.ToString("hh:mm:ss.fff");
+            Console.WriteLine($"{time} [{level.ToString()[0]}] {IndentString}{subMessage}");
         }
 
         Console.ForegroundColor = ConsoleColor.Gray;

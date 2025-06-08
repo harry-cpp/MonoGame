@@ -33,13 +33,15 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        ///
+        /// Determines if the assets will first be attempted to be loaded from a content server.
         /// </summary>
+        /// <value><c>false</c> by default.</value>
         public static bool CheckContentServer { get; set; }
 
         /// <summary>
-        ///
+        /// The location of the content server for loading assets. To use it enable <see cref="CheckContentServer"/>.
         /// </summary>
+        /// <value><c>http://localhost:7771/</c> by default.</value>
         public static string ContentServerAddress { get; set; }
 
         internal static string Location { get; private set; }
@@ -115,11 +117,11 @@ namespace Microsoft.Xna.Framework
 
                 return true;
             }
-            catch (HttpRequestException ex)
+            catch (HttpRequestException)
             {
                 return true;
             }
-            catch (SocketException ex)
+            catch (SocketException)
             {
                 return true;
             }

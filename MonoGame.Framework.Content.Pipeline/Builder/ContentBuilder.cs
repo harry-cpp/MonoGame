@@ -9,6 +9,9 @@ using Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler;
 
 namespace MonoGame.Framework.Content.Pipeline.Builder;
 
+/// <summary>
+/// This class is the entry point for the content builder system.
+/// </summary>
 public abstract class ContentBuilder
 {
     private readonly Dictionary<string, ContentInfo> _content = [];
@@ -16,24 +19,36 @@ public abstract class ContentBuilder
     private uint _succeededToBuild = 0;
     private uint _failedToBuild = 0;
 
+    /// <summary>
+    /// Parameters to be used by the <see cref="ContentBuilder"/> or any of its subsystems.
+    /// 
+    /// Can be passed from CLI args, see <see cref="Run(string[])"/>.
+    /// </summary>
     public ContentBuilderParams Parameters { get; set; } = new ContentBuilderParams();
 
     /// <summary>
-    /// Gets or sets the logger to be used by <see cref="ContentBuilder"/>.
+    /// Gets or sets the logger to be used by the <see cref="ContentBuilder"/>.
     /// </summary>
     /// <value><see cref="ContentBuildLogger"/> by default.</value>
     public ContentBuildLogger Logger { get; set; } = new ContentBuildLogger();
 
+    /// <summary>
+    /// Gets or sets the content cahcing system to be used by the <see cref="ContentBuilder"/>.
+    /// </summary>
     public virtual IContentCache ContentCache { get; init; } = new ContentCache();
 
-    public abstract IContentCollection CollectContent(ContentBuilderParams args);
+    /// <summary>
+    /// Called to build system to gather information about the content. It gets called only once during initialization.
+    /// </summary>
+    /// <returns>An <see cref="IContentCollection"/> that contains information about the content handling.</returns>
+    public abstract IContentCollection CollectContent();
 
-    // for server!
-    // tells the server that the file changes should affect the ContentCollection and CollectContent should be re-run.
-    // public virtual bool CheckNeedsRecollect(pass file watcher changes) => false;
-
-    // will have a default implementation, but there are moments where you want to override the default implementation
-
+    /// <summary>
+    /// Initiates a build of the specified asset and then writes down the result to disk..
+    /// </summary>
+    /// <param name="relativePath">A relative path to the source asset.</param>
+    /// <param name="contentInfo">The desired <see cref="ContentInfo"/> to be used for the content building.</param>
+    /// <returns></returns>
     public ContentFileCache? BuildAndWriteContent(string relativePath, ContentInfo contentInfo)
     {
         ContentFileCache? contentFileCache = null;
@@ -52,6 +67,12 @@ public abstract class ContentBuilder
         return contentFileCache;
     }
 
+    /// <summary>
+    /// Initiates a build of the specified asset and then loads the result into memory.
+    /// </summary>
+    /// <param name="relativePath">A relative path to the source asset.</param>
+    /// <param name="contentInfo">The desired <see cref="ContentInfo"/> to be used for the content building.</param>
+    /// <returns></returns>
     public (ContentFileCache? contentFileCache, object? processedObject) BuildAndLoadContent(string relativePath, ContentInfo contentInfo)
     {
         Logger.PushFile(relativePath);
@@ -163,6 +184,10 @@ public abstract class ContentBuilder
         return (contentFileCache, processedObject);
     }
 
+    /// <summary>
+    /// Runs the <see cref="ContentBuilder"/> with the specified parameters.
+    /// </summary>
+    /// <param name="parameters">A <see cref="ContentBuilderParams"/> describing both the platform paramteres for the content compilation as well as the configuration of the <see cref="ContentBuilder"/> itself.</param>
     public void Run(ContentBuilderParams parameters)
     {
         Parameters = parameters;
@@ -170,6 +195,7 @@ public abstract class ContentBuilder
 
         Logger.IndentCharacter = ' ';
         Logger.IndentCharacterSize = 2;
+        Logger.ShowRealTime = parameters.Mode == ContentBuilderMode.Server;
 
         Logger.PushFile("Starting Content Builder");
         foreach (var prop in parameters.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
@@ -179,7 +205,7 @@ public abstract class ContentBuilder
         Logger.PopFile();
 
         ContentCache.LoadCache(this);
-        var contentCollection = CollectContent(Parameters);
+        var contentCollection = CollectContent();
         ScanFiles(contentCollection, Parameters.RootedSourceDirectory);
 
         switch (Parameters.Mode)
@@ -193,6 +219,10 @@ public abstract class ContentBuilder
         }
     }
 
+    /// <summary>
+    /// A helper method to run the <see cref="ContentBuilder"/> with the passed <see cref="ContentBuilderParams"/> from the entry point args.
+    /// </summary>
+    /// <param name="args">An array of string to be deserialized into <see cref="ContentBuilderParams"/>.</param>
     public void Run(string[] args) => Run(ContentBuilderParams.Parse(args));
 
     private void ScanFiles(IContentCollection contentCollection, string directory)
