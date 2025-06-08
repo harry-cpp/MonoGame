@@ -20,20 +20,15 @@ namespace Microsoft.Xna.Framework
         static partial void PlatformInit()
         {
             Location = NSBundle.MainBundle.ResourcePath;
-#if IOS
             SupportRetina = UIScreen.MainScreen.Scale >= 2.0f;
             RetinaScale = (int)Math.Round(UIScreen.MainScreen.Scale);
-#endif
         }
 
-#if IOS
         static internal bool SupportRetina { get; private set; }
         static internal int RetinaScale { get; private set; }
-#endif
 
         private static Stream PlatformOpenStream(string safeName)
         {
-#if IOS
             var cachePath = Path.Combine(CacheLocation, safeName);
             if (File.Exists(cachePath))
             {
@@ -60,10 +55,6 @@ namespace Microsoft.Xna.Framework
             }
 
             return null;
-#else
-            var absolutePath = Path.Combine(Location, safeName);
-            return File.OpenRead(absolutePath);
-#endif
         }
 
         private static Stream PlatformOpenWriteStream(string safeName)

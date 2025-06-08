@@ -33,12 +33,12 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public static bool CheckContentServer { get; set; }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public static string ContentServerAddress { get; set; }
 
@@ -87,10 +87,6 @@ namespace Microsoft.Xna.Framework
                 return true;
             }
 
-            var dirPath = Path.GetDirectoryName(relativePath) ?? "";
-            if (!Directory.Exists(dirPath))
-                Directory.CreateDirectory(dirPath);
-
             Client.DefaultRequestHeaders.Clear();
             Client.DefaultRequestHeaders.Add("Path", relativePath);
             if (ModifiedTimes.TryGetValue(relativePath, out long lastModifiedTime))
@@ -119,11 +115,11 @@ namespace Microsoft.Xna.Framework
 
                 return true;
             }
-            catch (HttpRequestException)
+            catch (HttpRequestException ex)
             {
                 return true;
             }
-            catch (SocketException)
+            catch (SocketException ex)
             {
                 return true;
             }
