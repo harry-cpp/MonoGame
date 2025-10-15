@@ -11,6 +11,7 @@ using YamlDotNet.Core.Events;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 using MonoGame.Framework.Content.Pipeline.Builder.Server;
+using System.Globalization;
 
 namespace MonoGame.Framework.Content.Pipeline.Builder;
 
@@ -26,10 +27,10 @@ static class ContentBuilderHelper
             var color = new Color();
             var split = scalar.Value.Split(",");
 
-            color.R = byte.Parse(split[0]);
-            color.G = byte.Parse(split[1]);
-            color.B = byte.Parse(split[2]);
-            color.A = byte.Parse(split[3]);
+            color.R = byte.Parse(split[0], CultureInfo.InvariantCulture);
+            color.G = byte.Parse(split[1], CultureInfo.InvariantCulture);
+            color.B = byte.Parse(split[2], CultureInfo.InvariantCulture);
+            color.A = byte.Parse(split[3], CultureInfo.InvariantCulture);
 
             return color;
         }

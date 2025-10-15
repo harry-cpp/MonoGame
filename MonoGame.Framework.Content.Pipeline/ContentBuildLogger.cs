@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System.Diagnostics;
+using System.Globalization;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline;
 
@@ -124,7 +125,7 @@ public class ContentBuildLogger
 
         foreach (var subMessage in message.Split(['\r', '\n'], StringSplitOptions.None))
         {
-            var time = ShowRealTime ? DateTime.Now.ToString("HH:mm:ss.fff") : _stopWatch.Elapsed.ToString("hh\\:mm\\:ss\\.fff");
+            var time = ShowRealTime ? DateTime.Now.ToString("HH:mm:ss.fff", CultureInfo.InvariantCulture) : _stopWatch.Elapsed.ToString("hh\\:mm\\:ss\\.fff", CultureInfo.InvariantCulture);
             Console.WriteLine($"{time} [{level.ToString()[0]}] {IndentString}{subMessage}");
         }
 
@@ -144,7 +145,7 @@ public class ContentBuildLogger
     /// <param name="messageArgs">Arguments for the reported message.</param>
     [Obsolete("LogImportantMessage is deprecated, please use Log instead.")]
     public virtual void LogImportantMessage(string message, params object[] messageArgs)
-        => Log(LogLevel.Error, string.Format(message, messageArgs));
+        => Log(LogLevel.Error, string.Format(CultureInfo.InvariantCulture, message, messageArgs));
 
     /// <summary>
     /// Outputs a low priority status message from the content system.
@@ -153,7 +154,7 @@ public class ContentBuildLogger
     /// <param name="messageArgs">Arguments for the reported message.</param>
     [Obsolete("LogMessage is deprecated, please use Log instead.")]
     public virtual void LogMessage(string message, params object[] messageArgs)
-        => Log(string.Format(message, messageArgs));
+        => Log(string.Format(CultureInfo.InvariantCulture, message, messageArgs));
 
     /// <summary>
     /// Outputs a warning message from the content system.
@@ -164,7 +165,7 @@ public class ContentBuildLogger
     /// <param name="messageArgs">Arguments for the reported message.</param>
     [Obsolete("LogWarning is deprecated, please use Log instead.")]
     public virtual void LogWarning(string helpLink, ContentIdentity contentIdentity, string message, params object[] messageArgs)
-        => Log(LogLevel.Warning, $"{string.Format(message, messageArgs)}: {GetCurrentFilename(contentIdentity)}");
+        => Log(LogLevel.Warning, $"{string.Format(CultureInfo.InvariantCulture, message, messageArgs)}: {GetCurrentFilename(contentIdentity)}");
 
     /// <summary>
     /// Outputs a message indicating that a content asset has begun processing.

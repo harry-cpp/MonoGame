@@ -12,6 +12,14 @@
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
     <AssemblyName>mgfxc</AssemblyName>
     <UseAppHost>true</UseAppHost>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- NETSDK1206 - Disable nuget rid complaining. -->
+    <NoWarn>NETSDK1206</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

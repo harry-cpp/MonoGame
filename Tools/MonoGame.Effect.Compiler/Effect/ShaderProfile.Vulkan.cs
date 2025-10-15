@@ -2,25 +2,16 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Text.RegularExpressions;
-using MonoGame.Effect.TPGParser;
 using Microsoft.Xna.Framework.Graphics;
-using System.Diagnostics;
-using System.Threading;
-using Microsoft.Xna.Framework.Content.Pipeline;
 using MonoGame.Tool;
-using System.Runtime.InteropServices;
+using System.Globalization;
 
 namespace MonoGame.Effect
 {
     class VulkanShaderProfile : ShaderProfile
     {
-        public VulkanShaderProfile()
-            : base("Vulkan", 80)
+        public VulkanShaderProfile() : base("Vulkan", 80)
         {
         }
 
@@ -35,27 +26,27 @@ namespace MonoGame.Effect
             if (!string.IsNullOrEmpty(pass.vsFunction))
             {
                 if (pass.vsModel != "vs_6_0")
-                    throw new Exception(String.Format("Invalid Vulkan vertex profile '{0}'! Requires vs_6_0.", pass.vsModel));
+                    throw new Exception($"Invalid Vulkan vertex profile '{pass.vsModel}'! Requires vs_6_0.");
             }
 
             if (!string.IsNullOrEmpty(pass.psFunction))
             {
                 if (pass.psModel != "ps_6_0")
-                    throw new Exception(String.Format("Invalid Vulkan pixel profile '{0}'! Requires ps_6_0.", pass.psModel));
+                    throw new Exception($"Invalid Vulkan pixel profile '{pass.psModel}'! Requires ps_6_0.");
             }
         }
 
         class VkStructMember
         {
-            public string name;
+            public required string name;
             public int offset;
-            public string type;
+            public string? type;
         };
 
         class VkStruct
         {
-            public string name;
-            public readonly Dictionary<int, VkStructMember> members = new Dictionary<int, VkStructMember>();
+            public required string name;
+            public readonly Dictionary<int, VkStructMember> members = [];
         };
 
         enum VkDescriptorType : uint
@@ -116,7 +107,7 @@ namespace MonoGame.Effect
 
         class VkDescriptor
         {
-            public string name;
+            public required string name;
             public VkDescriptorType type;
             public int set;
             public int binding;
@@ -124,8 +115,8 @@ namespace MonoGame.Effect
 
         class VkInput
         {
-            public string name;
-            public string type;
+            public required string name;
+            public string? type;
             public int location;
         };
 
@@ -142,7 +133,7 @@ namespace MonoGame.Effect
         {
             const int SlotOffset = 32;
 
-            var outputPath = Path.GetDirectoryName(shaderResult.OutputFilePath);
+            var outputPath = Path.GetDirectoryName(shaderResult.OutputFilePath) ?? "";
             var sourceFileName = Path.GetFileNameWithoutExtension(shaderResult.FilePath) + "." + shaderFunction;
 
             // TODO: We have no intermediate folder in 2MGFX for temp stuff
@@ -158,11 +149,13 @@ namespace MonoGame.Effect
             var dbgFile = Path.Combine(outputPath, sourceFileName + ".dbg");
 
             // Disable this if you want to keep these around for testing!
-            var cleanup = new List<string>();
-            cleanup.Add(hlslFile);
-            cleanup.Add(binFile);
-            cleanup.Add(dbgFile);
-            cleanup.Add(reflectFile);
+            var cleanup = new List<string>
+            {
+                hlslFile,
+                binFile,
+                dbgFile,
+                reflectFile
+            };
             
             try
             {
@@ -233,7 +226,7 @@ namespace MonoGame.Effect
                 //      but if the return code was not success=0 then treat stdout as stderr
                 if (toolResult != 0)
                 {
-                    errorsAndWarnings += string.Format("DXC.exe returned error code '{0}'.\n", toolResult);
+                    errorsAndWarnings += $"DXC.exe returned error code '{toolResult}'.\n";
                     errorsAndWarnings += stdout;
                     throw new ShaderCompilerException();
                 }
@@ -289,64 +282,69 @@ namespace MonoGame.Effect
                     }
                     else if (data[0] == "OpMemberName")
                     {
-                        var name = data[3].Trim(new[] { '\"' });
+                        var name = data[3].Trim(['\"']);
                         var id = data[1];
-                        var index = int.Parse(data[2]);
+                        var index = int.Parse(data[2], CultureInfo.InvariantCulture);
 
-                        VkStruct s;
-                        if (!structs.TryGetValue(id, out s))
+                        if (!structs.TryGetValue(id, out var s))
                         {
-                            s = new VkStruct();
-                            s.name = names[id];
+                            s = new VkStruct
+                            {
+                                name = names[id]
+                            };
                             structs.Add(id, s);
                         }
 
-                        var member = new VkStructMember();
-                        member.name = name;
+                        var member = new VkStructMember
+                        {
+                            name = name
+                        };
                         s.members.Add(index, member);
                     }
                     else if (data[0] == "OpDecorate")
                     {
                         if (data[2] == "DescriptorSet")
                         {
-                            VkDescriptor d;
-                            if (!descriptors.TryGetValue(data[1], out d))
+                            if (!descriptors.TryGetValue(data[1], out var d))
                             {
-                                d = new VkDescriptor();
-                                d.name = data[1];
-                                d.type = VkDescriptorType.UNIFORM_BUFFER;
+                                d = new VkDescriptor
+                                {
+                                    name = data[1],
+                                    type = VkDescriptorType.UNIFORM_BUFFER
+                                };
                                 descriptors.Add(d.name, d);
                             }
 
-                            d.set = int.Parse(data[3]);
+                            d.set = int.Parse(data[3], CultureInfo.InvariantCulture);
                         }
                         else if (data[2] == "Binding")
                         {
-                            VkDescriptor d;
-                            if (!descriptors.TryGetValue(data[1], out d))
+                            if (!descriptors.TryGetValue(data[1], out var d))
                             {
-                                d = new VkDescriptor();
-                                d.name = data[1];
-                                d.type = VkDescriptorType.UNIFORM_BUFFER;
+                                d = new VkDescriptor
+                                {
+                                    name = data[1],
+                                    type = VkDescriptorType.UNIFORM_BUFFER
+                                };
                                 descriptors.Add(d.name, d);
                             }
 
-                            d.binding = int.Parse(data[3]);
+                            d.binding = int.Parse(data[3], CultureInfo.InvariantCulture);
                         }
                         else if (data[1].StartsWith("%in_var_"))
                         {
-                            inputs[data[1]].location = int.Parse(data[3]);
+                            inputs[data[1]].location = int.Parse(data[3], CultureInfo.InvariantCulture);
                         }
                     }
                     else if (data[0] == "OpMemberDecorate")
                     {
                         var id = data[1];
-                        var index = int.Parse(data[2]);
+                        var index = int.Parse(data[2], CultureInfo.InvariantCulture);
                         var s = structs[id];
 
                         if (data[3] == "Offset")
                         {
-                            var offset = int.Parse(data[4]);
+                            var offset = int.Parse(data[4], CultureInfo.InvariantCulture);
                             s.members[index].offset = offset;
                         }
                     }
@@ -366,8 +364,7 @@ namespace MonoGame.Effect
                         }
                         else if (data[2] == "OpVariable")
                         {
-                            VkDescriptor d;
-                            if (descriptors.TryGetValue(data[0], out d))
+                            if (descriptors.TryGetValue(data[0], out var d))
                             {
                                 if (data[3].EndsWith("_type_2d_image"))
                                     d.type = VkDescriptorType.SAMPLED_IMAGE;
@@ -383,16 +380,15 @@ namespace MonoGame.Effect
                 // TODO: Support multiple constant buffers one day!
 
                 int cbCount = 0;
-                VkStruct globals;
                 foreach (var descriptor in descriptors)
                 {
                     // Find uniform buffers.
                     if (descriptor.Value.type == VkDescriptorType.UNIFORM_BUFFER)
                     {
                         // Check if there is a corresponding struct.
-                        if (names.TryGetValue(descriptor.Key, out string name))
+                        if (names.TryGetValue(descriptor.Key, out var name))
                         {
-                            if (structs.TryGetValue("%type_" + name, out globals))
+                            if (structs.TryGetValue("%type_" + name, out var globals))
                             {
                                 if (++cbCount > 1)
                                 {
@@ -402,7 +398,15 @@ namespace MonoGame.Effect
 
                                 // Gather uniforms.
                                 foreach (var member in globals.members.Values)
+                                {
+                                    if (member.type == null)
+                                    {
+                                        errorsAndWarnings += $"{member.name} did not have any type set.";
+                                        throw new ShaderCompilerException();
+                                    }
+
                                     cbuffer.AddParameter(member.name, member.type, 0, member.offset);
+                                }
                             }
                         }
                     }
@@ -421,13 +425,13 @@ namespace MonoGame.Effect
 
                         var m = Regex.Match(input.name, @"(\D+)(\d+)?");
                         if (m.Groups[2].Success)
-                            a.index = int.Parse(m.Groups[2].Value);
+                            a.index = int.Parse(m.Groups[2].Value, CultureInfo.InvariantCulture);
                         else
                             a.index = 0;
 
                         if (m.Groups[1].Success)
                         {
-                            switch (m.Groups[1].Value.ToUpper())
+                            switch (m.Groups[1].Value.ToUpper(CultureInfo.InvariantCulture))
                             {
                                 default:
                                     a.usage = VertexElementUsage.TextureCoordinate;
@@ -510,8 +514,7 @@ namespace MonoGame.Effect
                     s.samplerSlot -= SlotOffset;
 
                     // Associate sampler state to the sampler.
-                    SamplerStateInfo state;
-                    if (shaderResult.ShaderInfo.SamplerStates.TryGetValue(s.samplerName, out state))
+                    if (shaderResult.ShaderInfo.SamplerStates.TryGetValue(s.samplerName, out var state))
                     {
                         s.parameterName = s.parameterName ?? state.TextureName;
                         s.state = state.State;
@@ -520,7 +523,6 @@ namespace MonoGame.Effect
                     }
 
                     s.parameterName = s.parameterName ?? s.samplerName;
-                    s.state = state.State;
                     samplers.Add(s);
                 }
 

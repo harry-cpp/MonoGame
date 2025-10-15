@@ -106,7 +106,7 @@ namespace MonoGame.Effect.Compiler
         {
             var srcPath = Path.GetTempFileName();
             var dstPath = Path.GetTempFileName();
-            CompilationResult ret = null;
+            CompilationResult? ret = null;
 
             try
             {
